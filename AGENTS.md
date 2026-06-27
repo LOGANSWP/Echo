@@ -1,6 +1,6 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v4.7  
+**版本**：v4.8  
 **生效日期**：2026-06-27  
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（Codex/Cursor/Claude）及人类开发者  
 **优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
@@ -110,9 +110,182 @@ Echo 是一个 **本地优先、隐私可审计、完全离线可用** 的端侧
 
 ---
 
-## 3. 核心架构原则
+## 3. Git 协作规范
 
-### 3.1 认知管线（Cognitive Pipeline）契约
+### 3.1 分支命名规范
+
+所有分支名称必须遵循以下格式：
+
+```
+{type}/{description}
+```
+
+**Type 类型**：
+
+| Type       | 说明                   | 示例                                |
+| ---------- | ---------------------- | ----------------------------------- |
+| `feature`  | 新功能开发             | `feature/search-pipeline`           |
+| `fix`      | Bug 修复               | `fix/excludedassets-cascade-delete` |
+| `docs`     | 文档更新               | `docs/update-agents-md`             |
+| `refactor` | 代码重构（不改变功能） | `refactor/actor-isolation`          |
+| `test`     | 测试补充或修复         | `test/golden-dataset-expand`        |
+| `chore`    | 构建/工具/依赖更新     | `chore/upgrade-spm-deps`            |
+
+**Description 命名规则**：
+- 使用小写字母和连字符（`-`）连接
+- 应使用**英文**，简洁描述分支目的
+- 关联用户故事时，**必须在描述中包含故事编号**（如 `US-PRV-001`）
+
+**正确示例**：
+- `feature/search-pipeline-US-RET-001`
+- `fix/excludedassets-write-condition-US-PRV-007`
+- `docs/update-agents-md`
+
+**错误示例**：
+- `my-branch`（缺少 type）
+- `feature/修复搜索`（使用了中文）
+- `feature/search`（未关联用户故事，且描述不清晰）
+
+### 3.2 Commit Message 规范
+
+所有 Commit Message 必须遵循以下格式：
+
+```
+{type}({scope}): {subject}
+
+{body}
+
+{footer}
+```
+
+**Type 类型**（与分支命名保持一致）：
+
+| Type       | 说明           |
+| ---------- | -------------- |
+| `feat`     | 新功能         |
+| `fix`      | Bug 修复       |
+| `docs`     | 文档更新       |
+| `refactor` | 代码重构       |
+| `test`     | 测试相关       |
+| `chore`    | 构建/工具/依赖 |
+
+**Scope 范围**（必填）：
+
+| Scope       | 对应模块             |
+| ----------- | -------------------- |
+| `actor`     | Core/Actors/ 目录    |
+| `pipeline`  | Core/Pipelines/ 目录 |
+| `viewmodel` | UI/ViewModels/ 目录  |
+| `view`      | UI/Views/ 目录       |
+| `service`   | Core/Services/ 目录  |
+| `model`     | Core/Models/ 目录    |
+| `utils`     | Core/Utils/ 目录     |
+| `docs`      | docs/ 目录           |
+| `ci`        | .github/ 目录        |
+| `config`    | 配置文件             |
+
+**Subject 规则**：
+- 使用**英文**，不超过 50 个字符
+- 使用**祈使句**（如 `add`, `fix`, `update`, `remove`）
+- 首字母小写，末尾不加句号
+
+**Body 规则**（可选，但强烈建议包含）：
+- 说明“为什么”做这个变更，而非“做了什么”
+- 每行不超过 72 个字符
+- **必须包含关联的用户故事编号**（如 `Related: US-PRV-001`）
+
+**Footer 规则**（可选）：
+- 关联 Issue：`Closes #123`
+
+**正确示例**：
+```
+feat(actor): add ExcludedAssetsActor with cascade cleanup
+
+- Implements write conditions per US-PRV-004
+- Adds cascade cleanup for invalid records per US-PRV-007
+- Includes unit tests covering all write paths
+
+Related: US-PRV-004, US-PRV-007
+```
+
+```
+fix(pipeline): correct FTS5 filter logic in SearchPipeline
+
+FTS5 was incorrectly filtering out time-based queries due to
+date format mismatch. Now using ISO8601 format consistently.
+
+Related: US-RET-004
+Closes #89
+```
+
+**错误示例**：
+```
+fixed bug                    # 缺少 type/scope，描述不清晰
+feat(search): 增加向量检索   # 使用了中文
+refactor(actor): fixed things  # subject 不是祈使句
+```
+
+### 3.3 Pull Request 规范
+
+**PR 标题格式**：
+
+```
+{type}({scope}): {description} [US-XXX]
+```
+
+- `type` 和 `scope` 同 Commit 规范
+- `description` 简要描述 PR 内容（英文）
+- 末尾必须包含关联的用户故事编号（如 `[US-PRV-001]`）
+
+**PR 描述模板**（Agent 与人类开发者通用）：
+
+```markdown
+## 📋 概述
+[简要描述这个 PR 实现的功能或修复的问题]
+
+## 🔗 关联规格
+- 用户故事: US-PRV-001
+- 文档路径: docs/01-spec/用户故事与验收标准规格书.md
+
+## ✅ AC 覆盖对照表
+| AC 编号 | 规格原文摘要 | 测试文件 | 实现文件 | 状态 |
+| --- | --- | --- | --- | --- |
+| AC-1 | ... | ... | ... | ✅ |
+| AC-2 | ... | ... | ... | ✅ |
+
+## 🧪 测试
+- [ ] 单元测试通过，覆盖率 ≥95%
+- [ ] 集成测试通过（含跨语言 Golden 用例）
+- [ ] 无并发警告（-strict-concurrency=complete）
+
+## 🔍 自检清单
+- [ ] 所有新增 Actor 方法入口包含 PrivacyCheckpoint
+- [ ] 无 @unchecked Sendable / nonisolated(unsafe) / Combine
+- [ ] 无硬编码语言字符串
+- [ ] 错误已按 L1~L4 分级，L2 写入 PendingOperations
+- [ ] 长任务已通过 TaskQueueActor 入队
+
+## 📝 Agent 备注
+[如有需要特别说明的实现决策，在此记录]
+```
+
+### 3.4 Codex 提交前的强制自检
+
+在 Agent 执行 `git commit` 或发起 PR 之前，必须完成以下检查：
+
+1. **运行 SwiftLint**：确保 0 违规
+2. **运行单元测试**：确保全部通过
+3. **检查 Commit Message 格式**：符合上述规范
+4. **检查 PR 描述**：包含 AC 覆盖对照表
+5. **检查文件头部**：核心文件包含“出生证明”水印（见第 11.3 节）
+
+若任何检查失败，Agent **必须**修复后再提交。
+
+---
+
+## 4. 核心架构原则
+
+### 4.1 认知管线（Cognitive Pipeline）契约
 
 所有认知处理流程必须遵循以下契约：
 
@@ -127,7 +300,7 @@ Pipeline 契约:
   - 可取消: 长任务必须支持 Task.isCancelled 检查
 ```
 
-### 3.2 Actor 隔离契约
+### 4.2 Actor 隔离契约
 
 ```yaml
 Actor 契约:
@@ -140,7 +313,7 @@ Actor 契约:
   - 禁止 nonisolated(unsafe): 全局禁用，CI 扫描拦截
 ```
 
-### 3.3 长任务与队列契约
+### 4.3 长任务与队列契约
 
 ```yaml
 TaskQueue 契约:
@@ -152,7 +325,7 @@ TaskQueue 契约:
   - 取消保留进度: 取消时保留进度，下次启动询问是否继续
 ```
 
-### 3.4 错误分级契约（L1~L4）
+### 4.4 错误分级契约（L1~L4）
 
 | 等级            | 定义                                    | 系统行为                                                | 用户感知              |
 | --------------- | --------------------------------------- | ------------------------------------------------------- | --------------------- |
@@ -161,7 +334,7 @@ TaskQueue 契约:
 | **L3 阻断**     | 数据库损坏、模型加载失败                | 停止功能，引导用户跳转系统设置修复                      | 全屏引导页            |
 | **L4 数据冲突** | 外部删除 + 本地编辑同时发生             | 标记 conflict，提供手动合并 UI                          | Banner + 解决冲突入口 |
 
-### 3.5 断点续传契约
+### 4.5 断点续传契约
 
 ```yaml
 断点续传契约:
@@ -175,9 +348,9 @@ TaskQueue 契约:
 
 ---
 
-## 4. 数据持久化与存储契约
+## 5. 数据持久化与存储契约
 
-### 4.1 存储层次
+### 5.1 存储层次
 
 | 存储类型                   | 用途                    | 封装 Actor            |
 | -------------------------- | ----------------------- | --------------------- |
@@ -188,7 +361,7 @@ TaskQueue 契约:
 | SQLite - PendingOperations | L2 错误待重试队列       | `PendingOpsActor`     |
 | SQLite - AuditLog          | 隐私审计日志            | `PrivacyActor`        |
 
-### 4.2 ExcludedAssets 契约（核心）
+### 5.2 ExcludedAssets 契约（核心）
 
 ```yaml
 ExcludedAssets 写入条件（仅有三种）:
@@ -205,7 +378,7 @@ ExcludedAssets 禁止写入条件:
   - 不存在则自动从 ExcludedAssets 移除并提示用户
 ```
 
-### 4.3 反馈存储契约
+### 5.3 反馈存储契约
 
 ```yaml
 反馈重排契约:
@@ -219,7 +392,7 @@ ExcludedAssets 禁止写入条件:
   - 存储: 仅本地 SQLite，永不上传
 ```
 
-### 4.4 审计日志契约
+### 5.4 审计日志契约
 
 ```yaml
 审计日志契约:
@@ -233,15 +406,15 @@ ExcludedAssets 禁止写入条件:
 
 ---
 
-## 5. 跨语言与 i18n 契约
+## 6. 跨语言与 i18n 契约
 
-### 5.1 支持语言范围
+### 6.1 支持语言范围
 
 - **仅支持 `zh-Hans` 和 `en-US`**
 - 繁体中文、粤语、其他方言：映射为 `zh-Hans`，首次启动提示一次
 - 所有 String Catalog 必须包含两个语言的完整条目
 
-### 5.2 语言检测与处理
+### 6.2 语言检测与处理
 
 ```yaml
 语言检测契约:
@@ -257,7 +430,7 @@ AI 输出语言控制:
   - 降级模板: 预定义多语言模板 (跟随 preferredLanguage)
 ```
 
-### 5.3 术语表契约
+### 6.3 术语表契约
 
 - 存储格式：JSON `{ "term_key": { "zh-Hans": "...", "en-US": "..." } }`
 - 展示层优先查术语表，未命中再调用 Apple Translation
@@ -265,7 +438,7 @@ AI 输出语言控制:
 - 术语表变更必须同步更新 String Catalog + Golden Dataset
 - 覆盖率要求：Golden Dataset 术语测试 ≥ 90%
 
-### 5.4 翻译触发条件（仅展示层）
+### 6.4 翻译触发条件（仅展示层）
 
 | 场景          | 触发条件                              | 翻译目标 | 缓存策略       |
 | ------------- | ------------------------------------- | -------- | -------------- |
@@ -277,9 +450,9 @@ AI 输出语言控制:
 
 ---
 
-## 6. 隐私校验与审计契约
+## 7. 隐私校验与审计契约
 
-### 6.1 PrivacyCheckpoint 强制注入
+### 7.1 PrivacyCheckpoint 强制注入
 
 ```swift
 // 每个 Pipeline Actor 方法的第一个语句必须是：
@@ -290,13 +463,13 @@ let checkpoint = await PrivacyActor.shared.validate(
 // 若返回 .denied，立即终止并返回 Denial Response
 ```
 
-### 6.2 Trace ID 传递契约
+### 7.2 Trace ID 传递契约
 
 - Trace ID 在 Pipeline 入口生成（UUID）
 - 通过所有函数参数显式传递，禁止 TaskLocal/全局变量
 - 审计日志、错误日志、性能监控均使用同一 Trace ID
 
-### 6.3 审计事件完整清单
+### 7.3 审计事件完整清单
 
 | 事件类型                          | 触发场景                 | 必填字段                                                  |
 | --------------------------------- | ------------------------ | --------------------------------------------------------- |
@@ -331,9 +504,9 @@ let checkpoint = await PrivacyActor.shared.validate(
 
 ---
 
-## 7. ViewModel 与 UI 契约
+## 8. ViewModel 与 UI 契约
 
-### 7.1 ViewModel 强制规范
+### 8.1 ViewModel 强制规范
 
 ```yaml
 ViewModel 契约:
@@ -346,7 +519,7 @@ ViewModel 契约:
   - 订阅进度: 使用 Task 或 .task 修饰符，禁止 Task.detached
 ```
 
-### 7.2 ViewModel 状态流
+### 8.2 ViewModel 状态流
 
 ```mermaid
 stateDiagram-v2
@@ -360,7 +533,7 @@ stateDiagram-v2
     Cancelled --> Idle: 重置
 ```
 
-### 7.3 后台任务面板契约（US-SYS-001）
+### 8.3 后台任务面板契约（US-SYS-001）
 
 ```yaml
 后台任务面板契约:
@@ -372,7 +545,7 @@ stateDiagram-v2
   - 串行执行: 索引构建与数据同步通过 TaskQueueActor 串行
 ```
 
-### 7.4 无障碍适配（P2，可延后）
+### 8.4 无障碍适配（P2，可延后）
 
 - 所有交互元素有 `accessibilityLabel`
 - 动态内容变化触发 `accessibilityAnnouncement`
@@ -381,9 +554,9 @@ stateDiagram-v2
 
 ---
 
-## 8. 测试与质量契约
+## 9. 测试与质量契约
 
-### 8.1 测试层级与门禁
+### 9.1 测试层级与门禁
 
 | 测试层级 | 覆盖内容                            | 工具            | 门禁阈值                  |
 | -------- | ----------------------------------- | --------------- | ------------------------- |
@@ -394,14 +567,14 @@ stateDiagram-v2
 | 审计测试 | PrivacyCheckpoint 覆盖率            | CI 静态扫描     | 100%                      |
 | 合规测试 | PIPL、数据删除、排除表边界          | ComplianceTest  | 100%                      |
 
-### 8.2 Golden Dataset 要求
+### 9.2 Golden Dataset 要求
 
 - 跨语言用例：≥ 800 条（覆盖 zh-Hans/en-US × query/memory × 精确/模糊/情感/事实）
 - 反馈测试用例：≥ 200 条（覆盖点赞/点踩/时间衰减/截断）
 - 术语测试：≥ 100 条（术语表命中率 ≥ 90%）
 - 每季度更新，纳入真实用户 Bad Case
 
-### 8.3 CI 门禁清单
+### 9.3 CI 门禁清单
 
 ```yaml
 PR 合并前必须通过:
@@ -424,9 +597,9 @@ PR 合并前必须通过:
 
 ---
 
-## 9. 模块目录结构与文件命名
+## 10. 模块目录结构与文件命名
 
-### 9.1 强制目录结构
+### 10.1 强制目录结构
 
 ```
 Echo/
@@ -482,7 +655,7 @@ Echo/
 └── AGENTS.md
 ```
 
-### 9.2 文件命名规范
+### 10.2 文件命名规范
 
 | 类型      | 命名规则                               | 示例                       |
 | --------- | -------------------------------------- | -------------------------- |
@@ -496,16 +669,16 @@ Echo/
 
 ---
 
-## 10. Codex / Agent 协作规约
+## 11. Codex / Agent 协作规约
 
-### 10.1 AGENTS.md 加载机制
+### 11.1 AGENTS.md 加载机制
 
 - Codex 启动时自动加载根目录 `AGENTS.md`
 - 子目录 `AGENTS.md` 在进入对应目录时叠加加载
 - 禁止 Agent 绕过 `AGENTS.md` 规则
 - 如果 Agent 发现规则冲突，以更具体的子目录规则为准，并在日志中记录冲突
 
-### 10.2 Agent 任务分配与自检
+### 11.2 Agent 任务分配与自检
 
 ```yaml
 Agent 开发流程:
@@ -516,11 +689,12 @@ Agent 开发流程:
      - [Model] 新增/修改数据模型
      - [Test] 补充测试用例
   2. 代码生成: 必须基于 /docs/agent/templates/ 中的模板（待创建）
-  3. 自检清单: Agent 必须在 PR 描述中填写自检结果（见 10.3）
+  3. 自检清单: Agent 必须在 PR 描述中填写自检结果（见 11.3）
   4. 人类复审: 关键决策 (模型更换、架构调整) 必须人类确认
+  5. Git 合规: Commit 和 PR 必须符合第 3 章规范
 ```
 
-### 10.3 Agent 自检清单（PR 描述必填）
+### 11.3 Agent 自检清单（PR 描述必填）
 
 ```markdown
 ## Agent 自检清单
@@ -536,6 +710,11 @@ Agent 开发流程:
 - [ ] 长任务已通过 TaskQueueActor 入队，支持暂停/取消
 - [ ] 断点续传进度已通过 ProgressActor 持久化
 - [ ] 模型文件已在 Bundle 内，无网络下载代码
+
+### Git 规范检查
+- [ ] 分支命名符合 `{type}/{description}-US-XXX` 格式
+- [ ] Commit Message 符合 `{type}({scope}): {subject}` 格式
+- [ ] PR 标题包含关联的用户故事编号
 
 ### 跨语言专项
 - [ ] 向量模型变更附带跨语言 Recall@10 ≥85% 报告
@@ -560,7 +739,7 @@ Agent 开发流程:
 - [ ] 错误注入测试 (L1~L4 全覆盖)
 ```
 
-### 10.4 Agent 禁忌清单
+### 11.4 Agent 禁忌清单
 
 | 行为                        | 后果               | 说明                     |
 | --------------------------- | ------------------ | ------------------------ |
@@ -570,14 +749,15 @@ Agent 开发流程:
 | 使用 `print()` 或 `NSLog()` | PR 阻断            | 使用统一日志系统         |
 | 引入未审批的第三方依赖      | PR 阻断            | 需通过 Privacy Reviewer  |
 | 修改核心模板                | PR 阻断 + 团队通知 | 需 ADR 审批              |
+| 违反 Git 提交规范           | PR 阻断            | CI 会检查 Commit 格式    |
 
 ---
 
-## 11. Agent 工作流与溯源协议（Anti-Hallucination Directives）
+## 12. Agent 工作流与溯源协议（Anti-Hallucination Directives）
 
 > **核心原则**：Codex 是“翻译官”，不是“创作者”。任何代码实现必须能在本地规格文档中找到确切的原文依据。**无引用，不编码。**
 
-### 11.1 强制溯源协议（Compulsory Traceability）
+### 12.1 强制溯源协议（Compulsory Traceability）
 
 在编写任何业务代码（Core/Pipelines/ViewModels）之前，Agent 必须严格执行以下步骤，否则视为违规：
 
@@ -588,15 +768,15 @@ Agent 开发流程:
 2. **原文引用**：在回复中，**逐字粘贴**本次涉及的验收标准（AC）原文或架构约束原文。
 3. **禁止推断**：严禁使用“根据常规做法，我认为应该...”之类的推断。如果 AC 描述模糊，Agent 必须在此步骤停止编码，并向人类提出澄清问题。
 
-### 11.2 TDD 契约协议（Test-First Contract）
+### 12.2 TDD 契约协议（Test-First Contract）
 
 为防止 Agent 写出无法验证的“黑盒代码”，必须强制实行测试先行：
 
-1. **先写测试**：Agent 必须根据 11.1 中引用的 AC，首先生成对应的单元测试方法。测试方法命名必须包含 AC 编号（如 `test_AC1_ExcludedAssetsWriteCondition`）。
+1. **先写测试**：Agent 必须根据 12.1 中引用的 AC，首先生成对应的单元测试方法。测试方法命名必须包含 AC 编号（如 `test_AC1_ExcludedAssetsWriteCondition`）。
 2. **后写实现**：只有在测试框架中确认测试用例失败（Red）后，Agent 才能开始编写实现代码。
 3. **逐条覆盖**：一次仅实现一个测试用例。实现通过后，再重复循环处理下一条 AC。
 
-### 11.3 “出生证明”水印协议（Provenance Watermark）
+### 12.3 “出生证明”水印协议（Provenance Watermark）
 
 Agent 在创建或修改核心架构文件（`Core/Actors/*.swift`, `Core/Pipelines/*.swift`）时，**必须在文件头部注入强制性的溯源注释**。这将作为 CI 扫描的依据，防止“无证代码”混入。
 
@@ -607,14 +787,14 @@ Agent 在创建或修改核心架构文件（`Core/Actors/*.swift`, `Core/Pipeli
 // 文件: PrivacyActor.swift
 // 对应规格: docs/01-spec/用户故事与验收标准规格书.md → US-PRV-001
 // AC 覆盖: AC-1 (授权校验), AC-5 (重新授权不清除排除表)
-// 架构约束: 遵循 AGENTS.md §3.2 (Actor 隔离)
+// 架构约束: 遵循 AGENTS.md §4.2 (Actor 隔离)
 // 生成时间: 2026-06-27
 // ==========================================
 ```
 
 > **CI 门禁**：若核心文件头部缺少 `对应规格` 或 `AC 覆盖` 字段，CI 将阻断 PR 合并。
 
-### 11.4 自检交付物协议（Self-Correction Checklist）
+### 12.4 自检交付物协议（Self-Correction Checklist）
 
 Agent 在提交 PR 时，**必须**在 PR 描述中粘贴一份 `AC 覆盖对照表`，格式如下：
 
@@ -625,7 +805,7 @@ Agent 在提交 PR 时，**必须**在 PR 描述中粘贴一份 `AC 覆盖对照
 
 **作用**：这份表格让人类审核者在 5 秒内判断 Agent 是否遗漏了功能，而不必去翻阅整个 Diff。
 
-### 11.5 幻觉熔断机制（Hallucination Circuit Breaker）
+### 12.5 幻觉熔断机制（Hallucination Circuit Breaker）
 
 当 Agent 不确定某个 API 是否存在（例如：不确定 iOS 18 是否有特定的 `@Observable` 行为）时：
 
@@ -635,7 +815,7 @@ Agent 在提交 PR 时，**必须**在 PR 描述中粘贴一份 `AC 覆盖对照
 
 ---
 
-## 12. 决策记录模板 (ADR)
+## 13. 决策记录模板 (ADR)
 
 Agent 在遇到架构决策时，必须按以下格式记录：
 
@@ -666,7 +846,7 @@ ADR 存入 `docs/decisions/`，Agent 在遇到相关上下文时自动加载。
 
 ---
 
-## 13. 版本与维护声明
+## 14. 版本与维护声明
 
 本规约与 Echo v4.6 全量规格书、架构设计文档、避坑手册、工具指南同步维护。任何规约变更必须：
 
@@ -685,3 +865,4 @@ ADR 存入 `docs/decisions/`，Agent 在遇到相关上下文时自动加载。
 | ---- | ---------- | ------------------------------------------------------------ | --------- |
 | v4.6 | 2026-06-16 | 初始版本，整合规格书 v4.6、架构设计、数据流、避坑手册、工具指南、AI Native 理念 | AI 架构师 |
 | v4.7 | 2026-06-27 | 移除 Notion 引用，改用本地 `docs/` 文档索引；更新溯源协议指向本地文件 | AI 架构师 |
+| v4.8 | 2026-06-27 | 新增第 3 章 Git 协作规范，包含分支命名、Commit Message、PR 规范；更新自检清单与禁忌清单 | AI 架构师 |
