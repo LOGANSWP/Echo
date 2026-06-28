@@ -1,0 +1,554 @@
+{
+  "version": "1.0",
+  "project": "Echo v4.6",
+  "last_updated": "2026-06-28T09:00:00Z",
+  "current_phase": 1,
+  "phases": [
+    {
+      "id": 1,
+      "name": "基础设施搭建",
+      "status": "in_progress",
+      "integration_test": "pending",
+      "tasks": [
+        {
+          "id": "1.1",
+          "title": "创建 Xcode 项目，配置 Swift 6 并发严格模式",
+          "story": null,
+          "status": "ready",
+          "documents_required": [
+            "docs/02-architecture/技术选型文档.md",
+            "AGENTS.md"
+          ],
+          "dependencies": [],
+          "test_file": "Tests/UnitTests/ProjectConfigTests.swift"
+        },
+        {
+          "id": "1.2",
+          "title": "编写根目录 AGENTS.md，整合避坑手册核心规则",
+          "story": null,
+          "status": "ready",
+          "documents_required": [
+            "docs/03-implementation/开发避坑与关键注意点手册.md",
+            "docs/04-ai-native/AI Native开发理念与实战技巧手册.md"
+          ],
+          "dependencies": [],
+          "test_file": null
+        },
+        {
+          "id": "1.3",
+          "title": "集成 LanceDB Mobile，封装 VectorStoreActor",
+          "story": null,
+          "status": "ready",
+          "documents_required": [
+            "docs/02-architecture/技术选型文档.md",
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["1.1"],
+          "test_file": "Tests/UnitTests/VectorStoreActorTests.swift"
+        },
+        {
+          "id": "1.4",
+          "title": "集成 SQLite，创建 ExcludedAssets, Feedback, TaskProgress, PendingOperations 表",
+          "story": null,
+          "status": "ready",
+          "documents_required": [
+            "docs/02-architecture/架构设计文档.md",
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["1.1"],
+          "test_file": "Tests/UnitTests/SQLiteActorTests.swift"
+        },
+        {
+          "id": "1.5",
+          "title": "将 SigLIP, MobileCLIP, GTE-Qwen2, Whisper 模型打包到 Bundle",
+          "story": null,
+          "status": "ready",
+          "documents_required": [
+            "docs/02-architecture/技术选型文档.md"
+          ],
+          "dependencies": [],
+          "test_file": "Tests/UnitTests/ModelBundleTests.swift"
+        },
+        {
+          "id": "1.6",
+          "title": "实现 ModelLoaderActor 手动加载/重试机制",
+          "story": "US-RES-004",
+          "status": "ready",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/03-implementation/开发避坑与关键注意点手册.md"
+          ],
+          "dependencies": ["1.5"],
+          "test_file": "Tests/UnitTests/ModelLoaderActorTests.swift"
+        },
+        {
+          "id": "1.7",
+          "title": "搭建 CI（GitHub Actions）：SwiftLint, 单元测试, 覆盖率",
+          "story": null,
+          "status": "ready",
+          "documents_required": [
+            "AGENTS.md"
+          ],
+          "dependencies": ["1.1"],
+          "test_file": null
+        },
+        {
+          "id": "1.8",
+          "title": "搭建单元测试框架，编写第一个 Actor 测试用例",
+          "story": null,
+          "status": "ready",
+          "documents_required": [
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["1.2"],
+          "test_file": "Tests/UnitTests/PrivacyActorTests.swift"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "核心认知管线",
+      "status": "not_started",
+      "integration_test": "pending",
+      "tasks": [
+        {
+          "id": "2.1",
+          "title": "PrivacyActor + UserPolicy 实现",
+          "story": "US-PRV-001",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/架构设计文档.md",
+            "docs/03-implementation/开发避坑与关键注意点手册.md"
+          ],
+          "dependencies": ["1.4"],
+          "test_file": "Tests/UnitTests/PrivacyActorTests.swift"
+        },
+        {
+          "id": "2.2",
+          "title": "ExcludedAssetsActor 实现（含恢复、一键恢复、变更监测）",
+          "story": "US-SRC-008",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/架构设计文档.md",
+            "docs/03-implementation/开发避坑与关键注意点手册.md"
+          ],
+          "dependencies": ["1.4"],
+          "test_file": "Tests/UnitTests/ExcludedAssetsActorTests.swift"
+        },
+        {
+          "id": "2.3",
+          "title": "IngestPipeline：图片摄入（US-ING-004）",
+          "story": "US-ING-004",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md",
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["2.1", "1.3"],
+          "test_file": "Tests/UnitTests/IngestPipelineImageTests.swift"
+        },
+        {
+          "id": "2.4",
+          "title": "IngestPipeline：视频摄入（US-ING-005）",
+          "story": "US-ING-005",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["2.3", "1.6"],
+          "test_file": "Tests/UnitTests/IngestPipelineVideoTests.swift"
+        },
+        {
+          "id": "2.5",
+          "title": "IngestPipeline：备忘录 + 语音转写（US-ING-001~003）",
+          "story": "US-ING-001, US-ING-002, US-ING-003",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/03-implementation/双语言实现说明文档.md"
+          ],
+          "dependencies": ["2.3"],
+          "test_file": "Tests/UnitTests/IngestPipelineTextTests.swift"
+        },
+        {
+          "id": "2.6",
+          "title": "SearchPipeline：向量检索 + FTS5 过滤",
+          "story": "US-RET-001~004",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md",
+            "docs/03-implementation/双语言实现说明文档.md"
+          ],
+          "dependencies": ["2.3"],
+          "test_file": "Tests/UnitTests/SearchPipelineTests.swift"
+        },
+        {
+          "id": "2.7",
+          "title": "FeedbackActor + 重排公式（阈值0.80，截断±0.5）",
+          "story": "US-FBK-002",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["1.4"],
+          "test_file": "Tests/UnitTests/FeedbackActorTests.swift"
+        },
+        {
+          "id": "2.8",
+          "title": "集成反馈到 SearchPipeline",
+          "story": "US-FBK-002",
+          "status": "backlog",
+          "documents_required": [
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["2.6", "2.7"],
+          "test_file": "Tests/IntegrationTests/SearchWithFeedbackTests.swift"
+        },
+        {
+          "id": "2.9",
+          "title": "跨语言低置信度降级（US-RET-006）",
+          "story": "US-RET-006",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/03-implementation/双语言实现说明文档.md"
+          ],
+          "dependencies": ["2.6"],
+          "test_file": "Tests/UnitTests/LowConfidenceFallbackTests.swift"
+        },
+        {
+          "id": "2.10",
+          "title": "SyncPipeline：相册变更监听 + 增量替换",
+          "story": "US-SRC-012",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["2.3", "2.2"],
+          "test_file": "Tests/UnitTests/SyncPipelineTests.swift"
+        },
+        {
+          "id": "2.11",
+          "title": "AwakeningPipeline：地理围栏（US-AWK-001）",
+          "story": "US-AWK-001",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["2.6"],
+          "test_file": "Tests/UnitTests/AwakeningGeoTests.swift"
+        },
+        {
+          "id": "2.12",
+          "title": "AwakeningPipeline：情绪唤醒（US-AWK-003）",
+          "story": "US-AWK-003",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["2.6", "1.2"],
+          "test_file": "Tests/UnitTests/AwakeningEmotionTests.swift"
+        },
+        {
+          "id": "2.13",
+          "title": "FeedbackPipeline：点赞/点踩/Bad Case 记录",
+          "story": "US-FBK-001, US-FBK-003",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["2.7"],
+          "test_file": "Tests/UnitTests/FeedbackPipelineTests.swift"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "UI 与集成",
+      "status": "not_started",
+      "integration_test": "pending",
+      "tasks": [
+        {
+          "id": "3.1",
+          "title": "主视图 HomeView + HomeViewModel",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/02-architecture/架构设计文档.md",
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["2.11"],
+          "test_file": "Tests/UnitTests/HomeViewModelTests.swift"
+        },
+        {
+          "id": "3.2",
+          "title": "检索视图 SearchView + SearchViewModel",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["2.6"],
+          "test_file": "Tests/UnitTests/SearchViewModelTests.swift"
+        },
+        {
+          "id": "3.3",
+          "title": "记忆详情页 MemoryDetailView + ViewModel（含编辑功能 US-AWK-007）",
+          "story": "US-AWK-007",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["2.3", "3.1"],
+          "test_file": "Tests/UnitTests/MemoryDetailViewModelTests.swift"
+        },
+        {
+          "id": "3.4",
+          "title": "设置页面 SettingsView + ViewModel（数据源开关、排除项管理、缓存清理）",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["2.2", "1.4"],
+          "test_file": "Tests/UnitTests/SettingsViewModelTests.swift"
+        },
+        {
+          "id": "3.5",
+          "title": "实时后台任务面板",
+          "story": "US-SYS-001",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["3.4", "2.10"],
+          "test_file": "Tests/UnitTests/BackgroundTaskPanelTests.swift"
+        },
+        {
+          "id": "3.6",
+          "title": "统一错误处理 UI（L1~L4）",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/03-implementation/开发避坑与关键注意点手册.md",
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["2.1", "2.7"],
+          "test_file": "Tests/UnitTests/ErrorHandlerUITests.swift"
+        },
+        {
+          "id": "3.7",
+          "title": "断点续传集成到长任务",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/02-architecture/架构设计文档.md"
+          ],
+          "dependencies": ["3.5", "1.4"],
+          "test_file": "Tests/UnitTests/ProgressActorTests.swift"
+        },
+        {
+          "id": "3.8",
+          "title": "跨语言翻译层集成",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/03-implementation/双语言实现说明文档.md"
+          ],
+          "dependencies": ["3.1", "3.2"],
+          "test_file": "Tests/UnitTests/TranslationServiceTests.swift"
+        },
+        {
+          "id": "3.9",
+          "title": "整合所有 ViewModel 与 Pipeline",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8"],
+          "test_file": "Tests/IntegrationTests/EndToEndFlowTests.swift"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "质量保障与发布准备",
+      "status": "not_started",
+      "integration_test": "pending",
+      "tasks": [
+        {
+          "id": "4.1",
+          "title": "扩展 Golden Dataset 至 800+ 跨语言用例",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/03-implementation/双语言实现说明文档.md",
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["2.6"],
+          "test_file": "Tests/GoldenDataset/CrossLingualTests.swift"
+        },
+        {
+          "id": "4.2",
+          "title": "编写集成测试：每个 Pipeline 端到端",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/02-architecture/数据流全链路技术说明文档.md"
+          ],
+          "dependencies": ["3.9"],
+          "test_file": "Tests/IntegrationTests/AllPipelinesTests.swift"
+        },
+        {
+          "id": "4.3",
+          "title": "性能基准测试（检索延迟、内存峰值、存储大小）",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/02-architecture/技术选型文档.md"
+          ],
+          "dependencies": ["3.9"],
+          "test_file": "Tests/PerformanceTests/BenchmarkTests.swift"
+        },
+        {
+          "id": "4.4",
+          "title": "低电量/过热降级模拟测试",
+          "story": "US-RES-002, US-RES-003",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["2.11"],
+          "test_file": "Tests/IntegrationTests/DegradationTests.swift"
+        },
+        {
+          "id": "4.5",
+          "title": "模型加载失败手动重试测试",
+          "story": "US-RES-004",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["1.6"],
+          "test_file": "Tests/UnitTests/ModelLoaderRetryTests.swift"
+        },
+        {
+          "id": "4.6",
+          "title": "ExcludedAssets 边界场景测试",
+          "story": "US-PRV-007, US-SRC-008",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["2.2"],
+          "test_file": "Tests/IntegrationTests/ExcludedAssetsBoundaryTests.swift"
+        },
+        {
+          "id": "4.7",
+          "title": "反馈重排准确性验证",
+          "story": "US-FBK-002",
+          "status": "backlog",
+          "documents_required": [
+            "docs/01-spec/用户故事与验收标准规格书.md"
+          ],
+          "dependencies": ["2.7"],
+          "test_file": "Tests/UnitTests/FeedbackRankingAccuracyTests.swift"
+        },
+        {
+          "id": "4.8",
+          "title": "完成项目文档更新",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/",  // 所有文档
+            "AGENTS.md"
+          ],
+          "dependencies": ["3.9"],
+          "test_file": null
+        },
+        {
+          "id": "4.9",
+          "title": "TestFlight 内测（内部 50 人）",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [],
+          "dependencies": ["4.2"],
+          "test_file": null
+        },
+        {
+          "id": "4.10",
+          "title": "修复 P0/P1 bug",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [],
+          "dependencies": ["4.9"],
+          "test_file": null
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "创新工具预研与原型",
+      "status": "not_started",
+      "integration_test": "pending",
+      "tasks": [
+        {
+          "id": "5.1",
+          "title": "AGenUI 原型：动态生成回忆卡片",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/04-ai-native/产品创新工具全景指南.md"
+          ],
+          "dependencies": [],
+          "test_file": null
+        },
+        {
+          "id": "5.2",
+          "title": "Eagle AI 集成：以图搜图功能",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/04-ai-native/产品创新工具全景指南.md"
+          ],
+          "dependencies": [],
+          "test_file": null
+        },
+        {
+          "id": "5.3",
+          "title": "CHORD 预研：端侧重排模型个性化",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [
+            "docs/04-ai-native/产品创新工具全景指南.md"
+          ],
+          "dependencies": [],
+          "test_file": null
+        },
+        {
+          "id": "5.4",
+          "title": "MCP + Notion 工作流验证（已不适用，标记为可跳过）",
+          "story": null,
+          "status": "backlog",
+          "documents_required": [],
+          "dependencies": [],
+          "test_file": null
+        }
+      ]
+    }
+  ],
+  "documentation_conflicts": [],
+  "decisions": []
+}
