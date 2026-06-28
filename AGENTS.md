@@ -1,6 +1,6 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v5.0  
+**版本**：v5.1  
 **生效日期**：2026-06-28  
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（OpenCode/Codex/Cursor/Claude）及人类开发者  
 **优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
@@ -8,6 +8,7 @@
 **对应规格**：Echo v4.6 全量用户故事与验收标准规格书  
 **架构基准**：Cognitive Pipeline + Observable ViewModel + Actor Isolation  
 **任务追踪**：`docs/05-planning/task-status.json` 记录所有任务执行状态  
+**GitHub 自动化**：OpenCode 可自动创建 PR、添加评论、管理标签，合并操作需人类审批
 
 ---
 
@@ -17,18 +18,21 @@
 
 ### 0.1 文档目录
 
-| 文档类别               | 文件路径                                               | 用途                                       |
-| ---------------------- | ------------------------------------------------------ | ------------------------------------------ |
-| **规格与需求**         | `docs/01-spec/用户故事与验收标准规格书.md`             | 所有用户故事与 AC 的唯一来源               |
-| **架构设计**           | `docs/02-architecture/架构设计文档.md`                 | Cognitive Pipeline + Actor 架构详细设计    |
-| **技术选型**           | `docs/02-architecture/技术选型文档.md`                 | 模型、数据库、推理框架选型决策             |
-| **数据流**             | `docs/02-architecture/数据流全链路技术说明文档.md`     | 数据在系统中各环节的流转细节               |
-| **双语言实现**         | `docs/03-implementation/双语言实现说明文档.md`         | 跨语言检索、翻译、术语表等实现规范         |
-| **开发避坑手册**       | `docs/03-implementation/开发避坑与关键注意点手册.md`   | 禁止事项、陷阱与防御性检查清单             |
-| **AI Native 开发理念** | `docs/04-ai-native/AI Native开发理念与实战技巧手册.md` | AI Native 方法论、工具与实战技巧           |
-| **产品创新工具**       | `docs/04-ai-native/产品创新工具全景指南.md`            | 前沿创新工具介绍及融入 Echo 的方案         |
-| **开发计划**           | `docs/05-planning/开发计划安排文档.md`                 | 里程碑、时间线及资源安排                   |
-| **任务状态**           | `docs/05-planning/task-status.json`                    | 每个任务的执行状态、依赖关系、测试文件映射 |
+| 文档类别                | 文件路径                                               | 用途                                       |
+| ----------------------- | ------------------------------------------------------ | ------------------------------------------ |
+| **规格与需求**          | `docs/01-spec/用户故事与验收标准规格书.md`             | 所有用户故事与 AC 的唯一来源               |
+| **架构设计**            | `docs/02-architecture/架构设计文档.md`                 | Cognitive Pipeline + Actor 架构详细设计    |
+| **技术选型**            | `docs/02-architecture/技术选型文档.md`                 | 模型、数据库、推理框架选型决策             |
+| **数据流**              | `docs/02-architecture/数据流全链路技术说明文档.md`     | 数据在系统中各环节的流转细节               |
+| **双语言实现**          | `docs/03-implementation/双语言实现说明文档.md`         | 跨语言检索、翻译、术语表等实现规范         |
+| **开发避坑手册**        | `docs/03-implementation/开发避坑与关键注意点手册.md`   | 禁止事项、陷阱与防御性检查清单             |
+| **AI Native 开发理念**  | `docs/04-ai-native/AI Native开发理念与实战技巧手册.md` | AI Native 方法论、工具与实战技巧           |
+| **产品创新工具**        | `docs/04-ai-native/产品创新工具全景指南.md`            | 前沿创新工具介绍及融入 Echo 的方案         |
+| **开发计划**            | `docs/05-planning/开发计划安排文档.md`                 | 里程碑、时间线及资源安排                   |
+| **任务状态**            | `docs/05-planning/task-status.json`                    | 每个任务的执行状态、依赖关系、测试文件映射 |
+| **GitHub Actions 配置** | `.github/workflows/opencode.yml`                       | OpenCode 自动化触发配置                    |
+| **OpenCode 本地配置**   | `.opencode/config.toml`                                | OpenCode 行为配置                          |
+| **PR 描述模板**         | `.opencode/pr-template.md`                             | 自动生成 PR 描述的模板                     |
 
 ### 0.2 任务类型 → 文档快速索引（Agent 必读）
 
@@ -53,6 +57,8 @@
 | **创新工具集成**        | `docs/04-ai-native/产品创新工具全景指南.md`            | 对应工具章节                                       |
 | **查阅开发计划/任务**   | `docs/05-planning/开发计划安排文档.md`                 | 里程碑、时间线                                     |
 |                         | `docs/05-planning/task-status.json`                    | 当前任务状态、依赖关系                             |
+| **配置 GitHub 自动化**  | `.github/workflows/opencode.yml`                       | 触发条件、工作流步骤                               |
+|                         | `.opencode/config.toml`                                | PR 模板、审查人、合并策略                          |
 
 ### 0.3 Agent 文档读取规范
 
@@ -294,7 +300,7 @@ refactor(actor): fixed things  # subject 不是祈使句
 3. **检查 Commit Message 格式**：符合上述规范
 4. **检查 PR 描述**：包含 AC 覆盖对照表
 5. **检查文件头部**：核心文件包含“出生证明”水印（见 §12.3）
-6. **更新任务状态**：在 `docs/05-planning/task-status.json` 中标记任务为 `done`
+6. **更新任务状态**：在 `docs/05-planning/task-status.json` 中标记任务为 `review`，并记录 `pr` 信息
 
 若任何检查失败，Agent **必须**修复后再提交。
 
@@ -668,17 +674,21 @@ Echo/
 │   ├── UnitTests/
 │   ├── IntegrationTests/
 │   └── GoldenDataset/
-├── docs/                          # 📚 项目文档中心（详见第0章）
-│   ├── INDEX.md                   # 文档摘要索引
+├── .github/
+│   └── workflows/
+│       └── opencode.yml         # OpenCode GitHub Actions 工作流
+├── .opencode/
+│   ├── config.toml              # OpenCode 配置文件
+│   └── pr-template.md           # PR 描述模板
+├── docs/                        # 📚 项目文档中心（详见第0章）
+│   ├── INDEX.md                 # 文档摘要索引
 │   ├── 01-spec/
 │   ├── 02-architecture/
 │   ├── 03-implementation/
 │   ├── 04-ai-native/
 │   └── 05-planning/
 │       ├── 开发计划安排文档.md
-│       └── task-status.json      # 任务状态追踪
-├── .codex/
-│   └── config.toml                # Codex 配置文件（可选）
+│       └── task-status.json    # 任务状态追踪
 └── AGENTS.md
 ```
 
@@ -729,8 +739,9 @@ flowchart TD
     Q -->|否| R[修复代码或测试]
     R --> P
     Q -->|是| S[Step 7: 生成 AC 覆盖表]
-    S --> T[Step 8: 更新 task-status.json]
-    T --> U[Step 9: 提交 PR，附自检清单]
+    S --> T[Step 8: 更新 task-status.json 为 review]
+    T --> U[Step 9: 创建分支并提交 PR]
+    U --> V[Step 10: 等待人类审查与合并]
 ```
 
 ### 11.3 Agent 自检清单（PR 描述必填）
@@ -761,8 +772,9 @@ flowchart TD
 - [ ] 核心文件头部包含“出生证明”水印（见 §12.3）
 
 ### 任务状态检查
-- [ ] task-status.json 中该任务已标记为 in_progress/done
+- [ ] task-status.json 中该任务已标记为 in_progress/review
 - [ ] 所有依赖任务已确认完成
+- [ ] PR 链接已记录到 task-status.json
 
 ### 跨语言专项
 - [ ] 向量模型变更附带跨语言 Recall@10 ≥85% 报告
@@ -785,6 +797,11 @@ flowchart TD
 - [ ] 集成测试包含跨语言 Golden 用例
 - [ ] 边界场景测试 (磁盘满、模型损坏、权限拒绝)
 - [ ] 错误注入测试 (L1~L4 全覆盖)
+
+### GitHub 自动化检查
+- [ ] OpenCode 已配置 GitHub token
+- [ ] PR 已自动请求指定 reviewer
+- [ ] 所有 CI 检查已触发并等待结果
 ```
 
 ### 11.4 Agent 禁忌清单
@@ -800,6 +817,7 @@ flowchart TD
 | 违反 Git 提交规范           | PR 阻断            | CI 会检查 Commit 格式         |
 | 未按 §0.2 读取文档就编码    | PR 阻断            | 强制溯源，防止幻觉            |
 | 跳过任务状态更新            | PR 阻断            | task-status.json 必须同步更新 |
+| **Agent 自动合并 PR**       | PR 阻断            | 合并必须由人类手动执行        |
 
 ---
 
@@ -819,9 +837,24 @@ stateDiagram-v2
     in_progress --> blocked: 发现文档问题
     blocked --> in_progress: 人类决策后继续
     in_progress --> review: 代码完成，PR 提交
-    review --> done: PR 合并
+    review --> approved: 人类审查通过
+    approved --> merged: 人类手动合并
+    merged --> done
     done --> [*]
 ```
+
+**状态说明**：
+
+| 状态          | 含义                  | 谁可以变更        |
+| ------------- | --------------------- | ----------------- |
+| `backlog`     | 任务已定义，尚未就绪  | 人类              |
+| `ready`       | 依赖已满足，等待执行  | Agent 自动        |
+| `in_progress` | Agent 正在执行        | Agent 自动        |
+| `blocked`     | 等待人类决策          | Agent 自动 + 人类 |
+| `review`      | PR 已提交，等待审查   | Agent 自动        |
+| `approved`    | PR 已获批准，等待合并 | 人类              |
+| `merged`      | PR 已合并             | 人类              |
+| `done`        | 任务完成              | 人类              |
 
 ### 12.2 Agent 启动时的强制检查
 
@@ -838,7 +871,7 @@ stateDiagram-v2
    依赖状态：全部已完成 ✅
    ```
 
-### 12.3 任务执行六步法
+### 12.3 任务执行九步法（含 GitHub 自动化）
 
 #### 第 1 步：查阅文档并引用原文
 
@@ -859,17 +892,54 @@ stateDiagram-v2
 
 执行 `swift test --filter [任务ID]`，测试通过才进入下一步。
 
-#### 第 5 步：更新任务状态
+#### 第 5 步：更新任务状态为 review
 
 修改 `task-status.json`：
-- 将任务 `status` 从 `in_progress` 改为 `done`
+- 将任务 `status` 从 `in_progress` 改为 `review`
 - 更新 `last_updated` 时间戳
-- 记录 `completed_at` 时间戳
-- 填写 `pr_link`（PR 链接）
+- 准备填写 `pr` 信息
 
-#### 第 6 步：提交 PR
+#### 第 6 步：创建分支并提交代码
 
-创建分支 → 提交代码 → 发起 PR → PR 描述包含 AC 覆盖对照表（见 §3.3）。
+```bash
+git checkout -b {type}/{description}-US-XXX
+git add .
+git commit -m "{type}({scope}): {subject}
+
+{body}
+
+Related: US-XXX"
+git push origin {branch_name}
+```
+
+#### 第 7 步：自动创建 PR（OpenCode 自动化）
+
+OpenCode 自动执行以下操作：
+
+1. 使用 GitHub API 创建 PR，标题和描述遵循 §3.3 规范
+2. 自动请求配置的 reviewer
+3. 在 PR 描述中插入 AC 覆盖对照表
+4. 自动添加标签（如 `status:review`, `US-XXX`）
+5. 在 PR 中添加评论，包含：
+   - 任务 ID 和用户故事编号
+   - 测试结果摘要
+   - 文档变更摘要（如有）
+6. 更新 `task-status.json` 中的 `pr` 字段
+
+#### 第 8 步：等待人类审查
+
+Agent **必须等待**人类 reviewer 的批准。在等待期间：
+
+- Agent 不自动合并 PR
+- Agent 可以响应 PR 中的评论
+- Agent 可以在测试失败时自动推送修复
+
+#### 第 9 步：人类合并后更新状态
+
+PR 合并后，人类（或人类触发的 GitHub Actions）更新 `task-status.json`：
+- 将任务 `status` 从 `review` 改为 `done`
+- 记录 `merged_at` 时间戳
+- 更新 `last_updated` 时间戳
 
 ### 12.4 文档问题处理流程
 
@@ -1023,7 +1093,174 @@ ADR 存入 `docs/decisions/`，Agent 在遇到相关上下文时自动加载。
 
 ---
 
-## 15. 版本与维护声明
+## 15. GitHub 自动化操作规约（OpenCode 专用）
+
+> **核心原则**：OpenCode 可自动化执行常规 GitHub 操作以提升效率，但**合并操作必须由人类手动执行**，确保代码质量和安全性。
+
+### 15.1 操作权限矩阵
+
+| 操作             | 触发条件                   | 是否需要人类审批 | 说明                                    |
+| ---------------- | -------------------------- | ---------------- | --------------------------------------- |
+| **创建分支**     | 任务状态变为 `in_progress` | ❌ 自动           | 分支命名遵循 §3.1 规范                  |
+| **提交代码**     | 任务状态变为 `review`      | ❌ 自动           | Commit message 遵循 §3.2 规范           |
+| **创建 PR**      | 任务状态变为 `review`      | ❌ 自动           | PR 标题和描述遵循 §3.3 规范             |
+| **添加 PR 评论** | 任务状态变更 / CI 完成     | ❌ 自动           | 用于通知、状态更新、测试结果            |
+| **请求 PR 审查** | PR 创建后                  | ❌ 自动           | 自动请求配置的 reviewer                 |
+| **添加 PR 标签** | PR 创建 / 状态变更         | ❌ 自动           | 如 `status:review`, `US-XXX`, `phase-2` |
+| **更新 PR 描述** | 文档/代码变更后            | ❌ 自动           | 同步更新 AC 覆盖表                      |
+| **更新任务状态** | PR 事件触发                | ❌ 自动           | 同步更新 task-status.json               |
+| **通过 PR 审查** | —                          | ✅ **必须**       | 必须由人类完成                          |
+| **合并 PR**      | 所有检查通过 + 人类批准    | ✅ **必须**       | 需要人类手动点击“合并”按钮              |
+| **关闭 PR**      | PR 被拒绝或任务取消        | ✅ **必须**       | 需要人类确认                            |
+
+### 15.2 OpenCode 配置文件
+
+OpenCode 的 GitHub 行为由 `.opencode/config.toml` 控制，Agent 首次启动时应检查该文件是否存在，如不存在则创建：
+
+```toml
+[github]
+token = "$GITHUB_TOKEN"
+repository = "your-username/Echo"
+main_branch = "main"
+
+[github.pr]
+auto_create = true
+auto_request_reviewers = true
+reviewers = ["@teammember1", "@teammember2"]
+required_approvals = 1
+merge_strategy = "squash"
+
+[github.pr.templates]
+title = "{type}({scope}): {description} [US-{story}]"
+description_file = ".opencode/pr-template.md"
+
+[task_tracking]
+enabled = true
+status_file = "docs/05-planning/task-status.json"
+auto_update = true
+
+[rules]
+rules_files = ["AGENTS.md"]
+```
+
+### 15.3 合并前强制门禁
+
+OpenCode **在任何情况下都不得自动合并 PR**。人类执行合并前，必须确认以下所有条件：
+
+1. ✅ 所有 CI 检查通过（单元测试、集成测试、SwiftLint、覆盖率）
+2. ✅ 获得至少 1 名人类 Reviewer 的批准（`required_approvals`）
+3. ✅ `task-status.json` 中对应任务状态为 `review`
+4. ✅ 无未解决的对话线程
+5. ✅ 分支与目标分支（main）无冲突
+
+### 15.4 自动化评论规范
+
+- **PR 创建时**：自动添加评论，包含：
+  - 关联的任务 ID 和用户故事编号
+  - AC 覆盖对照表
+  - 测试结果摘要
+  - 文档变更摘要（如有）
+- **任务状态变更时**：自动在 PR 中添加状态更新评论
+- **文档同步完成时**：自动在 PR 中添加“文档已同步”评论
+- **CI 完成时**：自动更新 PR 中的检查状态
+
+### 15.5 异常处理
+
+| 异常场景            | OpenCode 行为                  | 人类介入方式                  |
+| ------------------- | ------------------------------ | ----------------------------- |
+| **CI 失败**         | 在 PR 中评论失败原因，等待修复 | 查看失败日志，指导修复        |
+| **合并冲突**        | 在 PR 中标记冲突，不自动解决   | 手动解决冲突或指示 Agent 处理 |
+| **权限不足**        | 记录错误，通知人类             | 检查 GitHub token 权限配置    |
+| **reviewer 未响应** | 24 小时后自动提醒              | 手动联系 reviewer 或更换      |
+| **PR 长时间未合并** | 每周提醒一次                   | 评估是否合并或关闭            |
+
+### 15.6 GitHub Actions 工作流
+
+`.github/workflows/opencode.yml` 定义了 OpenCode 的自动化触发规则：
+
+```yaml
+name: OpenCode Automation
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+      - 'fix/*'
+  pull_request:
+    types: [opened, synchronize, ready_for_review, labeled]
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  checks: read
+
+jobs:
+  opencode-automation:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup OpenCode
+        uses: opencode/actions-setup@v1
+        with:
+          version: latest
+
+      - name: Run OpenCode
+        run: |
+          opencode ci \
+            --github-event "${{ github.event_name }}" \
+            --github-token "${{ secrets.GITHUB_TOKEN }}"
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### 15.7 PR 描述模板
+
+`.opencode/pr-template.md` 定义了 PR 描述的自动生成格式：
+
+```markdown
+## 📋 概述
+{description}
+
+## 🔗 关联规格
+- 用户故事: {story}
+- 任务 ID: {task_id}
+- 文档路径: {doc_path}
+
+## ✅ AC 覆盖对照表
+{ac_coverage_table}
+
+## 🧪 测试结果
+- 单元测试: {test_result}
+- 覆盖率: {coverage}%
+
+## 🔍 自检清单
+- [x] 所有新增 Actor 方法入口包含 PrivacyCheckpoint
+- [x] 无 @unchecked Sendable / nonisolated(unsafe) / Combine
+- [x] 无硬编码语言字符串
+- [x] 错误已按 L1~L4 分级，L2 写入 PendingOperations
+- [x] 长任务已通过 TaskQueueActor 入队
+- [x] 模型文件已在 Bundle 内，无网络下载代码
+
+## 📝 Agent 备注
+{agent_notes}
+
+## 📌 下一步
+请人类 Reviewer 审查代码，审查通过后手动合并。
+```
+
+---
+
+## 16. 版本与维护声明
 
 本规约与 Echo v4.6 全量规格书、架构设计文档、避坑手册、工具指南同步维护。任何规约变更必须：
 
@@ -1044,4 +1281,5 @@ ADR 存入 `docs/decisions/`，Agent 在遇到相关上下文时自动加载。
 | v4.7 | 2026-06-27 | 移除 Notion 引用，改用本地 `docs/` 文档索引                  | AI 架构师 |
 | v4.8 | 2026-06-27 | 新增 Git 协作规范                                            | AI 架构师 |
 | v4.9 | 2026-06-27 | 新增任务类型 → 文档快速索引                                  | AI 架构师 |
-| v5.0 | 2026-06-28 | 新增第 12 章“任务执行流程规范”：整合 task-status.json 状态管理、任务执行六步法、文档问题处理流程、阶段集成测试；更新 §0.1/§0.2/§3.4/§11.2 引用任务状态；使开发计划与 Agent 执行闭环 | AI 架构师 |
+| v5.0 | 2026-06-28 | 新增第 12 章“任务执行流程规范”                               | AI 架构师 |
+| v5.1 | 2026-06-28 | 新增第 15 章“GitHub 自动化操作规约”：整合 OpenCode GitHub 操作权限矩阵、配置文件说明、合并门禁、自动化评论规范、异常处理、工作流模板；更新 §0.1 文档目录新增 .github/ 和 .opencode/ 配置；更新 §3.4/§11.3/§12.3 任务执行流程整合 PR 自动化 | AI 架构师 |
