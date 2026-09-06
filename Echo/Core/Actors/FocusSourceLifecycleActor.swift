@@ -4,9 +4,10 @@
 //           docs/decisions/ADR-019-photokit-source-deletion-recovery.md
 // Task: 4.0h - Live source resolution and PhotoKit deletion saga
 // AC coverage: orthogonal source facets, PhotoKit deletion capability gate, confirmed-only D-005,
-//              launch/foreground recovery matrix, hash-only L2, and structured audit
+//              full-scope foreground reconciliation, active-intent isolation, per-journal L2,
+//              non-PhotoKit D-005 recovery, hash-only identity, and structured audit
 // Architecture: AGENTS.md §4.2 actor isolation, R-001/R-005/R-006, D-002/D-003/D-005
-// Generated: 2026-09-05
+// Generated: 2026-09-05 | Updated: 2026-09-06 (PR #76 review)
 // ==========================================
 
 import Foundation
@@ -74,6 +75,18 @@ public nonisolated struct FocusSourceRecoveryResult: Sendable, Equatable {
         self.deletedMemoryIDs = deletedMemoryIDs.sorted { $0.uuidString < $1.uuidString }
         self.retainedMemoryIDs = retainedMemoryIDs.sorted { $0.uuidString < $1.uuidString }
         self.pendingMemoryIDs = pendingMemoryIDs.sorted { $0.uuidString < $1.uuidString }
+    }
+}
+
+public nonisolated struct PhotoSourceMemoryReference: Sendable, Equatable {
+    public nonisolated let memoryID: UUID
+    public nonisolated let sourceLocator: String
+    public nonisolated let sourceType: String
+
+    public nonisolated init(memoryID: UUID, sourceLocator: String, sourceType: String) {
+        self.memoryID = memoryID
+        self.sourceLocator = sourceLocator
+        self.sourceType = sourceType
     }
 }
 
@@ -240,86 +253,64 @@ public actor FocusSourceLifecycleActor {
     ) async throws -> FocusSourceRecoveryResult {
         let checkpoint = await privacyActor.validate(operation: .delete, traceID: traceID)
         guard checkpoint.decision == .allowed else { throw FocusSourceLifecycleError.privacyDenied }
-        let journals = try await database.loadAllDeletionJournals().filter {
+        let allJournals = try await database.loadAllDeletionJournals()
+        let journalMemoryIDs = Set(allJournals.map(\.memoryID))
+        let journals = allJournals.filter {
             $0.intentKind == .photoLibraryAndEcho
+                && !activeDeletionMemoryIDs.contains($0.memoryID)
         }
         var deleted: [UUID] = []
         var retained: [UUID] = []
         var pending: [UUID] = []
 
         for journal in journals {
-            if journal.sourceDeletionState == .confirmedDeleted {
-                _ = try await repository.deleteMemory(
-                    memoryId: journal.memoryID, writeExcluded: false, traceID: journal.traceID
+            do {
+                switch try await recover(journal: journal) {
+                case .deleted:
+                    Self.appendUnique(journal.memoryID, to: &deleted)
+                case .retained:
+                    Self.appendUnique(journal.memoryID, to: &retained)
+                case .pending:
+                    Self.appendUnique(journal.memoryID, to: &pending)
+                }
+            } catch {
+                // A damaged or temporarily unwritable row is L2 for that memory only.
+                // Preserve the journal and continue so it cannot starve later recoveries.
+                try? await enqueuePending(
+                    memoryID: journal.memoryID,
+                    outcome: .systemResultUnknown
                 )
-                try? await removePending(journal.memoryID)
-                deleted.append(journal.memoryID)
-                continue
-            }
-            guard let locator = journal.sourceLocator else {
-                _ = try await repository.updatePhotoLibraryDeletion(
-                    memoryId: journal.memoryID,
-                    state: .indeterminate,
-                    outcome: .sourceUnavailable
-                )
-                try await enqueuePending(memoryID: journal.memoryID, outcome: .sourceUnavailable)
-                pending.append(journal.memoryID)
-                continue
-            }
-
-            let access = await photoLibrary.currentAccess()
-            let snapshot = await photoLibrary.assetSnapshot(assetID: locator)
-            switch (access, snapshot) {
-            case (.authorized, .none):
-                _ = try await repository.updatePhotoLibraryDeletion(
-                    memoryId: journal.memoryID,
-                    state: .confirmedDeleted,
-                    outcome: .reconciledAbsent
-                )
-                _ = try await repository.deleteMemory(
-                    memoryId: journal.memoryID, writeExcluded: false, traceID: journal.traceID
-                )
-                try? await removePending(journal.memoryID)
-                deleted.append(journal.memoryID)
-
-            case (.authorized, .some), (.limited, .some):
-                _ = try await repository.updatePhotoLibraryDeletion(
-                    memoryId: journal.memoryID,
-                    state: .notDeleted,
-                    outcome: .assetVisible
-                )
-                try await repository.abandonPhotoLibraryDeletion(memoryId: journal.memoryID)
-                try? await removePending(journal.memoryID)
-                retained.append(journal.memoryID)
-
-            case (.limited, .none):
-                _ = try await repository.updatePhotoLibraryDeletion(
-                    memoryId: journal.memoryID,
-                    state: .indeterminate,
-                    outcome: .limitedScopeHidden
-                )
-                try await enqueuePending(memoryID: journal.memoryID, outcome: .limitedScopeHidden)
-                pending.append(journal.memoryID)
-
-            case (.denied, _), (.notDetermined, _):
-                _ = try await repository.updatePhotoLibraryDeletion(
-                    memoryId: journal.memoryID,
-                    state: .indeterminate,
-                    outcome: .authorizationDenied
-                )
-                try await enqueuePending(memoryID: journal.memoryID, outcome: .authorizationDenied)
-                pending.append(journal.memoryID)
-
-            case (.restricted, _):
-                _ = try await repository.updatePhotoLibraryDeletion(
-                    memoryId: journal.memoryID,
-                    state: .indeterminate,
-                    outcome: .accessRestricted
-                )
-                try await enqueuePending(memoryID: journal.memoryID, outcome: .accessRestricted)
-                pending.append(journal.memoryID)
+                Self.appendUnique(journal.memoryID, to: &pending)
             }
         }
+
+        for journal in allJournals where journal.intentKind != .photoLibraryAndEcho {
+            guard !activeDeletionMemoryIDs.contains(journal.memoryID) else { continue }
+            do {
+                _ = try await repository.deleteMemory(
+                    memoryId: journal.memoryID,
+                    sourceLocator: journal.sourceLocator,
+                    sourceType: journal.sourceType,
+                    writeExcluded: journal.writeExcluded ?? (journal.intentKind == .echoOnly),
+                    traceID: journal.traceID
+                )
+                try? await removePending(journal.memoryID)
+                Self.appendUnique(journal.memoryID, to: &deleted)
+            } catch {
+                try? await enqueuePending(
+                    memoryID: journal.memoryID,
+                    outcome: .systemResultUnknown
+                )
+                Self.appendUnique(journal.memoryID, to: &pending)
+            }
+        }
+
+        try await reconcileTrackedPhotoSources(
+            traceID: traceID,
+            excluding: journalMemoryIDs,
+            deleted: &deleted,
+            pending: &pending
+        )
         return FocusSourceRecoveryResult(
             deletedMemoryIDs: deleted,
             retainedMemoryIDs: retained,
@@ -346,7 +337,7 @@ public actor FocusSourceLifecycleActor {
     }
 
     private func resolvePhotoMemory(_ memory: Memory) async -> FocusSourceResolution {
-        let access = await photoLibrary.currentAccess()
+        let (access, snapshot) = await photoLibraryEvidence(assetID: memory.sourceLocator)
         guard access == .authorized || access == .limited else {
             return FocusSourceResolution(
                 memoryID: memory.memoryId,
@@ -356,7 +347,7 @@ public actor FocusSourceLifecycleActor {
                 sourceDeletionCapability: .unavailable
             )
         }
-        guard let snapshot = await photoLibrary.assetSnapshot(assetID: memory.sourceLocator) else {
+        guard let snapshot else {
             return FocusSourceResolution(
                 memoryID: memory.memoryId,
                 sourceType: memory.sourceType,
@@ -372,6 +363,166 @@ public actor FocusSourceLifecycleActor {
             presentation: snapshot.mediaType == .video ? .video : .photo,
             sourceDeletionCapability: snapshot.canDelete ? .photoLibraryDeletable : .unavailable
         )
+    }
+
+    private enum RecoveryDisposition {
+        case deleted
+        case retained
+        case pending
+    }
+
+    private struct PhotoSourceKey: Hashable {
+        let sourceLocator: String
+        let sourceType: String
+    }
+
+    private func recover(journal: MemoryDeletionJournal) async throws -> RecoveryDisposition {
+        if journal.sourceDeletionState == .confirmedDeleted {
+            _ = try await repository.deleteMemory(
+                memoryId: journal.memoryID, writeExcluded: false, traceID: journal.traceID
+            )
+            try? await removePending(journal.memoryID)
+            return .deleted
+        }
+        guard let locator = journal.sourceLocator else {
+            _ = try await repository.updatePhotoLibraryDeletion(
+                memoryId: journal.memoryID,
+                state: .indeterminate,
+                outcome: .sourceUnavailable
+            )
+            try await enqueuePending(memoryID: journal.memoryID, outcome: .sourceUnavailable)
+            return .pending
+        }
+
+        let (access, snapshot) = await photoLibraryEvidence(assetID: locator)
+        switch (access, snapshot) {
+        case (.authorized, .none):
+            _ = try await repository.updatePhotoLibraryDeletion(
+                memoryId: journal.memoryID,
+                state: .confirmedDeleted,
+                outcome: .reconciledAbsent
+            )
+            _ = try await repository.deleteMemory(
+                memoryId: journal.memoryID, writeExcluded: false, traceID: journal.traceID
+            )
+            try? await removePending(journal.memoryID)
+            return .deleted
+
+        case (.authorized, .some), (.limited, .some):
+            _ = try await repository.updatePhotoLibraryDeletion(
+                memoryId: journal.memoryID,
+                state: .notDeleted,
+                outcome: .assetVisible
+            )
+            try await repository.abandonPhotoLibraryDeletion(memoryId: journal.memoryID)
+            try? await removePending(journal.memoryID)
+            return .retained
+
+        case (.limited, .none):
+            _ = try await repository.updatePhotoLibraryDeletion(
+                memoryId: journal.memoryID,
+                state: .indeterminate,
+                outcome: .limitedScopeHidden
+            )
+            try await enqueuePending(memoryID: journal.memoryID, outcome: .limitedScopeHidden)
+            return .pending
+
+        case (.denied, _), (.notDetermined, _):
+            _ = try await repository.updatePhotoLibraryDeletion(
+                memoryId: journal.memoryID,
+                state: .indeterminate,
+                outcome: .authorizationDenied
+            )
+            try await enqueuePending(memoryID: journal.memoryID, outcome: .authorizationDenied)
+            return .pending
+
+        case (.restricted, _):
+            _ = try await repository.updatePhotoLibraryDeletion(
+                memoryId: journal.memoryID,
+                state: .indeterminate,
+                outcome: .accessRestricted
+            )
+            try await enqueuePending(memoryID: journal.memoryID, outcome: .accessRestricted)
+            return .pending
+        }
+    }
+
+    private func reconcileTrackedPhotoSources(
+        traceID: String,
+        excluding journalMemoryIDs: Set<UUID>,
+        deleted: inout [UUID],
+        pending: inout [UUID]
+    ) async throws {
+        guard await photoLibrary.currentAccess() == .authorized else { return }
+        let visibleAssetIDs = await photoLibrary.visibleAssetIDs()
+        // The full-scope set is deletion evidence only if authorization is still full
+        // after enumeration; a concurrent downgrade must fail closed.
+        guard await photoLibrary.currentAccess() == .authorized else { return }
+        let references = try await repository.loadPhotoSourceReferences()
+        let groups = Dictionary(grouping: references) {
+            PhotoSourceKey(sourceLocator: $0.sourceLocator, sourceType: $0.sourceType)
+        }
+        for (key, group) in groups.sorted(by: {
+            ($0.key.sourceType, $0.key.sourceLocator) < ($1.key.sourceType, $1.key.sourceLocator)
+        }) {
+            let candidates = group.filter {
+                !journalMemoryIDs.contains($0.memoryID)
+                    && !activeDeletionMemoryIDs.contains($0.memoryID)
+            }
+            guard !candidates.isEmpty else { continue }
+            let sourceCheckpoint = await privacyActor.validate(
+                operation: .delete,
+                traceID: traceID,
+                sourceTypes: [key.sourceType]
+            )
+            guard sourceCheckpoint.decision == .allowed else { continue }
+            guard !visibleAssetIDs.contains(key.sourceLocator) else { continue }
+
+            let reserved = candidates.filter {
+                activeDeletionMemoryIDs.insert($0.memoryID).inserted
+            }
+            guard reserved.count == candidates.count else {
+                reserved.forEach { activeDeletionMemoryIDs.remove($0.memoryID) }
+                continue
+            }
+            defer { reserved.forEach { activeDeletionMemoryIDs.remove($0.memoryID) } }
+            do {
+                let result = try await repository.cascadeDeleteFromOriginal(
+                    assetId: key.sourceLocator,
+                    sourceType: key.sourceType,
+                    traceID: traceID
+                )
+                if result.deletedCount > 0 {
+                    candidates.forEach { Self.appendUnique($0.memoryID, to: &deleted) }
+                }
+            } catch {
+                for candidate in candidates {
+                    try? await enqueuePending(
+                        memoryID: candidate.memoryID,
+                        outcome: .systemResultUnknown
+                    )
+                    Self.appendUnique(candidate.memoryID, to: &pending)
+                }
+            }
+        }
+    }
+
+    /// Rechecks authorization after a nil fetch so revocation cannot be mistaken for absence.
+    private func photoLibraryEvidence(
+        assetID: String
+    ) async -> (PhotoAccess, PhotoSourceSnapshot?) {
+        let accessBeforeFetch = await photoLibrary.currentAccess()
+        guard accessBeforeFetch == .authorized || accessBeforeFetch == .limited else {
+            return (accessBeforeFetch, nil)
+        }
+        let snapshot = await photoLibrary.assetSnapshot(assetID: assetID)
+        guard snapshot == nil else { return (accessBeforeFetch, snapshot) }
+        return (await photoLibrary.currentAccess(), nil)
+    }
+
+    private nonisolated static func appendUnique(_ memoryID: UUID, to values: inout [UUID]) {
+        guard !values.contains(memoryID) else { return }
+        values.append(memoryID)
     }
 
     private nonisolated static func presentation(for sourceType: String) -> FocusSourcePresentation {

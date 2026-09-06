@@ -1,6 +1,6 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v5.46
+**版本**：v5.47
 **生效日期**：2026-09-05
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（Codex / OpenCode / Cursor / Claude）及人类开发者
 **优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
@@ -557,8 +557,8 @@ let checkpoint = await PrivacyActor.shared.validate(
 | `.videoIngested`                  | 视频摄入                 | frameCount, audioTranscriptLength, hasAudio               |
 | `.voiceIngested`                  | 语音转写摄入             | transcriptModelVersion                                    |
 | `.shareExtensionImported`         | Share Extension 分享摄入 | importOrigin=shareExtension, contentType；可信来源存在时可附 sourceAppDigest，禁止猜测 host App |
-| `.memoryDeleted`                  | 记忆删除或原始删除尝试   | preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAssetWritten, success |
-| `.cascadeDeleteFromOriginal`      | PhotoKit 原始文件级联清除 | assetIdDigest, memoryIdDigest, excludedAutoCleaned, userNotified=false, excludedAssetWritten=false, success |
+| `.memoryDeleted`                  | 记忆删除或原始删除尝试   | preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedWritten, success |
+| `.cascadeDeleteFromOriginal`      | PhotoKit 原始文件级联清除 | assetIdDigest, memoryIdDigest, excludedAutoCleaned, userNotified=false, excludedWritten=false, success |
 | `.memoryEdited`                   | 手动编辑记忆             | editedFields, reindexed, conflictResolvedWith             |
 | `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat, sharePresented, periodType（可选）；不记录目标 App/完成状态 |
 | `.narrativeReportGenerated`       | 月度/年度报告生成         | periodType, dataSourcesUsed, periodKeyDigest               |
@@ -1551,3 +1551,4 @@ $init-session-echo → $next-task-echo → $ui-bootstrap-build-echo <task-id>
 | v5.44 | 2026-09-04 | GitHub 认证误判防护：`gh` 认证改为沙箱初检与联网只读复核的双阶段判断；仅明确 401/Bad credentials 才要求重新认证，DNS、超时和 API 不可达统一归类为网络问题；同步 commit-pr-echo 的 Codex skill 与 OpenCode 回滚源。 | Codex |
 | v5.45 | 2026-09-04 | 4.0g PR 预审修订：用队列 taskId reservation 封闭 Restart 替换与普通入队竞态；区分活动队列所有权和 orphan checkpoint；清理排队取消后的 pause 所有权；未知任务类型 fail-closed 且不可执行；Pause/Resume/Cancel 仅在真实成功后更新 UI，Pause/Cancel 审计带 outcome。同步全部 Echo skills 使用 GitHub 双阶段认证判断，避免非 commit 流程继续误报需重认证。 | Codex |
 | v5.46 | 2026-09-05 | 4.0h 规格合理性复审（ADR-019）：来源内容可用性与删除能力分面建模；PhotoKit 删除要求 `canPerform(.delete)`；扩展同一删除 journal 的外部结果门禁，只有 confirmedDeleted 才能推进 D-005；limited-hidden/撤权不可见不作为删除证据；Share Extension 不猜测 host App，非持久化音频只展示转写；`userNotified` 仅在提示实际展示后为 true。 | Codex |
+| v5.47 | 2026-09-06 | 4.0h PR 预审修订：统一删除审计字段为生产 schema 的 `excludedWritten`；补齐 observer 注册前基线、全量 PhotoKit 前台补偿、活跃删除竞态隔离、逐 journal 容错、通知确认事务与非阻断 UI 结果；同步修复 Share Extension 备忘录 AC 和 Phase 3F 基线状态一致性。 | Codex |

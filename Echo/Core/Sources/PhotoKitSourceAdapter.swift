@@ -10,13 +10,14 @@
 // AC 覆盖: US-SRC-001 AC-1 (PHAsset 读取图片/视频), AC-5 (.dataSourceConnected 审计 sourceType+itemCount),
 //          AC-6 (仅处理已下载本地资源 — isNetworkAccessAllowed=false), AC-3 (支持"仅授权部分相册"),
 //          US-SRC-008 AC-4 (排除项不重新导入), ADR-008 §决策-1/5 (全授权状态 + 撤回立即停止),
+//          US-PRV-004/007 (live canPerform(.delete) snapshot + visible-ID reconciliation),
 //          iOS 26 fix (limited 选择器主动弹出 — shouldPresentLimitedLibraryPicker, 3F.2 review)
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), §7.3 (审计事件), R-001/R-005 (零网络),
 //            R-007 (禁止 unchecked Sendable)
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
 //       PhotoKit SDK 将 PHPhotoLibrary/PHImageManager 标注 @MainActor，真实实现通过
 //       MainActor.run 跳转访问；协议方法均为 async，可被 Fake 注入测试
-// Generated: 2026-08-05 | Updated: 2026-09-05 (4.0h)
+// Generated: 2026-08-05 | Updated: 2026-09-06 (PR #76 review)
 // ==========================================
 
 import Foundation
@@ -135,6 +136,7 @@ public nonisolated enum PhotoLibraryDeletionResult: Sendable, Equatable {
 public protocol PhotoSourceLifecycleServing: Sendable {
     func currentAccess() async -> PhotoAccess
     func assetSnapshot(assetID: String) async -> PhotoSourceSnapshot?
+    func visibleAssetIDs() async -> Set<String>
     func deleteAsset(assetID: String) async -> PhotoLibraryDeletionResult
 }
 
@@ -187,6 +189,19 @@ public struct RealPhotoLibrary: PhotoLibraryServing, PhotoSourceLifecycleServing
 
     public nonisolated func assetSnapshot(assetID: String) async -> PhotoSourceSnapshot? {
         await Self.lifecycleSnapshot(assetID)
+    }
+
+    public nonisolated func visibleAssetIDs() async -> Set<String> {
+        await MainActor.run {
+            let access = PhotoAccessMapper.map(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+            guard access == .authorized || access == .limited else { return [] }
+            let fetch = PHAsset.fetchAssets(with: nil)
+            var identifiers: Set<String> = []
+            fetch.enumerateObjects { asset, _, _ in
+                identifiers.insert(asset.localIdentifier)
+            }
+            return identifiers
+        }
     }
 
     public nonisolated func deleteAsset(assetID: String) async -> PhotoLibraryDeletionResult {

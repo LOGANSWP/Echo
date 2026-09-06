@@ -306,6 +306,15 @@ struct MemoryDetailView: View {
                 // 媒体预览 (US-RET-001: photo/image, video/player, voice/audio)
                 mediaPreview(memory)
 
+                if let notice = viewModel.sourceDeletionNotice {
+                    EchoContainer(level: .section) {
+                        Label(notice, systemImage: "info.circle.fill")
+                            .font(EchoTypographyToken.metadata.font)
+                            .foregroundStyle(EchoColorToken.secondaryText.color)
+                    }
+                    .accessibilityIdentifier("memory-source-deletion-notice")
+                }
+
                 // 主内容本体
                 memoryContent(memory)
 

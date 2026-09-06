@@ -17,6 +17,7 @@ private actor FocusSourcePhotoLibraryFake: PhotoSourceLifecycleServing {
     private var snapshots: [String: PhotoSourceSnapshot]
     private var deletionResult: PhotoLibraryDeletionResult
     private var deleteCalls: [String] = []
+    private var deletionSuspended = false
 
     init(
         access: PhotoAccess,
@@ -34,14 +35,22 @@ private actor FocusSourcePhotoLibraryFake: PhotoSourceLifecycleServing {
         snapshots[assetID]
     }
 
+    func visibleAssetIDs() async -> Set<String> {
+        Set(snapshots.keys)
+    }
+
     func deleteAsset(assetID: String) async -> PhotoLibraryDeletionResult {
         deleteCalls.append(assetID)
+        while deletionSuspended {
+            await Task.yield()
+        }
         return deletionResult
     }
 
     func setAccess(_ value: PhotoAccess) { access = value }
     func setSnapshot(_ value: PhotoSourceSnapshot?, for assetID: String) { snapshots[assetID] = value }
     func setDeletionResult(_ value: PhotoLibraryDeletionResult) { deletionResult = value }
+    func setDeletionSuspended(_ value: Bool) { deletionSuspended = value }
     func deletionCalls() -> [String] { deleteCalls }
 }
 
@@ -356,6 +365,150 @@ struct FocusSourceLifecycleTests {
         #expect(try await system.db.loadDeletionJournals(memoryId: memoryID).isEmpty)
     }
 
+    @Test("AC-3/5: foreground recovery skips an in-flight PhotoKit confirmation")
+    func test_AC3_AC5_recoverySkipsActiveDeletion() async throws {
+        let assetID = "asset-active-deletion"
+        let system = try await makeSystem(snapshots: [
+            assetID: PhotoSourceSnapshot(
+                assetID: assetID, mediaType: .photo, isLocallyAvailable: true, canDelete: true
+            ),
+        ])
+        let memoryID = try await seedMemory(
+            system.db, sourceLocator: assetID, sourceType: "photo"
+        )
+        await system.library.setDeletionSuspended(true)
+
+        let deletion = Task {
+            try await system.lifecycle.deletePhotoLibraryOriginal(
+                memoryID: memoryID, traceID: "delete-active"
+            )
+        }
+        for _ in 0..<200 where await system.library.deletionCalls().isEmpty {
+            await Task.yield()
+        }
+
+        let recovery = try await system.lifecycle.recoverPendingPhotoLibraryDeletions(
+            traceID: "recover-during-delete"
+        )
+        #expect(recovery.deletedMemoryIDs.isEmpty)
+        #expect(recovery.retainedMemoryIDs.isEmpty)
+        #expect(try await system.repository.loadMemory(memoryId: memoryID) != nil)
+
+        await system.library.setDeletionSuspended(false)
+        #expect(try await deletion.value == .deleted)
+        #expect(try await system.repository.loadMemory(memoryId: memoryID) == nil)
+    }
+
+    @Test("AC-3: one corrupt journal does not block recovery of later memories")
+    func test_AC3_recoveryIsolatesJournalFailures() async throws {
+        let badAssetID = "asset-visible-corrupt-journal"
+        let goodAssetID = "asset-missing-later-journal"
+        let system = try await makeSystem(snapshots: [
+            badAssetID: PhotoSourceSnapshot(
+                assetID: badAssetID, mediaType: .photo, isLocallyAvailable: true, canDelete: true
+            ),
+        ])
+        let badMemoryID = try await seedMemory(
+            system.db, sourceLocator: badAssetID, sourceType: "photo"
+        )
+        let goodMemoryID = try await seedMemory(
+            system.db, sourceLocator: goodAssetID, sourceType: "photo"
+        )
+        let badPrepared = try await system.repository.preparePhotoLibraryDeletion(
+            memoryId: badMemoryID, traceID: "bad-journal"
+        )
+        try await system.db.upsertDeletionJournal(MemoryDeletionJournal(
+            operationID: badPrepared.operationID,
+            memoryID: badPrepared.memoryID,
+            auditSubjectHash: badPrepared.auditSubjectHash,
+            traceID: badPrepared.traceID,
+            phase: .cacheInvalidated,
+            vectorIDsByGeneration: badPrepared.vectorIDsByGeneration,
+            sourceLocator: badPrepared.sourceLocator,
+            sourceType: badPrepared.sourceType,
+            writeExcluded: false,
+            intentKind: .photoLibraryAndEcho,
+            sourceDeletionState: .prepared,
+            sourceDeletionOutcome: .notRequested
+        ))
+        _ = try await system.repository.preparePhotoLibraryDeletion(
+            memoryId: goodMemoryID, traceID: "good-journal"
+        )
+
+        let recovery = try await system.lifecycle.recoverPendingPhotoLibraryDeletions(
+            traceID: "recover-independent"
+        )
+
+        #expect(recovery.pendingMemoryIDs.contains(badMemoryID))
+        #expect(recovery.deletedMemoryIDs.contains(goodMemoryID))
+        #expect(try await system.repository.loadMemory(memoryId: badMemoryID) != nil)
+        #expect(try await system.repository.loadMemory(memoryId: goodMemoryID) == nil)
+    }
+
+    @Test("AC-4: foreground reconciliation removes only missing PhotoKit memories")
+    func test_AC4_foregroundReconcilesTrackedPhotoSources() async throws {
+        let sharedLocator = "tracked-photo-missing"
+        let system = try await makeSystem(access: .authorized)
+        let photoID = try await seedMemory(
+            system.db, sourceLocator: sharedLocator, sourceType: "photo"
+        )
+        let noteID = try await seedMemory(
+            system.db, sourceLocator: sharedLocator, sourceType: "note"
+        )
+
+        let recovery = try await system.lifecycle.recoverPendingPhotoLibraryDeletions(
+            traceID: "recover-tracked-sources"
+        )
+
+        #expect(recovery.deletedMemoryIDs == [photoID])
+        #expect(try await system.repository.loadMemory(memoryId: photoID) == nil)
+        #expect(try await system.repository.loadMemory(memoryId: noteID) != nil)
+    }
+
+    @Test("AC-4/5: foreground recovery completes an interrupted external cascade with audit evidence")
+    func test_AC4_AC5_recoveryCompletesExternalCascadeJournal() async throws {
+        let assetID = "asset-interrupted-cascade"
+        let system = try await makeSystem(access: .authorized)
+        let memoryID = try await seedMemory(
+            system.db, sourceLocator: assetID, sourceType: "photo"
+        )
+        try await system.excluded.add(
+            assetId: assetID, sourceType: "photo", traceID: "exclude-before-interruption"
+        )
+        await system.repository.setFault(.deleteFail)
+        await #expect(throws: CanonicalRepositoryError.self) {
+            try await system.repository.deleteMemory(
+                memoryId: memoryID,
+                writeExcluded: false,
+                traceID: "interrupted-cascade"
+            )
+        }
+        await system.repository.setFault(nil)
+        #expect(try await system.db.loadDeletionJournals(memoryId: memoryID).count == 1)
+
+        let recovery = try await system.lifecycle.recoverPendingPhotoLibraryDeletions(
+            traceID: "foreground-recovery"
+        )
+
+        #expect(recovery.deletedMemoryIDs == [memoryID])
+        #expect(try await system.repository.loadMemory(memoryId: memoryID) == nil)
+        #expect(try await system.db.loadDeletionJournals(memoryId: memoryID).isEmpty)
+        #expect(try await system.excluded.contains(assetId: assetID) == false)
+        let memoryAudits = try await system.db.executeQuery(
+            sql: "SELECT * FROM AuditLog WHERE eventType = 'memoryDeleted' AND traceID = ?",
+            bindings: [.text("interrupted-cascade")]
+        )
+        let cascadeAudits = try await system.db.executeQuery(
+            sql: "SELECT * FROM AuditLog WHERE eventType = 'cascadeDeleteFromOriginal' AND traceID = ?",
+            bindings: [.text("interrupted-cascade")]
+        )
+        #expect(memoryAudits.count == 1)
+        #expect(cascadeAudits.count == 1)
+        #expect(cascadeAudits.first?["excludedWritten"]?.intValue == 0)
+        #expect(cascadeAudits.first?["excludedAutoCleaned"]?.intValue == 1)
+        #expect(cascadeAudits.first?["userNotified"]?.intValue == 0)
+    }
+
     @Test("AC-4: external cascade cleanup is pending until the notice is actually presented")
     func test_AC4_cascadeCleanupNoticeIsTruthful() async throws {
         let assetID = "asset-cascade"
@@ -498,6 +651,42 @@ struct FocusSourceLifecycleTests {
         #expect(viewModel.hasRemovedMemory)
         #expect(viewModel.memory == nil)
         #expect(await lifecycle.deletionCallCount() == 1)
+    }
+
+    @Test("AC-2/3: retained original deletion keeps Detail loaded and shows a notice")
+    func test_AC2_AC3_retainedDeletionKeepsDetailLoaded() async throws {
+        let memoryID = UUID()
+        let memory = Memory(
+            memoryId: memoryID,
+            sourceLocator: "asset-retained-detail",
+            canonicalText: "Detail text",
+            sourceType: "photo"
+        )
+        let lifecycle = FocusSourceLifecycleServiceFake(
+            resolution: FocusSourceResolution(
+                memoryID: memoryID,
+                sourceType: "photo",
+                contentAvailability: .available,
+                presentation: .photo,
+                sourceDeletionCapability: .photoLibraryDeletable
+            ),
+            deletionResult: .retained(.assetNotDeletable)
+        )
+        let viewModel = MemoryDetailViewModel(
+            translationService: FixtureTranslationService(),
+            translationCache: TranslationCache(),
+            canonicalRepository: FocusMemoryDetailRepositoryFake(memory: memory),
+            sourceLifecycleService: lifecycle
+        )
+        viewModel.load(memoryId: memoryID)
+        for _ in 0..<100 where viewModel.viewState == .loading { await Task.yield() }
+
+        viewModel.deleteOriginal()
+        for _ in 0..<100 where viewModel.viewState == .loading { await Task.yield() }
+
+        #expect(viewModel.viewState == .completed)
+        #expect(viewModel.memory?.id == memoryID)
+        #expect(viewModel.sourceDeletionNotice != nil)
     }
 
     @Test("AC-4: Excluded Items adapter acknowledges cleanup only through its presentation action")

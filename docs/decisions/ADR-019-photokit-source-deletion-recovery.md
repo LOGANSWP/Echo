@@ -61,13 +61,13 @@ Share Extension 文本只展示 Echo 已保存的 canonical 文本；Share Exten
 
 ### 4. 外部级联删除只覆盖可可靠观察的 PhotoKit 资产
 
-v1 的 `US-PRV-007` 仅对已摄入、可通过 PhotoKit 稳定 localIdentifier 追踪的 photo/video 生效。`PHPhotoLibraryChangeObserver` 只在系统向 App 投递变更时触发处理；App 启动/进入前台时执行补偿核对。Share Extension 文本、音频和第三方文件的来源原件位于其他 App 或文件提供者控制域，Echo 不声称能监听其删除。
+v1 的 `US-PRV-007` 仅对已摄入、可通过 PhotoKit 稳定 localIdentifier 追踪的 photo/video 生效。`PHPhotoLibraryChangeObserver` 注册前必须建立 pre-change `PHFetchResult` 基线，避免首个变更回调因缺少旧快照而丢失。App 启动/进入前台时，在 full `.authorized` 下枚举当前可见 localIdentifier 集合，与所有已追踪 photo/video canonical 记录补偿核对；枚举完成后必须复读授权，防止并发降权被误判为缺失。补偿按 `sourceLocator + sourceType` 删除，且跳过已有 journal 或当前活动删除 intent，避免和用户确认流竞态。Share Extension 文本、音频和第三方文件的来源原件位于其他 App 或文件提供者控制域，Echo 不声称能监听其删除。
 
 limited 范围内的“资产不再可见”只表示 `limitedScopeHidden`，不是删除证据；不得触发级联清理。硬性“删除后 5 秒内完成”改为“Echo 收到可验证删除事件或在 full 授权下确认缺失后尽快启动可恢复 D-005 清理”，不承诺 iOS 未给执行机会时的墙钟时间。
 
 ### 5. 审计字段必须是真实的结构化事实
 
-`.memoryDeleted` 至少结构化保存：`preservedOriginal`、`sourceDeletionRequested`、`sourceDeletionCompleted`、`sourceDeletionOutcome`、`excludedAssetWritten`、`success`。`.cascadeDeleteFromOriginal` 保存 hash-only 的 asset/memory identity、`excludedAutoCleaned`、`excludedAssetWritten=false` 与结果。
+`.memoryDeleted` 至少结构化保存：`preservedOriginal`、`sourceDeletionRequested`、`sourceDeletionCompleted`、`sourceDeletionOutcome`、`excludedWritten`、`success`。`.cascadeDeleteFromOriginal` 保存 hash-only 的 asset/memory identity、`excludedAutoCleaned`、`excludedWritten=false` 与结果。
 
 清理无效排除项时先记录 `userNotified=false`。只有“已排除项目”界面实际展示一次性提示后，才另写 `.excludedAutoCleaned` 展示事件并记录 `userNotified=true`；禁止提前宣称用户已获知。
 
@@ -94,6 +94,7 @@ limited 范围内的“资产不再可见”只表示 `limitedScopeHidden`，不
 ## 后果
 
 - `4.0h` 需要受控扩展 `MemoryDeletionJournal` schema、恢复协调器、结构化审计字段与 foreground reconciliation；不能只做 UI adapter。
+- 所有 D-005 journal（包括 `echoOnly` 与 `externalCascade`）必须可在前台逐条恢复；单条损坏或临时写失败只进入该记忆的 L2，不得阻塞后续 journal。完成审计在移除 journal 前原子提交，避免半写审计或静默丢证据。
 - Source resolver 不再声称能识别 Share Extension host App，也不再承诺非持久化语音原件播放。
 - PhotoKit limited 状态变得更保守：不可见资产不会自动级联删除，优先避免误删本地记忆。
 - `4.2`、`4.5`、`4.6` 必须消费并验证该门禁，不能用 fixture 或单纯 fetch-missing 测试替代。

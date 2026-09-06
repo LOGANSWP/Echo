@@ -335,6 +335,8 @@ final class MemoryDetailViewModel {
     private(set) var hasRemovedMemory = false
     /// True only after an explicit Preview/test/XCUITest fixture injection.
     private(set) var isFixtureBacked = false
+    /// Non-blocking status for an original-source deletion that retained the Echo memory.
+    private(set) var sourceDeletionNotice: String?
 
     // MARK: - Edit Form State (US-AWK-007 AC-1)
 
@@ -486,6 +488,7 @@ final class MemoryDetailViewModel {
         requestedMemoryID = memoryId
         memory = nil
         stubMemory = nil
+        sourceDeletionNotice = nil
 
         // Set loading synchronously (AGENTS.md §8.1: first line of action)
         viewState = .loading
@@ -603,6 +606,7 @@ final class MemoryDetailViewModel {
     func loadPreloaded(_ model: MemoryDetailModel) {
         requestedMemoryID = nil
         isFixtureBacked = true
+        sourceDeletionNotice = nil
         stubMemory = model
         memory = model
         photoImage = nil
@@ -898,6 +902,7 @@ final class MemoryDetailViewModel {
     func deleteOriginal() {
         viewState = .loading
         showDeleteConfirmation = false
+        sourceDeletionNotice = nil
         guard let current = memory else {
             viewState = .idle
             return
@@ -909,9 +914,10 @@ final class MemoryDetailViewModel {
             return
         }
         guard canDeleteOriginal, let sourceLifecycleService else {
-            viewState = .error(.l2Recoverable(
-                message: EchoStrings.tr("The original source is not currently available for deletion.")
-            ))
+            sourceDeletionNotice = EchoStrings.tr(
+                "The original source is not currently available for deletion."
+            )
+            viewState = .completed
             return
         }
         Task { [weak self] in
@@ -928,18 +934,21 @@ final class MemoryDetailViewModel {
                 case .retained(.userCancelled):
                     self.viewState = .completed
                 case .retained:
-                    self.viewState = .error(.l2Recoverable(
-                        message: EchoStrings.tr("The original was not deleted. Your Echo memory was kept.")
-                    ))
+                    self.sourceDeletionNotice = EchoStrings.tr(
+                        "The original was not deleted. Your Echo memory was kept."
+                    )
+                    self.viewState = .completed
                 case .pendingRecovery:
-                    self.viewState = .error(.l2Recoverable(
-                        message: EchoStrings.tr("Deletion could not be confirmed. Echo kept the memory and will check again.")
-                    ))
+                    self.sourceDeletionNotice = EchoStrings.tr(
+                        "Deletion could not be confirmed. Echo kept the memory and will check again."
+                    )
+                    self.viewState = .completed
                 }
             } catch {
-                self.viewState = .error(.l2Recoverable(
-                    message: EchoStrings.tr("Unable to delete the original source. Your Echo memory was kept.")
-                ))
+                self.sourceDeletionNotice = EchoStrings.tr(
+                    "Unable to delete the original source. Your Echo memory was kept."
+                )
+                self.viewState = .completed
             }
         }
     }

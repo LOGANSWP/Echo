@@ -42,17 +42,15 @@ final class ExcludedItemsViewModel {
 
     /// Called only after the notice has entered the visible SwiftUI hierarchy.
     func markCleanupNoticePresented(visibleCount: Int) async {
-        state = .loading
+        guard case .completed = state else { return }
         do {
             _ = try await excludedAssets.markCleanupNoticesPresented(traceID: UUID().uuidString)
             state = .completed(
                 pendingCleanupCount: visibleCount,
                 wasPresentedThisSession: true
             )
-        } catch is CancellationError {
-            state = .cancelled
         } catch {
-            state = .error
+            // Keep the loaded notice visible. The database row remains pending and load() retries it.
         }
     }
 }

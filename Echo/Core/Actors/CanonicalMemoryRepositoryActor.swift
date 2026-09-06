@@ -25,6 +25,8 @@
 //                  and remove every representation vector plus IndexBuildItem residue.
 // PR#65 third review fix: vector persistence is a fail-stop phase boundary, and resumed
 //                        deletion removes the exact persisted journal operation.
+// PR#76 review fix: external cascades are source-type scoped; incomplete journals recover;
+//                   mandatory completion audits commit atomically before journal removal.
 // ==========================================
 
 import Foundation
@@ -252,6 +254,25 @@ public actor CanonicalMemoryRepositoryActor {
             bindings: [.text(sourceLocator)]
         )
         return rows.compactMap { $0["memoryId"]?.stringValue }
+    }
+
+    /// Returns every canonical PhotoKit identity used by foreground deletion reconciliation.
+    func loadPhotoSourceReferences() async throws -> [PhotoSourceMemoryReference] {
+        let rows = try await db.executeQuery(
+            sql: "SELECT memoryId, sourceLocator, sourceType FROM Memory WHERE sourceType IN ('photo', 'video') ORDER BY sourceType, sourceLocator, memoryId",
+            bindings: []
+        )
+        return rows.compactMap { row in
+            guard let rawMemoryID = row["memoryId"]?.stringValue,
+                  let memoryID = UUID(uuidString: rawMemoryID),
+                  let sourceLocator = row["sourceLocator"]?.stringValue,
+                  let sourceType = row["sourceType"]?.stringValue else { return nil }
+            return PhotoSourceMemoryReference(
+                memoryID: memoryID,
+                sourceLocator: sourceLocator,
+                sourceType: sourceType
+            )
+        }
     }
 
     public func loadRepresentations(memoryId: UUID) async throws -> [Representation] {
@@ -555,14 +576,27 @@ public actor CanonicalMemoryRepositoryActor {
         }
 
         var excludedActuallyWritten = false
+        var excludedAutoCleaned = false
         if effectiveWriteExcluded, let locator = effectiveLocator, let st = effectiveType {
             try await excludedAssets.add(assetId: locator, sourceType: st, traceID: journal.traceID)
             excludedActuallyWritten = true
+        } else if journal.intentKind == .externalCascade,
+                  let locator = effectiveLocator,
+                  let st = effectiveType {
+            let removed = try await excludedAssets.recordCascadeCleanup(
+                assetId: locator,
+                sourceType: st,
+                traceID: journal.traceID
+            )
+            let hasCleanupNotice = try await excludedAssets.hasCleanupNotice(assetId: locator)
+            excludedAutoCleaned = removed || hasCleanupNotice
         }
 
-        // 完成审计（不含 memory subject 明文）
+        // Mandatory completion evidence is committed atomically before the journal is removed.
+        // If the transaction fails, the canonicalDeleted journal remains recoverable and no
+        // partial completion evidence can be duplicated by the next foreground retry.
         let policy = await privacyActor.getPolicy()
-        try? await privacyActor.writeAuditLog(
+        var completionAuditWrites = [PrivacyActor.makeAuditWrite(
             eventType: .memoryDeleted,
             traceID: journal.traceID,
             policyVersion: policy.policyVersion,
@@ -575,7 +609,21 @@ public actor CanonicalMemoryRepositoryActor {
             sourceDeletionCompleted: journal.intentKind == .photoLibraryAndEcho ? true : nil,
             sourceDeletionOutcome: journal.intentKind == .photoLibraryAndEcho
                 ? journal.sourceDeletionOutcome.rawValue : nil
-        )
+        )]
+        if journal.intentKind == .externalCascade {
+            completionAuditWrites.append(PrivacyActor.makeAuditWrite(
+                eventType: .cascadeDeleteFromOriginal,
+                traceID: journal.traceID,
+                policyVersion: policy.policyVersion,
+                success: true,
+                sourceType: effectiveType,
+                affectedCount: 1,
+                excludedWritten: false,
+                excludedAutoCleaned: excludedAutoCleaned,
+                userNotified: false
+            ))
+        }
+        try await db.executeTransaction(completionAuditWrites)
 
         // Completed：journal 自移除（防 subject 经 journal 重引入）
         journal = try await advanceDeletionJournal(journal, to: .completed)
@@ -624,8 +672,8 @@ public actor CanonicalMemoryRepositoryActor {
         traceID: String
     ) async throws -> CascadeDeleteResult {
         let rows = try await db.executeQuery(
-            sql: "SELECT memoryId FROM Memory WHERE sourceLocator = ?",
-            bindings: [.text(assetId)]
+            sql: "SELECT memoryId FROM Memory WHERE sourceLocator = ? AND sourceType = ?",
+            bindings: [.text(assetId), .text(sourceType)]
         )
         var deleted = 0
         for row in rows {
@@ -635,25 +683,26 @@ public actor CanonicalMemoryRepositoryActor {
             }
         }
 
-        // 清理 ExcludedAssets 无效记录（原始文件已消失，排除项无意义）
-        let excludedAutoCleaned = try await excludedAssets.recordCascadeCleanup(
-            assetId: assetId,
-            sourceType: sourceType,
-            traceID: traceID
-        )
-
-        let policy = await privacyActor.getPolicy()
-        try? await privacyActor.writeAuditLog(
-            eventType: .cascadeDeleteFromOriginal,
-            traceID: traceID,
-            policyVersion: policy.policyVersion,
-            success: true,
-            sourceType: sourceType,
-            affectedCount: deleted,
-            excludedWritten: false,
-            excludedAutoCleaned: excludedAutoCleaned,
-            userNotified: false
-        )
+        var excludedAutoCleaned = try await excludedAssets.hasCleanupNotice(assetId: assetId)
+        if deleted == 0 {
+            excludedAutoCleaned = try await excludedAssets.recordCascadeCleanup(
+                assetId: assetId,
+                sourceType: sourceType,
+                traceID: traceID
+            ) || excludedAutoCleaned
+            let policy = await privacyActor.getPolicy()
+            try await privacyActor.writeAuditLog(
+                eventType: .cascadeDeleteFromOriginal,
+                traceID: traceID,
+                policyVersion: policy.policyVersion,
+                success: true,
+                sourceType: sourceType,
+                affectedCount: 0,
+                excludedWritten: false,
+                excludedAutoCleaned: excludedAutoCleaned,
+                userNotified: false
+            )
+        }
         return CascadeDeleteResult(deletedCount: deleted, excludedAutoCleaned: excludedAutoCleaned)
     }
 

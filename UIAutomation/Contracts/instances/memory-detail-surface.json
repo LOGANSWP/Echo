@@ -9,7 +9,8 @@
     "memory": "MemoryDetailModel mapped from CanonicalMemory + MemoryUserEdit + MemoryEditConflict. Original source content remains separate from user title/multiline description/normalized tags.",
     "preferredLanguage": "UserPolicy.preferredLanguage (zh-Hans | en-US)",
     "contentAvailability": "available | offlineUnavailable | authorizationDenied | limitedScopeHidden | missing | unsupported",
-    "sourceDeletionCapability": "removeFromEchoOnly | photoLibraryDeletable; deletion requires current UserPolicy, authorized/limited-visible PhotoKit access and PHAsset.canPerform(.delete); Share Extension sources never claim source-app deletion authority"
+    "sourceDeletionCapability": "removeFromEchoOnly | photoLibraryDeletable; deletion requires current UserPolicy, authorized/limited-visible PhotoKit access and PHAsset.canPerform(.delete); Share Extension sources never claim source-app deletion authority",
+    "deleteOriginalActionVisibility": "memory-delete-delete-original is present if and only if sourceDeletionCapability=photoLibraryDeletable; fixture/service wiring alone does not decide visibility"
   },
   "outputs": {
     "visibleContent": "PhotoKit content plus user edit overlay, translated/canonical text, grouped metadata, verified citation anchors and capability-gated actions. Share text uses saved canonical content and Share audio is transcript-only because original audio is not persisted. Production media is resolved under current UserPolicy; offline, unresolved, revoked, limited-hidden and missing states remain distinct and never fall back to bundled samples.",
@@ -36,5 +37,5 @@
     "memory-detail-voice-loaded (voice transcript)",
     "memory-detail-video-loaded (video_frame)"
   ],
-  "version": "1.3.0"
+  "version": "1.4.0"
 }
