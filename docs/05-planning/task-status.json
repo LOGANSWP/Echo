@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-06T02:42:36Z",
+  "last_updated": "2026-09-06T02:45:11Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2042,7 +2042,7 @@
       "integration_test": "pending",
       "integration_test_file": "EchoTests/Phase4/Phase4IntegrationTests.swift",
       "entry_gate": "3F.11",
-      "last_updated": "2026-09-06T02:42:36Z",
+      "last_updated": "2026-09-06T02:45:11Z",
       "tasks": [
         {
           "id": "4.0",
@@ -2745,8 +2745,15 @@
             "最终完整清除且 ExcludedAssets 不写；无效排除项的一次性提示实际展示前后 userNotified=false/true",
             "memoryDeleted/cascadeDeleteFromOriginal/excludedAutoCleaned 审计记录真实结构化请求、结果、完成和失败阶段，ID 仅摘要"
           ],
-          "last_updated": "2026-09-06T02:42:36Z",
-          "notes": "Created by ADR-017 because PhotoKit and Echo stores cannot form one atomic transaction, and Share Extension imports do not grant deletion authority over Notes, Voice Memos or third-party source content. Automatically promoted from backlog to ready after dependency 4.0e completed. The 2026-09-05 reasonableness review (ADR-019) found that the prior .planned-only saga could not distinguish an unconfirmed PhotoKit request from D-005 cleanup, that limited/revoked invisibility is not deletion evidence, that non-persisted Share audio cannot support original playback, and that userNotified was being specified before actual presentation. The task now requires typed source facets, PHAsset.canPerform(.delete), an external-result journal gate, conservative indeterminate recovery, honest Share provenance/transcript-only audio, and structured truthful audit fields. Implementation completed on 2026-09-05: composition-owned FocusSourceLifecycleActor resolves orthogonal source facets, gates PhotoKit deletion on current policy and live capability, persists external deletion state separately from D-005, resumes confirmed and indeterminate journals on launch/foreground, routes trusted PhotoKit removals through cascade cleanup, provides hash-only L2 recovery, and records cleanup notices as presented only from the Settings UI. Detail and Settings consume the production adapters without fixture success claims. Verification: FocusSourceLifecycleTests 10/10; related SyncPipeline, MemoryDetailViewModel, FocusProductionActions and ProductionComposition regressions 73/73; corrected FocusBalancedCanvasTests 16/16; full EchoTests regression 1371 tests in 160 suites passed with 5 pre-existing known issues; coverage gate passed at 76% excluding declarative Views against the repository threshold of 65%; SwiftLint reported zero violations; static bans, localization parity (416 keys), accessibility/UI contracts (170), JSON validation and git diff whitespace checks all passed. No commit, push or PR was created by do-task-echo."
+          "last_updated": "2026-09-06T02:45:11Z",
+          "pr": {
+            "number": 76,
+            "url": "https://github.com/logan-suu/Echo/pull/76",
+            "head": "feature/focus-source-lifecycle-US-PRV-004",
+            "base": "dev-1.0",
+            "created_at": "2026-09-06T02:45:11Z"
+          },
+          "notes": "Created by ADR-017 because PhotoKit and Echo stores cannot form one atomic transaction, and Share Extension imports do not grant deletion authority over Notes, Voice Memos or third-party source content. Automatically promoted from backlog to ready after dependency 4.0e completed. The 2026-09-05 reasonableness review (ADR-019) found that the prior .planned-only saga could not distinguish an unconfirmed PhotoKit request from D-005 cleanup, that limited/revoked invisibility is not deletion evidence, that non-persisted Share audio cannot support original playback, and that userNotified was being specified before actual presentation. The task now requires typed source facets, PHAsset.canPerform(.delete), an external-result journal gate, conservative indeterminate recovery, honest Share provenance/transcript-only audio, and structured truthful audit fields. Implementation completed on 2026-09-05: composition-owned FocusSourceLifecycleActor resolves orthogonal source facets, gates PhotoKit deletion on current policy and live capability, persists external deletion state separately from D-005, resumes confirmed and indeterminate journals on launch/foreground, routes trusted PhotoKit removals through cascade cleanup, provides hash-only L2 recovery, and records cleanup notices as presented only from the Settings UI. Detail and Settings consume the production adapters without fixture success claims. Verification: FocusSourceLifecycleTests 10/10; related SyncPipeline, MemoryDetailViewModel, FocusProductionActions and ProductionComposition regressions 73/73; corrected FocusBalancedCanvasTests 16/16; full EchoTests regression 1371 tests in 160 suites passed with 5 pre-existing known issues; coverage gate passed at 76% excluding declarative Views against the repository threshold of 65%; SwiftLint reported zero violations; static bans, localization parity (416 keys), accessibility/UI contracts (170), JSON validation and git diff whitespace checks all passed. commit-pr-echo preflight revalidated the task tests 10/10, SwiftLint, static bans, Actor/Pipeline watermarks, branch uniqueness, and network-enabled GitHub identity. Commit f8818f808b7ca1dc64e22cc9066ba985ff6a8c32 was pushed and PR #76 was opened against dev-1.0 at 2026-09-06T02:45:11Z."
         },
         {
           "id": "4.0i",
