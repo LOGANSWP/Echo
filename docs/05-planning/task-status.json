@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-06T02:45:11Z",
+  "last_updated": "2026-09-06T16:40:42Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2042,7 +2042,7 @@
       "integration_test": "pending",
       "integration_test_file": "EchoTests/Phase4/Phase4IntegrationTests.swift",
       "entry_gate": "3F.11",
-      "last_updated": "2026-09-06T02:45:11Z",
+      "last_updated": "2026-09-06T16:40:42Z",
       "tasks": [
         {
           "id": "4.0",
@@ -2718,7 +2718,7 @@
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "review",
+          "status": "done",
           "dependencies": [
             "4.0e"
           ],
@@ -2745,7 +2745,7 @@
             "最终完整清除且 ExcludedAssets 不写；无效排除项的一次性提示实际展示前后 userNotified=false/true",
             "memoryDeleted/cascadeDeleteFromOriginal/excludedAutoCleaned 审计记录真实结构化请求、结果、完成和失败阶段，ID 仅摘要"
           ],
-          "last_updated": "2026-09-06T16:09:18Z",
+          "last_updated": "2026-09-06T16:40:42Z",
           "pr": {
             "number": 76,
             "url": "https://github.com/logan-suu/Echo/pull/76",
@@ -2753,7 +2753,10 @@
             "base": "dev-1.0",
             "created_at": "2026-09-06T02:45:11Z"
           },
-          "notes": "Created by ADR-017 because PhotoKit and Echo stores cannot form one atomic transaction, and Share Extension imports do not grant deletion authority over Notes, Voice Memos or third-party source content. The 2026-09-05 reasonableness review (ADR-019) corrected the former planned-only saga, limited/revoked visibility inference, non-persisted Share-audio playback claim, and premature userNotified semantics. Implementation completed on 2026-09-05 with typed source facets, a live PhotoKit deletion capability gate, an external-result journal gate before D-005, conservative indeterminate recovery, hash-only L2 state, and honest Detail/Settings adapters. Initial verification passed 10 task tests, 73 related regressions, 16 Focus contract tests, and the full 1371-test EchoTests regression; coverage was 76% against the 65% gate, with SwiftLint and all static/document gates clean. Commit f8818f808b7ca1dc64e22cc9066ba985ff6a8c32 was pushed and PR #76 opened against dev-1.0 at 2026-09-06T02:45:11Z. PR review on 2026-09-06 audited all ten CodeRabbit comments: nine valid findings were fixed (Share Extension spec wording, immutable Phase 3F baseline status, audit-field schema naming, atomic cleanup-notice acknowledgement, active-deletion recovery isolation, per-journal failure isolation, stable delete-action visibility, non-blocking retained/pending Detail state, and acknowledgement-error UI preservation); the duplicate PhotoKit snapshot concern was rejected because actual deletion refetches and revalidates current authorization/capability. Additional manual review fixed registration-before-change observer seeding, full-scope foreground PhotoKit reconciliation, authorization-downgrade fail-closed checks, source-type-scoped cascade SQL, recovery of non-PhotoKit D-005 journals, and atomic mandatory completion audits. No review item was deferred. Review-fix validation passed FocusSourceLifecycleTests 15/15 plus 97 affected regressions (112 tests total); SwiftLint, static bans, 416-key localization parity, 170 UI contracts, release compliance, JSON parsing, and diff checks passed. Incremental CodeRabbit review at 2026-09-06T15:17:16Z produced two inline findings and one review-summary nitpick; all three were valid and fixed. Trusted cascades now replace interrupted Echo-only exclusion intent without retaining ExcludedAssets, visible tracked sources skip source-specific deletion checkpoints, and PhotoKit reconciliation fetches only tracked local identifiers instead of enumerating the full library on MainActor. The focused review regression suite passed 17/17, and the complete serial EchoTests regression passed 1378 tests across 160 suites with zero failures and five unchanged known issues. CodeRabbit's generic 80% docstring-coverage warning was rejected because it is not an Echo gate or task AC and does not identify a behavioral defect. No incremental review finding was deferred."
+          "notes": "Created by ADR-017 because PhotoKit and Echo stores cannot form one atomic transaction, and Share Extension imports do not grant deletion authority over Notes, Voice Memos or third-party source content. The 2026-09-05 reasonableness review (ADR-019) corrected the former planned-only saga, limited/revoked visibility inference, non-persisted Share-audio playback claim, and premature userNotified semantics. Implementation completed on 2026-09-05 with typed source facets, a live PhotoKit deletion capability gate, an external-result journal gate before D-005, conservative indeterminate recovery, hash-only L2 state, and honest Detail/Settings adapters. Initial verification passed 10 task tests, 73 related regressions, 16 Focus contract tests, and the full 1371-test EchoTests regression; coverage was 76% against the 65% gate, with SwiftLint and all static/document gates clean. Commit f8818f808b7ca1dc64e22cc9066ba985ff6a8c32 was pushed and PR #76 opened against dev-1.0 at 2026-09-06T02:45:11Z. PR review on 2026-09-06 audited all ten CodeRabbit comments: nine valid findings were fixed (Share Extension spec wording, immutable Phase 3F baseline status, audit-field schema naming, atomic cleanup-notice acknowledgement, active-deletion recovery isolation, per-journal failure isolation, stable delete-action visibility, non-blocking retained/pending Detail state, and acknowledgement-error UI preservation); the duplicate PhotoKit snapshot concern was rejected because actual deletion refetches and revalidates current authorization/capability. Additional manual review fixed registration-before-change observer seeding, full-scope foreground PhotoKit reconciliation, authorization-downgrade fail-closed checks, source-type-scoped cascade SQL, recovery of non-PhotoKit D-005 journals, and atomic mandatory completion audits. No review item was deferred. Review-fix validation passed FocusSourceLifecycleTests 15/15 plus 97 affected regressions (112 tests total); SwiftLint, static bans, 416-key localization parity, 170 UI contracts, release compliance, JSON parsing, and diff checks passed. Incremental CodeRabbit review at 2026-09-06T15:17:16Z produced two inline findings and one review-summary nitpick; all three were valid and fixed. Trusted cascades now replace interrupted Echo-only exclusion intent without retaining ExcludedAssets, visible tracked sources skip source-specific deletion checkpoints, and PhotoKit reconciliation fetches only tracked local identifiers instead of enumerating the full library on MainActor. The focused review regression suite passed 17/17, and the complete serial EchoTests regression passed 1378 tests across 160 suites with zero failures and five unchanged known issues. CodeRabbit's generic 80% docstring-coverage warning was rejected because it is not an Echo gate or task AC and does not identify a behavioral defect. No incremental review finding was deferred. PR #76 was human-merged by logan-suu at 2026-09-06T16:37:48Z with merge commit 643b1d11f52f6510ad35ddde7beedc0a01ed7c3d. Post-merge deferred-item scan found no PR #76 entries; DEF-51-003 was already resolved by ADR-019, while DEF-51-002 remains partial for task 4.2 because its Share Extension producer file lifecycle and ingestion E2E are outside task 4.0h.",
+          "merged_at": "2026-09-06T16:37:48Z",
+          "merge_commit": "643b1d11f52f6510ad35ddde7beedc0a01ed7c3d",
+          "merged_by": "logan-suu"
         },
         {
           "id": "4.0i",
@@ -2778,7 +2781,7 @@
             "UIAutomation/Contracts/instances/creation-action-save-to-notes.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "backlog",
+          "status": "ready",
           "dependencies": [
             "4.0h"
           ],
@@ -2802,8 +2805,8 @@
             "呈现成功/准备失败/呈现失败/已呈现后取消的状态与 L2 行为",
             "creativeGeneration 与 creationSharePresented 审计字段、结构化 sharePresented 及零目标 App/原文证明"
           ],
-          "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash."
+          "last_updated": "2026-09-06T16:40:42Z",
+          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed."
         },
         {
           "id": "4.0j",
@@ -3072,7 +3075,7 @@
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "backlog",
+          "status": "ready",
           "dependencies": [
             "4.0h"
           ],
@@ -3087,7 +3090,8 @@
           "migrated_from": [
             "4.6"
           ],
-          "last_updated": "2026-09-03T16:00:00Z"
+          "last_updated": "2026-09-06T16:40:42Z",
+          "notes": "Automatically promoted from backlog to ready after dependency 4.0h completed."
         },
         {
           "id": "4.6",
