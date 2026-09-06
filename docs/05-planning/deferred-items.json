@@ -767,8 +767,9 @@
       "target_tasks": [
         "4.2"
       ],
-      "resolution_notes": "3F.3b（2026-08-09）：ASREngineProtocol 新增 `transcribeFile(at:)` 文件 URL 输入契约，WhisperASREngine/StubASREngine 均已实现，DEF-51-002 的 ASR 契约部分关闭。剩余的 Share Extension 文件持久化与生产摄入 E2E 由 4.2 复核。",
+      "resolution_notes": "3F.3b（2026-08-09）：ASREngineProtocol 新增 `transcribeFile(at:)` 文件 URL 输入契约，WhisperASREngine/StubASREngine 均已实现，DEF-51-002 的 ASR 契约部分关闭。ADR-019（2026-09-05）进一步明确：App Group 文件只作为离线转写前的受控临时输入，摄入成功后不保留原音频、Focus 只展示 transcript；剩余的 Share Extension 生产者文件复制/清理与摄入 E2E 仍由 4.2 复核。",
       "tracking_status": "partial",
+      "last_checked_at": "2026-09-05T20:30:19Z",
       "recheck_trigger": "4.2 review"
     },
     {
@@ -777,9 +778,13 @@
       "title": "Share Extension note/voice 来源标记不可达（host app bundle ID 无公开 API）",
       "severity": "🟡",
       "location": "EchoShareExtension/ShareViewController.swift:168 (extractAndPreview: Bundle.main.bundleIdentifier)",
-      "reason": "Bundle.main.bundleIdentifier 在扩展进程内返回扩展自身 ID（com.echo.Echo.ShareExtension），永远不等于 com.apple.mobilenotes/VoiceMemos → note/voice 来源分支永不命中，备忘录/语音分享恒被标记 thirdParty（US-SRC-001 来源标记不精确）。iOS 26 SDK 无公开 API 获取 host app bundle ID（NSExtensionContext 无 hostIdentifier 公开属性）。修复需 3F.5 引入 host 识别方案（如 LSApplicationProxy 或分享确认 UI 让用户选择来源），本次 PR 无法用公开 API 修复。",
-      "defer_to": "3F.5（与 DEF-51-002 合并：语音摄入 + 来源标记一起按 host 识别方案处理）",
-      "deferred_at": "2026-08-05"
+      "reason": "Bundle.main.bundleIdentifier 在扩展进程内返回扩展自身 ID（com.echo.Echo.ShareExtension），永远不等于 com.apple.mobilenotes/VoiceMemos；iOS 公开 API 不提供可靠 host app bundle ID。原规格要求精确标记 Notes/Voice 来源不可达，也不能用私有 API、扩展 ID、文件名或内容启发式替代。",
+      "defer_to": "已由 ADR-019 作为产品契约修正解决：Echo 不再声称可从 Share Extension 推断 host App；生产实现只记录 importOrigin + contentType，并且仅在系统提供可验证值时记录可选 trusted sourceAppDigest。",
+      "deferred_at": "2026-08-05",
+      "tracking_status": "resolved",
+      "last_checked_at": "2026-09-05T20:30:19Z",
+      "resolved_at": "2026-09-05T20:30:19Z",
+      "resolved_by": "ADR-019 / 4.0h 规格合理性评审：删除不可公开获得的 host-App 归因要求，禁止通过私有 API、扩展 bundle ID 或用户猜测伪造 Notes/Voice 来源。"
     },
     {
       "id": "DEF-52-001",

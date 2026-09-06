@@ -4,7 +4,8 @@
 //            docs/01-spec/用户故事与验收标准规格书.md → US-ING-006, US-PRV-004/006/007,
 //            US-AWK-007, US-FBK-001/002/003
 //            AGENTS.md D-002/D-003/D-004/D-005, §5 存储契约
-// 任务: 3F.4 - Canonical storage 与 generation 生命周期; 4.0a - Discovery 只读最近记忆 API
+// Task: 3F.4 - Canonical storage and generation lifecycle; 4.0a - Discovery recent-memory API;
+//       4.0h - PhotoKit external-result gate and recoverable deletion intent
 // AC 覆盖: 确定性 ID (RFC 4122 派生), 事务 CRUD (canonical+vector+FTS 同事务/补偿),
 //          崩溃点故障注入 (无 half-write), 全删除边界 (D-005), 级联删除 (US-PRV-007),
 //          仅从 Echo 移除写 ExcludedAssets (US-PRV-004), 反馈 generation 身份
@@ -16,7 +17,7 @@
 //          2026-09-01 4.0a: 无副作用 fetchRecentMemories，供 live Discovery adapter 使用
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), R-007, R-008 (跨 Actor await)
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
-// 生成时间: 2026-08-09
+// Generated: 2026-08-09 | Updated: 2026-09-05 (4.0h)
 // PR#57 review fix: W-03 新增 DEBUG-only .deleteFail 故障点 + CanonicalRepositoryError.deleteInjected，
 //                   供 SyncPipeline canonical 删除失败路径测试（D-005 不静默吞错）
 // PR#57 CodeRabbit fix: CR-11 新增 memoryNotFound/invalidMemoryID 显式错误（deleteMemory false 与非法 UUID 不再静默）
@@ -24,6 +25,9 @@
 //                  and remove every representation vector plus IndexBuildItem residue.
 // PR#65 third review fix: vector persistence is a fail-stop phase boundary, and resumed
 //                        deletion removes the exact persisted journal operation.
+// PR#76 review fixes: external cascades are source-type scoped, override stale Echo-only
+//                     exclusion intents, recover incomplete journals, and commit mandatory
+//                     completion audits atomically before journal removal.
 // ==========================================
 
 import Foundation
@@ -253,6 +257,25 @@ public actor CanonicalMemoryRepositoryActor {
         return rows.compactMap { $0["memoryId"]?.stringValue }
     }
 
+    /// Returns every canonical PhotoKit identity used by foreground deletion reconciliation.
+    func loadPhotoSourceReferences() async throws -> [PhotoSourceMemoryReference] {
+        let rows = try await db.executeQuery(
+            sql: "SELECT memoryId, sourceLocator, sourceType FROM Memory WHERE sourceType IN ('photo', 'video') ORDER BY sourceType, sourceLocator, memoryId",
+            bindings: []
+        )
+        return rows.compactMap { row in
+            guard let rawMemoryID = row["memoryId"]?.stringValue,
+                  let memoryID = UUID(uuidString: rawMemoryID),
+                  let sourceLocator = row["sourceLocator"]?.stringValue,
+                  let sourceType = row["sourceType"]?.stringValue else { return nil }
+            return PhotoSourceMemoryReference(
+                memoryID: memoryID,
+                sourceLocator: sourceLocator,
+                sourceType: sourceType
+            )
+        }
+    }
+
     public func loadRepresentations(memoryId: UUID) async throws -> [Representation] {
         let rows = try await db.executeQuery(
             sql: "SELECT representationId, memoryId, modality, preprocessVersion, contentHash FROM Representation WHERE memoryId = ? ORDER BY representationId",
@@ -329,6 +352,83 @@ public actor CanonicalMemoryRepositoryActor {
 
     // MARK: - Deletion Boundary (D-005 / US-PRV-004/007)
 
+    /// Persists the external deletion intent before PhotoKit without starting D-005 effects.
+    public func preparePhotoLibraryDeletion(
+        memoryId: UUID,
+        traceID: String
+    ) async throws -> MemoryDeletionJournal {
+        if let existing = try await db.loadDeletionJournals(memoryId: memoryId).first {
+            guard existing.intentKind == .photoLibraryAndEcho,
+                  existing.phase == .planned,
+                  existing.sourceDeletionState == .prepared else {
+                throw CanonicalRepositoryError.deletionAlreadyInProgress(memoryId: memoryId.uuidString)
+            }
+            return existing
+        }
+        guard let memory = try await loadMemory(memoryId: memoryId) else {
+            throw CanonicalRepositoryError.memoryNotFound(memoryId: memoryId.uuidString)
+        }
+        let representations = try await loadRepresentations(memoryId: memoryId)
+        let vectorIDs = Array(Set([memoryId] + representations.map(\.representationId)))
+            .sorted { $0.uuidString < $1.uuidString }
+        let generations = try await generationRegistry.loadGenerations()
+        let journal = MemoryDeletionJournal(
+            operationID: "del-\(memoryId.uuidString.lowercased())",
+            memoryID: memoryId,
+            auditSubjectHash: AuditSubject.memory(memoryId).subjectHash,
+            traceID: traceID,
+            phase: .planned,
+            vectorIDsByGeneration: generations.map {
+                GenerationVectorIDs(generationID: $0.generationId, vectorIDs: vectorIDs)
+            },
+            sourceLocator: memory.sourceLocator,
+            sourceType: memory.sourceType,
+            writeExcluded: false,
+            intentKind: .photoLibraryAndEcho,
+            sourceDeletionState: .prepared,
+            sourceDeletionOutcome: .notRequested
+        )
+        try await db.upsertDeletionJournal(journal)
+        return journal
+    }
+
+    /// Persists the PhotoKit completion or reconciliation result independently of the D-005 phase.
+    public func updatePhotoLibraryDeletion(
+        memoryId: UUID,
+        state: SourceDeletionState,
+        outcome: SourceDeletionOutcome
+    ) async throws -> MemoryDeletionJournal {
+        guard let journal = try await db.loadDeletionJournals(memoryId: memoryId).first,
+              journal.intentKind == .photoLibraryAndEcho else {
+            throw CanonicalRepositoryError.memoryNotFound(memoryId: memoryId.uuidString)
+        }
+        let updated = MemoryDeletionJournal(
+            operationID: journal.operationID,
+            memoryID: journal.memoryID,
+            auditSubjectHash: journal.auditSubjectHash,
+            traceID: journal.traceID,
+            phase: journal.phase,
+            vectorIDsByGeneration: journal.vectorIDsByGeneration,
+            sourceLocator: journal.sourceLocator,
+            sourceType: journal.sourceType,
+            writeExcluded: journal.writeExcluded,
+            intentKind: journal.intentKind,
+            sourceDeletionState: state,
+            sourceDeletionOutcome: outcome
+        )
+        try await db.upsertDeletionJournal(updated)
+        return updated
+    }
+
+    /// Closes an effect-free intent after a definitive cancellation, denial, or non-deletable result.
+    public func abandonPhotoLibraryDeletion(memoryId: UUID) async throws {
+        guard let journal = try await db.loadDeletionJournals(memoryId: memoryId).first else { return }
+        guard journal.intentKind == .photoLibraryAndEcho, journal.phase == .planned else {
+            throw CanonicalRepositoryError.deletionAlreadyInProgress(memoryId: memoryId.uuidString)
+        }
+        try await db.deleteDeletionJournal(operationID: journal.operationID)
+    }
+
     /// 删除一条记忆，事务性覆盖 canonical + 向量 + FTS + translationCache + 审计。
     ///
     /// - Parameter writeExcluded: 用户选择「仅从 Echo 移除」时为 true →
@@ -347,6 +447,12 @@ public actor CanonicalMemoryRepositoryActor {
         let existingJournal = try await db.loadDeletionJournals(memoryId: memoryId).first
         let memory = try await loadMemory(memoryId: memoryId)
         guard memory != nil || existingJournal != nil else { return false }
+
+        if let existingJournal,
+           existingJournal.intentKind == .photoLibraryAndEcho,
+           existingJournal.sourceDeletionState != .confirmedDeleted {
+            throw CanonicalRepositoryError.externalDeletionNotConfirmed(memoryId: memoryId.uuidString)
+        }
 
         let effectiveLocator = existingJournal?.sourceLocator ?? sourceLocator ?? memory?.sourceLocator
         let effectiveType = existingJournal?.sourceType ?? sourceType ?? memory?.sourceType
@@ -371,7 +477,10 @@ public actor CanonicalMemoryRepositoryActor {
                 },
                 sourceLocator: effectiveLocator,
                 sourceType: effectiveType,
-                writeExcluded: effectiveWriteExcluded
+                writeExcluded: effectiveWriteExcluded,
+                intentKind: effectiveWriteExcluded ? .echoOnly : .externalCascade,
+                sourceDeletionState: effectiveWriteExcluded ? .notApplicable : .confirmedDeleted,
+                sourceDeletionOutcome: effectiveWriteExcluded ? .notRequested : .confirmedDeleted
             )
             try await db.upsertDeletionJournal(journal)
         }
@@ -468,22 +577,54 @@ public actor CanonicalMemoryRepositoryActor {
         }
 
         var excludedActuallyWritten = false
+        var excludedAutoCleaned = false
         if effectiveWriteExcluded, let locator = effectiveLocator, let st = effectiveType {
             try await excludedAssets.add(assetId: locator, sourceType: st, traceID: journal.traceID)
             excludedActuallyWritten = true
+        } else if journal.intentKind == .externalCascade,
+                  let locator = effectiveLocator,
+                  let st = effectiveType {
+            let removed = try await excludedAssets.recordCascadeCleanup(
+                assetId: locator,
+                sourceType: st,
+                traceID: journal.traceID
+            )
+            let hasCleanupNotice = try await excludedAssets.hasCleanupNotice(assetId: locator)
+            excludedAutoCleaned = removed || hasCleanupNotice
         }
 
-        // 完成审计（不含 memory subject 明文）
+        // Mandatory completion evidence is committed atomically before the journal is removed.
+        // If the transaction fails, the canonicalDeleted journal remains recoverable and no
+        // partial completion evidence can be duplicated by the next foreground retry.
         let policy = await privacyActor.getPolicy()
-        try? await privacyActor.writeAuditLog(
+        var completionAuditWrites = [PrivacyActor.makeAuditWrite(
             eventType: .memoryDeleted,
             traceID: journal.traceID,
             policyVersion: policy.policyVersion,
             success: true,
             sourceType: effectiveType,
             excludedWritten: excludedActuallyWritten,
-            content: nil
-        )
+            content: nil,
+            preservedOriginal: journal.intentKind == .echoOnly,
+            sourceDeletionRequested: journal.intentKind == .photoLibraryAndEcho,
+            sourceDeletionCompleted: journal.intentKind == .photoLibraryAndEcho ? true : nil,
+            sourceDeletionOutcome: journal.intentKind == .photoLibraryAndEcho
+                ? journal.sourceDeletionOutcome.rawValue : nil
+        )]
+        if journal.intentKind == .externalCascade {
+            completionAuditWrites.append(PrivacyActor.makeAuditWrite(
+                eventType: .cascadeDeleteFromOriginal,
+                traceID: journal.traceID,
+                policyVersion: policy.policyVersion,
+                success: true,
+                sourceType: effectiveType,
+                affectedCount: 1,
+                excludedWritten: false,
+                excludedAutoCleaned: excludedAutoCleaned,
+                userNotified: false
+            ))
+        }
+        try await db.executeTransaction(completionAuditWrites)
 
         // Completed：journal 自移除（防 subject 经 journal 重引入）
         journal = try await advanceDeletionJournal(journal, to: .completed)
@@ -504,10 +645,33 @@ public actor CanonicalMemoryRepositoryActor {
             vectorIDsByGeneration: journal.vectorIDsByGeneration,
             sourceLocator: journal.sourceLocator,
             sourceType: journal.sourceType,
-            writeExcluded: journal.writeExcluded
+            writeExcluded: journal.writeExcluded,
+            intentKind: journal.intentKind,
+            sourceDeletionState: journal.sourceDeletionState,
+            sourceDeletionOutcome: journal.sourceDeletionOutcome
         )
         try await db.upsertDeletionJournal(updated)
         return updated
+    }
+
+    /// Converts only a trusted original-file cascade into the no-exclusion deletion intent.
+    private func promoteEchoOnlyJournalToExternalCascade(memoryID: UUID) async throws {
+        guard let journal = try await db.loadDeletionJournals(memoryId: memoryID).first,
+              journal.intentKind == .echoOnly else { return }
+        try await db.upsertDeletionJournal(MemoryDeletionJournal(
+            operationID: journal.operationID,
+            memoryID: journal.memoryID,
+            auditSubjectHash: journal.auditSubjectHash,
+            traceID: journal.traceID,
+            phase: journal.phase,
+            vectorIDsByGeneration: journal.vectorIDsByGeneration,
+            sourceLocator: journal.sourceLocator,
+            sourceType: journal.sourceType,
+            writeExcluded: false,
+            intentKind: .externalCascade,
+            sourceDeletionState: .confirmedDeleted,
+            sourceDeletionOutcome: .confirmedDeleted
+        ))
     }
 
     /// WP3 steps 5a-5f：consent revoke 三接通组合入口——
@@ -517,10 +681,10 @@ public actor CanonicalMemoryRepositoryActor {
             _ = try await cache.invalidateAll()
         }
         _ = try await privacyActor.purgeAllAuditRecords()
-        try await db.deleteAllDeletionJournals()
+        _ = try await db.deleteAllDeletionJournals()
     }
 
-    /// 原始文件级联删除（US-PRV-007）— 不写 ExcludedAssets，清理无效排除记录。
+    /// Cascades a confirmed original-file deletion without adding an ExcludedAssets record.
     ///
     /// - Returns: 删除统计（内存删除数 + 是否清理了无效排除记录）
     public func cascadeDeleteFromOriginal(
@@ -529,35 +693,46 @@ public actor CanonicalMemoryRepositoryActor {
         traceID: String
     ) async throws -> CascadeDeleteResult {
         let rows = try await db.executeQuery(
-            sql: "SELECT memoryId FROM Memory WHERE sourceLocator = ?",
-            bindings: [.text(assetId)]
+            sql: "SELECT memoryId FROM Memory WHERE sourceLocator = ? AND sourceType = ?",
+            bindings: [.text(assetId), .text(sourceType)]
         )
+        let matchingJournalIDs: [UUID] = try await db.loadAllDeletionJournals().compactMap { journal in
+            guard journal.sourceLocator == assetId,
+                  journal.sourceType == sourceType,
+                  journal.intentKind == .echoOnly else { return nil }
+            return journal.memoryID
+        }
+        let memoryIDs = Set(rows.compactMap {
+            $0["memoryId"]?.stringValue.flatMap { UUID(uuidString: $0) }
+        } + matchingJournalIDs).sorted { $0.uuidString < $1.uuidString }
         var deleted = 0
-        for row in rows {
-            guard let mid = row["memoryId"]?.stringValue.flatMap({ UUID(uuidString: $0) }) else { continue }
+        for mid in memoryIDs {
+            try await promoteEchoOnlyJournalToExternalCascade(memoryID: mid)
             if try await deleteMemory(memoryId: mid, sourceType: sourceType, writeExcluded: false, traceID: traceID) {
                 deleted += 1
             }
         }
 
-        // 清理 ExcludedAssets 无效记录（原始文件已消失，排除项无意义）
-        var excludedAutoCleaned = false
-        if try await excludedAssets.contains(assetId: assetId) {
-            _ = try await excludedAssets.remove(assetId: assetId)
-            excludedAutoCleaned = true
+        var excludedAutoCleaned = try await excludedAssets.hasCleanupNotice(assetId: assetId)
+        if deleted == 0 {
+            excludedAutoCleaned = try await excludedAssets.recordCascadeCleanup(
+                assetId: assetId,
+                sourceType: sourceType,
+                traceID: traceID
+            ) || excludedAutoCleaned
+            let policy = await privacyActor.getPolicy()
+            try await privacyActor.writeAuditLog(
+                eventType: .cascadeDeleteFromOriginal,
+                traceID: traceID,
+                policyVersion: policy.policyVersion,
+                success: true,
+                sourceType: sourceType,
+                affectedCount: 0,
+                excludedWritten: false,
+                excludedAutoCleaned: excludedAutoCleaned,
+                userNotified: false
+            )
         }
-
-        let policy = await privacyActor.getPolicy()
-        try? await privacyActor.writeAuditLog(
-            eventType: .cascadeDeleteFromOriginal,
-            traceID: traceID,
-            policyVersion: policy.policyVersion,
-            success: true,
-            sourceType: sourceType,
-            affectedCount: deleted,
-            excludedWritten: false,
-            content: excludedAutoCleaned ? "excludedAutoCleaned=true|userNotified=true" : nil
-        )
         return CascadeDeleteResult(deletedCount: deleted, excludedAutoCleaned: excludedAutoCleaned)
     }
 
@@ -711,6 +886,8 @@ public enum CanonicalRepositoryError: Error, LocalizedError, Sendable {
     case memoryNotFound(memoryId: String)
     /// 记忆 ID 字符串无法解析为 UUID（CR-11：不再回退随机 UUID 静默跳过删除）
     case invalidMemoryID(memoryId: String)
+    case deletionAlreadyInProgress(memoryId: String)
+    case externalDeletionNotConfirmed(memoryId: String)
 
     public var errorDescription: String? {
         switch self {
@@ -728,6 +905,10 @@ public enum CanonicalRepositoryError: Error, LocalizedError, Sendable {
             return "Canonical memory not found: \(memoryId)"
         case .invalidMemoryID(let memoryId):
             return "Invalid memory UUID: \(memoryId)"
+        case .deletionAlreadyInProgress(let memoryId):
+            return "A deletion is already in progress for memory: \(memoryId)"
+        case .externalDeletionNotConfirmed(let memoryId):
+            return "External source deletion is not confirmed for memory: \(memoryId)"
         }
     }
 }

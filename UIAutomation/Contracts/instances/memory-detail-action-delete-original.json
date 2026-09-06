@@ -3,7 +3,7 @@
   "actionId": "detail.deleteOriginal",
   "source": "user",
   "targetIntent": "MemoryDetailViewModel.deleteMemory(preserveOriginal: false)",
-  "expectedOutcome": "After capability and PrivacyCheckpoint validation, persist the existing MemoryDeletionJournal(.planned) before requesting PhotoKit deletion. Cancel/denial/failure keeps canonical data unchanged and closes the intent; system success resumes the existing D-005 cleanup from .planned without writing ExcludedAssets. Recovery rechecks unresolved intents before any local cleanup (US-PRV-004 AC-3, ADR-017).",
+  "expectedOutcome": "This action and its stable identifier are present only when sourceDeletionCapability=photoLibraryDeletable, independent of whether the view is fixture-backed or production-backed. After UserPolicy, PhotoKit visibility, PHAsset.canPerform(.delete), and PrivacyCheckpoint validation, persist one MemoryDeletionJournal with intentKind=photoLibraryAndEcho, sourceDeletionState=prepared, and phase=planned before requesting PhotoKit deletion. Only a durably confirmedDeleted result unlocks D-005 without writing ExcludedAssets. Cancel/denial/failure keeps all Echo data unchanged; full-authorized absence may reconcile deletion, while limited-hidden or revoked visibility is indeterminate and must not trigger cleanup (US-PRV-004 AC-3, ADR-019).",
   "requiresConfirmation": true,
-  "version": "1.2.0"
+  "version": "1.4.0"
 }

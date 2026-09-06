@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-04T22:58:27Z",
+  "last_updated": "2026-09-06T02:45:11Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2042,7 +2042,7 @@
       "integration_test": "pending",
       "integration_test_file": "EchoTests/Phase4/Phase4IntegrationTests.swift",
       "entry_gate": "3F.11",
-      "last_updated": "2026-09-04T01:34:55Z",
+      "last_updated": "2026-09-06T02:45:11Z",
       "tasks": [
         {
           "id": "4.0",
@@ -2709,14 +2709,16 @@
             "docs/02-architecture/架构设计文档.md",
             "docs/02-architecture/数据流全链路技术说明文档.md",
             "docs/03-implementation/开发避坑与关键注意点手册.md",
+            "docs/decisions/ADR-008-source-import-boundaries.md",
             "docs/decisions/ADR-017-focus-production-boundaries.md",
+            "docs/decisions/ADR-019-photokit-source-deletion-recovery.md",
             "docs/ui/architecture.md",
             "UIAutomation/Contracts/instances/memory-detail-surface.json",
             "UIAutomation/Contracts/instances/memory-detail-action-delete-original.json",
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "ready",
+          "status": "review",
           "dependencies": [
             "4.0e"
           ],
@@ -2726,21 +2728,32 @@
             "Detail"
           ],
           "implementation_constraints": [
-            "FocusSourceResolver 仅通过当前 UserPolicy 和公开系统 API 解析 photo/video/voice/note，返回 Sendable 值类型或受控播放句柄；失效与撤权 fail closed",
-            "同时删除原始文件只对当前可写且可解析的 PhotoKit photo/video 可用；Share Extension note/voice/thirdParty 不具有来源 App 删除能力",
-            "PhotoKit 删除与 Echo D-005 清理采用有序 saga：请求前持久化既有 MemoryDeletionJournal(.planned)，系统成功后从 .planned 进入现有 D-005 本地清理；系统失败不修改 canonical，未决 intent 恢复时先复验资产存在性，本地清理可重放",
-            "系统资产已删除后本地清理失败进入 L2 手动重试/前台补偿，不声称外部回滚；级联清理不写 ExcludedAssets",
-            "生产媒体解析禁止 bundled sample fallback；所有异步入口执行 PrivacyCheckpoint，审计只含必要结构化字段和摘要"
+            "FocusSourceResolver 通过当前 UserPolicy 和公开系统 API 返回分面的 Sendable 结果：contentAvailability、presentation、sourceDeletionCapability；生产路径禁止 bundled sample fallback",
+            "PhotoKit 原始删除只对 authorized/limited-visible、当前范围可获取且 PHAsset.canPerform(.delete) 的 photo/video 可用；内容未下载与删除能力分开建模",
+            "Share Extension 不猜测 host App；text 展示 canonical，audio 因 US-ING-003 不持久化原件只展示转写，所有 Share 来源均无来源 App 删除能力",
+            "同一 MemoryDeletionJournal 正交保存 intentKind、sourceDeletionState 与既有 D-005 phase；photoLibraryAndEcho 只有 confirmedDeleted 解锁本地清理，同一 memory 同时只允许一个活动 intent",
+            "恢复 prepared intent 时 full-present 结束为未删除、full-missing 可 reconciledAbsent；limited-hidden 或 denied/restricted/notDetermined 为 indeterminate，保留 journal 和全部 Echo 数据并进入 L2",
+            "系统资产确认删除后本地清理失败进入 L2 手动重试/前台补偿，不声称外部回滚；级联清理不写 ExcludedAssets",
+            "所有异步业务入口执行与 operation/source 匹配的 PrivacyCheckpoint；审计使用结构化删除字段与 hash-only identity，userNotified 只在提示实际展示后为 true"
           ],
           "acceptance_evidence": [
-            "photo/video/voice/note 真实来源解析、播放/阅读、权限撤回、资产消失与重启证据",
-            "PhotoKit 可删/limited/denied/read-only/missing 与 Share Extension note/voice/thirdParty 能力矩阵",
+            "PhotoKit photo/video 与 Share Extension text/audio/file 的类型化来源解析；Share text canonical 阅读、Share audio transcript-only、权限撤回、内容离线、资产消失与重启证据",
+            "PhotoKit authorized、limited-visible、limited-hidden、denied、restricted、notDetermined、canPerform(delete)=false、iCloud-only 与 Share Extension 能力矩阵",
             "用户取消、系统拒绝、删除失败时 canonical/向量/缓存/ExcludedAssets 全部未变，intent 被安全结束",
-            "MemoryDeletionJournal(.planned) 写入后各终止点、未决 intent 资产存在性复验、从 .planned 进入 D-005 后各清理阶段故障、journal 重放、最终完整清除且 ExcludedAssets 不写",
-            "memoryDeleted/cascadeDeleteFromOriginal 审计记录请求、完成和失败阶段，ID 仅摘要"
+            "journal prepared 后、系统成功但 confirmedDeleted 持久化前、confirmedDeleted 后每个 D-005 phase 的崩溃恢复；未确认外部结果绝不推进本地清理",
+            "full-present/full-missing 与 limited-hidden/撤权恢复差异、同 memory 双击删除及用户删除和 change observer 竞态",
+            "最终完整清除且 ExcludedAssets 不写；无效排除项的一次性提示实际展示前后 userNotified=false/true",
+            "memoryDeleted/cascadeDeleteFromOriginal/excludedAutoCleaned 审计记录真实结构化请求、结果、完成和失败阶段，ID 仅摘要"
           ],
-          "last_updated": "2026-09-04T01:34:55Z",
-          "notes": "Created by ADR-017 because PhotoKit and Echo stores cannot form one atomic transaction, and Share Extension imports do not grant deletion authority over Notes, Voice Memos or third-party source content. Automatically promoted from backlog to ready after dependency 4.0e completed."
+          "last_updated": "2026-09-06T16:09:18Z",
+          "pr": {
+            "number": 76,
+            "url": "https://github.com/logan-suu/Echo/pull/76",
+            "head": "feature/focus-source-lifecycle-US-PRV-004",
+            "base": "dev-1.0",
+            "created_at": "2026-09-06T02:45:11Z"
+          },
+          "notes": "Created by ADR-017 because PhotoKit and Echo stores cannot form one atomic transaction, and Share Extension imports do not grant deletion authority over Notes, Voice Memos or third-party source content. The 2026-09-05 reasonableness review (ADR-019) corrected the former planned-only saga, limited/revoked visibility inference, non-persisted Share-audio playback claim, and premature userNotified semantics. Implementation completed on 2026-09-05 with typed source facets, a live PhotoKit deletion capability gate, an external-result journal gate before D-005, conservative indeterminate recovery, hash-only L2 state, and honest Detail/Settings adapters. Initial verification passed 10 task tests, 73 related regressions, 16 Focus contract tests, and the full 1371-test EchoTests regression; coverage was 76% against the 65% gate, with SwiftLint and all static/document gates clean. Commit f8818f808b7ca1dc64e22cc9066ba985ff6a8c32 was pushed and PR #76 opened against dev-1.0 at 2026-09-06T02:45:11Z. PR review on 2026-09-06 audited all ten CodeRabbit comments: nine valid findings were fixed (Share Extension spec wording, immutable Phase 3F baseline status, audit-field schema naming, atomic cleanup-notice acknowledgement, active-deletion recovery isolation, per-journal failure isolation, stable delete-action visibility, non-blocking retained/pending Detail state, and acknowledgement-error UI preservation); the duplicate PhotoKit snapshot concern was rejected because actual deletion refetches and revalidates current authorization/capability. Additional manual review fixed registration-before-change observer seeding, full-scope foreground PhotoKit reconciliation, authorization-downgrade fail-closed checks, source-type-scoped cascade SQL, recovery of non-PhotoKit D-005 journals, and atomic mandatory completion audits. No review item was deferred. Review-fix validation passed FocusSourceLifecycleTests 15/15 plus 97 affected regressions (112 tests total); SwiftLint, static bans, 416-key localization parity, 170 UI contracts, release compliance, JSON parsing, and diff checks passed. Incremental CodeRabbit review at 2026-09-06T15:17:16Z produced two inline findings and one review-summary nitpick; all three were valid and fixed. Trusted cascades now replace interrupted Echo-only exclusion intent without retaining ExcludedAssets, visible tracked sources skip source-specific deletion checkpoints, and PhotoKit reconciliation fetches only tracked local identifiers instead of enumerating the full library on MainActor. The focused review regression suite passed 17/17, and the complete serial EchoTests regression passed 1378 tests across 160 suites with zero failures and five unchanged known issues. CodeRabbit's generic 80% docstring-coverage warning was rejected because it is not an Echo gate or task AC and does not identify a behavioral defect. No incremental review finding was deferred."
         },
         {
           "id": "4.0i",
@@ -3997,6 +4010,40 @@
         "UIAutomation/Contracts/instances/resume-progress-journey-basic.json",
         "UIAutomation/Policies/acceptance-policy.json",
         "docs/05-planning/开发计划安排文档.md",
+        "docs/05-planning/deferred-items.json",
+        "docs/05-planning/task-status.json"
+      ]
+    },
+    {
+      "id": "DOC-20260905-4-0H-REASONABLENESS",
+      "status": "resolved",
+      "detected_at": "2026-09-05T20:30:19Z",
+      "resolved_at": "2026-09-05T20:30:19Z",
+      "decision_maker": "Codex spec review under human instruction",
+      "selected_option": "typed-source-facets-confirmed-external-delete-gate-conservative-recovery",
+      "decision": "Retain the 4.0h source-resolution and PhotoKit-deletion direction while separating content availability, presentation, and deletion capability; requiring current policy, current PhotoKit scope, a visible PHAsset, and PHAsset.canPerform(.delete); recording an external deletion result in the existing journal before any D-005 local cleanup; treating limited or revoked invisibility as indeterminate; making shared audio transcript-only after ingestion; and replacing unavailable Share host-App attribution with importOrigin plus contentType.",
+      "reason": "The prior specification used a local-only .planned journal phase that could not prove the PhotoKit mutation succeeded before irreversible local deletion, treated an asset hidden by limited or revoked authorization as if it were absent, promised shared-audio playback although raw audio is not persisted, required a host app identifier unavailable through public Share Extension APIs, and allowed userNotified=true to be recorded before UI presentation. It also promised universal five-second original-file cascade monitoring even for sources Echo cannot reliably observe.",
+      "affected_documents": [
+        "AGENTS.md",
+        "docs/INDEX.md",
+        "docs/01-spec/用户故事与验收标准规格书.md",
+        "docs/02-architecture/架构设计文档.md",
+        "docs/02-architecture/数据流全链路技术说明文档.md",
+        "docs/03-implementation/开发避坑与关键注意点手册.md",
+        "docs/decisions/ADR-008-source-import-boundaries.md",
+        "docs/decisions/ADR-017-focus-production-boundaries.md",
+        "docs/decisions/ADR-019-photokit-source-deletion-recovery.md",
+        "docs/ui/README.md",
+        "docs/ui/architecture.md",
+        "docs/ui/echo-memory-canvas-style.md",
+        "docs/ui/testing-and-artifacts.md",
+        "UIAutomation/Contracts/instances/memory-detail-action-delete.json",
+        "UIAutomation/Contracts/instances/memory-detail-action-delete-original.json",
+        "UIAutomation/Contracts/instances/memory-detail-surface.json",
+        "UIAutomation/Policies/acceptance-policy.json",
+        "docs/05-planning/开发计划安排文档.md",
+        "docs/05-planning/phase3f-story-matrix.md",
+        "docs/05-planning/phase3f-evidence-index.md",
         "docs/05-planning/deferred-items.json",
         "docs/05-planning/task-status.json"
       ]

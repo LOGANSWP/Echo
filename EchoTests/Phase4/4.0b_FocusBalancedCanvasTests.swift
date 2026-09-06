@@ -63,7 +63,9 @@ struct FocusBalancedCanvasTests {
 
         #expect(source.contains("Editing is unavailable because the production memory update boundary is not connected."))
         #expect(source.contains("Conflict resolution is unavailable because the production update boundary is not connected."))
-        #expect(source.contains("Original-file deletion is unavailable because the source deletion boundary is not connected."))
+        #expect(source.contains("FocusSourceLifecycleServicing"))
+        #expect(source.contains("sourceDeletionCapability"))
+        #expect(!source.contains("Original-file deletion is unavailable because the source deletion boundary is not connected."))
         #expect(!source.contains("guard !isFixtureBacked else { return }"))
     }
 

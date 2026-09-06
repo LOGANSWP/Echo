@@ -1,7 +1,7 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v5.45
-**生效日期**：2026-09-04
+**版本**：v5.47
+**生效日期**：2026-09-05
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（Codex / OpenCode / Cursor / Claude）及人类开发者
 **优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
 **加载方式**：Agent 启动时自动加载根目录 `AGENTS.md`；子目录 `AGENTS.md` 叠加补充。  
@@ -462,7 +462,7 @@ ExcludedAssets 禁止写入条件:
 ```yaml
 审计日志契约:
   - 强制字段: eventType, timestamp, traceID, policyVersion, success
-  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome
+  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified
   - 隐私保护: 标识符和内容仅记录哈希摘要，禁止原文；枚举/布尔/进度整数可作为结构化字段
   - 保留期: 30 天，超期自动清理
   - 加密: NSFileProtectionComplete
@@ -549,16 +549,16 @@ let checkpoint = await PrivacyActor.shared.validate(
 | `.excluded`                       | 排除操作                 | assetIds                                                  |
 | `.excludedRestored`               | 恢复排除项               | assetIds                                                  |
 | `.excludedBatchRestored`          | 一键恢复排除项           | sourceType, count                                         |
-| `.excludedAutoCleaned`            | 级联清除清理无效排除记录 | assetId, userNotified                                     |
+| `.excludedAutoCleaned`            | 无效排除记录清理提示实际展示 | assetIdDigest, userNotified=true                       |
 | `.dataSourceChangeSynced`         | 数据源变更同步           | changeType, sourceType, affectedCount, hashSkipped        |
 | `.manualChangeDetectionCompleted` | 手动检测变更完成         | detectedChanges, userUpdatedCount, conflictCount          |
 | `.memoryIngested`                 | 记忆摄入（无原文）       | inputHash, traceID                                        |
 | `.imageIngested`                  | 图片摄入                 | privacyBlurApplied=false                                  |
 | `.videoIngested`                  | 视频摄入                 | frameCount, audioTranscriptLength, hasAudio               |
 | `.voiceIngested`                  | 语音转写摄入             | transcriptModelVersion                                    |
-| `.shareExtensionImported`         | Share Extension 分享摄入 | appBundleId, contentType（均经哈希，仅 contentHash 落库） |
-| `.memoryDeleted`                  | 记忆删除                 | preservedOriginal, excludedAssetWritten                   |
-| `.cascadeDeleteFromOriginal`      | 原始文件级联清除         | assetId, memoryId, excludedAutoCleaned                    |
+| `.shareExtensionImported`         | Share Extension 分享摄入 | importOrigin=shareExtension, contentType；可信来源存在时可附 sourceAppDigest，禁止猜测 host App |
+| `.memoryDeleted`                  | 记忆删除或原始删除尝试   | preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedWritten, success |
+| `.cascadeDeleteFromOriginal`      | PhotoKit 原始文件级联清除 | assetIdDigest, memoryIdDigest, excludedAutoCleaned, userNotified=false, excludedWritten=false, success |
 | `.memoryEdited`                   | 手动编辑记忆             | editedFields, reindexed, conflictResolvedWith             |
 | `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat, sharePresented, periodType（可选）；不记录目标 App/完成状态 |
 | `.narrativeReportGenerated`       | 月度/年度报告生成         | periodType, dataSourcesUsed, periodKeyDigest               |
@@ -1416,7 +1416,7 @@ Echo 固定采用用户已批准的 **`echo-memory-canvas`** 设计配置，扩�
 
 **4.0d 交互式唤醒卡边界（2026-09-02 规格审查）**：音乐建议默认且始终可从随 App 打包的离线年份曲库产生；仅当用户在卡片中显式选择“匹配此设备音乐”后，才可请求媒体库权限并通过 `MPMediaQuery` 读取 `isCloudItem == false` 的本地曲目元数据。禁止 `MusicCatalog*`、personal recommendations、recently played 和任意 MusicKit Web Service，禁止上传记忆派生数据。领域 API 可暴露 `userFeelings` 集合，但物理存储必须为以 `memoryId` 为外键的 `MemoryFeeling` 关系表；感受不创建 Memory/Representation，不进入搜索或翻译索引。`next` 按稳定唤醒顺序前进，`record` 仅在事务成功后成立；`.cardInteraction` 仅记录 action、hash-only card/memory digest 与布尔 `feelingAssociatedToSource`。`4.0d` 只负责 card→typed Focus 路由，Focus 内真实来源解析/删除由 `4.0h` 交付，可验证 source anchor 与分享审计由 `4.0i` 交付。详见 ADR-016/017。
 
-**4.0e~4.0j Focus 生产边界（2026-09-03 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对可写 PhotoKit photo/video 发起原始删除，系统删除与 Echo D-005 清理采用持久 saga，Share Extension note/voice/thirdParty 不显示原始删除能力；`4.0i` 要求模型显式返回且 allow-list 校验 source MemoryID，禁止 round-robin 伪绑定，并把 `.creativeGeneration` 与结构化布尔 `.creationSharePresented` 审计分离；`4.0j` 以持久周期键和 TaskQueueActor earliest-eligible 生成月报/年报，不承诺精确后台时刻或伪造不可用分区。详见 ADR-017。
+**4.0e~4.0j Focus 生产边界（2026-09-03 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 要求模型显式返回且 allow-list 校验 source MemoryID，禁止 round-robin 伪绑定，并把 `.creativeGeneration` 与结构化布尔 `.creationSharePresented` 审计分离；`4.0j` 以持久周期键和 TaskQueueActor earliest-eligible 生成月报/年报，不承诺精确后台时刻或伪造不可用分区。详见 ADR-017/019。
 
 ### 17.3 双状态模型
 
@@ -1550,3 +1550,5 @@ $init-session-echo → $next-task-echo → $ui-bootstrap-build-echo <task-id>
 | v5.43 | 2026-09-04 | 4.0g 规格合理性复审：修正 SQLite checkpoint 替换与跨 Actor 入队的伪原子性；明确 Continue 不覆盖、精确 taskId/多记录/raw taskType、当前会话排除、恢复时隐私重校验、幂等及 pause/cancel 终态契约。 | Codex |
 | v5.44 | 2026-09-04 | GitHub 认证误判防护：`gh` 认证改为沙箱初检与联网只读复核的双阶段判断；仅明确 401/Bad credentials 才要求重新认证，DNS、超时和 API 不可达统一归类为网络问题；同步 commit-pr-echo 的 Codex skill 与 OpenCode 回滚源。 | Codex |
 | v5.45 | 2026-09-04 | 4.0g PR 预审修订：用队列 taskId reservation 封闭 Restart 替换与普通入队竞态；区分活动队列所有权和 orphan checkpoint；清理排队取消后的 pause 所有权；未知任务类型 fail-closed 且不可执行；Pause/Resume/Cancel 仅在真实成功后更新 UI，Pause/Cancel 审计带 outcome。同步全部 Echo skills 使用 GitHub 双阶段认证判断，避免非 commit 流程继续误报需重认证。 | Codex |
+| v5.46 | 2026-09-05 | 4.0h 规格合理性复审（ADR-019）：来源内容可用性与删除能力分面建模；PhotoKit 删除要求 `canPerform(.delete)`；扩展同一删除 journal 的外部结果门禁，只有 confirmedDeleted 才能推进 D-005；limited-hidden/撤权不可见不作为删除证据；Share Extension 不猜测 host App，非持久化音频只展示转写；`userNotified` 仅在提示实际展示后为 true。 | Codex |
+| v5.47 | 2026-09-06 | 4.0h PR 预审修订：统一删除审计字段为生产 schema 的 `excludedWritten`；补齐 observer 注册前基线、全量 PhotoKit 前台补偿、活跃删除竞态隔离、逐 journal 容错、通知确认事务与非阻断 UI 结果；同步修复 Share Extension 备忘录 AC 和 Phase 3F 基线状态一致性。 | Codex |

@@ -6,7 +6,7 @@
 //            docs/ui/echo-memory-canvas-style.md §3.3 (Task surfaces), §7.2 (Task surfaces),
 //            §10.1.3 (空态), §11 (Toast/Banner)
 //            docs/ui/architecture.md §2 (单向数据流), §3 (组件边界)
-// 任务: 4.0c - Task 平衡画布：设置、引导与运行状态页面
+// Task: 4.0c + 4.0h - Balanced Canvas task surface and cascade cleanup notice
 // Runtime status: the main overview and supported destructive actions use live services.
 // Placeholder sub-pages and unavailable service boundaries are labeled/fail visibly rather than
 // presenting fixture-backed success in production.
@@ -16,7 +16,7 @@
 // 架构约束: AGENTS.md §8.1 (@MainActor + @Observable), echo-memory-canvas apple-native 基础,
 //           Task surface family (Form/List, 禁止 masonry), §2.3 (semantic colors),
 //           §2.4 (SF Symbols), §2.5 (可访问性)
-// 生成时间: 2026-09-02
+// Generated: 2026-09-02 | Updated: 2026-09-05
 // ==========================================
 
 import SwiftUI
@@ -511,19 +511,9 @@ struct SettingsView: View {
     }
 
     private var excludedItemsPlaceholder: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "eye.slash")
-                .font(.system(size: 48))
-                .foregroundStyle(Color.secondary)
-            Text("Excluded Items")
-                .font(.headline)
-            Text("Management interface coming in next iteration.")
-                .font(.subheadline)
-                .foregroundStyle(Color.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground))
-        .navigationTitle("Excluded Items")
+        ExcludedItemsStatusView(viewModel: ExcludedItemsViewModel(
+            excludedAssets: AppComposition.shared.excludedAssetsActor
+        ))
     }
 
     // MARK: - Feedback Section (US-FBK-002)
@@ -775,6 +765,85 @@ struct SettingsView: View {
             Text("About")
         } footer: {
             Text("Echo · 回响 — Your memories, always within reach. All AI processing runs locally on your device. No data ever leaves your phone.")
+        }
+    }
+}
+
+private struct ExcludedItemsStatusView: View {
+    @State private var viewModel: ExcludedItemsViewModel
+
+    init(viewModel: ExcludedItemsViewModel) {
+        _viewModel = State(initialValue: viewModel)
+    }
+
+    var body: some View {
+        VStack(spacing: EchoSpacingToken.section.points) {
+            switch viewModel.state {
+            case .idle, .loading:
+                ProgressView()
+
+            case .completed(let cleanupCount, _):
+                if cleanupCount > 0 {
+                    EchoContainer(level: .section) {
+                        EchoStatusPresentation(
+                            role: .informational,
+                            systemImage: "checkmark.shield",
+                            title: EchoStrings.tr("Excluded items cleaned up"),
+                            message: String(
+                                format: EchoStrings.tr("%lld excluded item references were removed because their original Photo Library items no longer exist."),
+                                cleanupCount
+                            )
+                        )
+                    }
+                    .accessibilityIdentifier("excluded-cleanup-notice")
+                }
+                excludedManagementPlaceholder
+
+            case .error:
+                EchoStatusPresentation(
+                    role: .warning,
+                    systemImage: "exclamationmark.triangle",
+                    title: EchoStrings.tr("Unable to Load Excluded Items"),
+                    message: EchoStrings.tr("Please try again.")
+                )
+                Button(EchoStrings.tr("Retry")) {
+                    Task { await viewModel.load() }
+                }
+                .buttonStyle(EchoActionButtonStyle(role: .recovery))
+
+            case .cancelled:
+                EmptyView()
+            }
+        }
+        .padding(EchoSpacingToken.section.points)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(EchoColorToken.groupedBackground.color)
+        .navigationTitle(EchoStrings.tr("Excluded Items"))
+        .task { await viewModel.load() }
+        .onChange(of: viewModel.state) { _, state in
+            guard case .completed(let count, let wasPresented) = state,
+                  count > 0,
+                  !wasPresented else { return }
+            Task {
+                await Task.yield()
+                await viewModel.markCleanupNoticePresented(visibleCount: count)
+            }
+        }
+    }
+
+    private var excludedManagementPlaceholder: some View {
+        EchoContainer(level: .section) {
+            VStack(spacing: EchoSpacingToken.normal.points) {
+                Image(systemName: "eye.slash")
+                    .font(.system(size: 48))
+                    .foregroundStyle(EchoColorToken.secondaryText.color)
+                Text(EchoStrings.tr("Excluded Items"))
+                    .font(EchoTypographyToken.title.font)
+                Text(EchoStrings.tr("Management interface coming in next iteration."))
+                    .font(EchoTypographyToken.metadata.font)
+                    .foregroundStyle(EchoColorToken.secondaryText.color)
+            }
+            .frame(maxWidth: .infinity)
         }
     }
 }

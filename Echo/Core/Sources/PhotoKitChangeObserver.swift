@@ -1,16 +1,11 @@
 // ==========================================
-// 文件: PhotoKitChangeObserver.swift
-// 对应规格: docs/01-spec/用户故事与验收标准规格书.md → US-SRC-012 (数据源内容变更自动同步),
-//            docs/02-architecture/数据流全链路技术说明文档.md §4 (变更同步数据流)
-//            docs/decisions/ADR-008-source-import-boundaries.md §决策-1 (PhotoKitChangeObserver 变更去重)
-// 任务: 3F.2 - PhotoKit、Share Extension 与真实来源
-// AC 覆盖: US-SRC-012 AC-1 (监听 PHPhotoLibraryChangeObserver → 生成 ChangeEvent),
-//          ADR-008 §决策-1 (变更去重 — 批内去重于观察器，跨投递窗口去重于 SyncPipeline actor)
-// 架构约束: AGENTS.md §4.2, R-007 (禁止 unchecked Sendable)
-// 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor；本类全部成员显式 nonisolated，
-//       使其可被 SyncPipeline actor（非 MainActor）安全构造与注册，
-//       PHPhotoLibraryChangeObserver 回调由系统在主线程投递
-// 生成时间: 2026-08-05
+// File: PhotoKitChangeObserver.swift
+// Spec: docs/01-spec/用户故事与验收标准规格书.md → US-SRC-012, US-PRV-007
+//       docs/decisions/ADR-008-source-import-boundaries.md decision 1
+// Task: 3F.2 + 4.0h - PhotoKit observation and deletion reconciliation
+// AC coverage: seed the pre-change fetch before registration; emit deduplicated ChangeEvents
+// Architecture: AGENTS.md section 4.2; R-007; no PHAsset crosses an actor boundary
+// Generated: 2026-08-05 | Updated: 2026-09-06
 // ==========================================
 
 import Foundation
@@ -169,17 +164,21 @@ public final class PhotoKitChangeObserver: NSObject, PHPhotoLibraryChangeObserve
 internal enum MonitoredFetchResult {
     private static var result: PHFetchResult<PHAsset>?
 
-    /// Extracts inserted/changed/removed asset localIdentifiers from PHChange.
-    ///
-    /// Lazily seeds the pre-change fetch result on first callback (CodeRabbit #2/#6):
-    /// `changeDetails(for:)` must receive a result captured before the change; a fresh
-    /// result makes the system report "no changes" and drop the event. Called from
-    /// `photoLibraryDidChange` on MainActor (via Task).
-    static func assetIdentifiers(from changeInstance: PHChange)
-        -> (inserted: [String], changed: [String], removed: [String])? {
+    /// Establishes the pre-change baseline before observer registration.
+    static func seedIfNeeded() {
         if result == nil {
             result = PHAsset.fetchAssets(with: nil)
         }
+    }
+
+    /// Extracts inserted/changed/removed asset localIdentifiers from PHChange.
+    ///
+    /// Uses the pre-change fetch result seeded before observer registration. The fallback
+    /// keeps direct test use safe, while production registration always establishes the
+    /// baseline first. Called from `photoLibraryDidChange` on MainActor (via Task).
+    static func assetIdentifiers(from changeInstance: PHChange)
+        -> (inserted: [String], changed: [String], removed: [String])? {
+        seedIfNeeded()
         guard let fetch = result,
               let details = changeInstance.changeDetails(for: fetch) else { return nil }
         result = details.fetchResultAfterChanges

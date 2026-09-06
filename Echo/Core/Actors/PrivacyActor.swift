@@ -7,17 +7,19 @@
 //       3F.1 - deny-by-default 同意闸门 (ADR-007 §决策-2)
 //       4.0a - Search operation/source authorization separation
 //       4.0d - Structured hash-only awakening card interaction fields
+//       4.0h - Structured original-source deletion and cleanup-notice audit fields
 // AC 覆盖: US-PRV-001 AC-1 (策略即时生效), AC-2 (被拒数据不进 Retriever),
 //          AC-3 (Denial Response), AC-4 (缓存失效), AC-5 (重新授权不清除排除表),
 //          AC-6 (审计记录 .denied/.reauthorized),
 //          AC-7 (search is an operation, not an authorized source type),
 //          US-AWK-005 AC-5 (结构化卡片交互字段写入与公开读取),
+//          4.0h AC-2/3/5 (structured source deletion and cascade cleanup audit),
 //          PR review 修复: 同意闸门仅 .denied 短路，.allowed 落入 per-source 授权检查 (US-PRV-001)
 // 架构约束: 遵循 AGENTS.md §4.2 (Actor 隔离契约), §7.1 (PrivacyCheckpoint 强制注入),
 //           §7.3 (审计日志), §5.4 (30天保留), R-006 (审计强制覆盖),
 //           R-007 (禁止 unchecked Sendable), R-008 (跨 Actor 调用必须 await)
 // 重要: 所有 struct stored/computed properties 必须 nonisolated（项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor）
-// 生成时间: 2026-07-05 (Stub), 2026-07-07 (Task 2.1 Full Implementation), 2026-08-05 (3F.1 PR review 修复)
+// Generated: 2026-07-05 (Stub), 2026-07-07 (Task 2.1 Full Implementation); Updated: 2026-09-05 (4.0h)
 // ==========================================
 
 import Foundation
@@ -387,7 +389,13 @@ public actor PrivacyActor {
         feelingAssociatedToSource: Bool? = nil,
         editedFields: [String]? = nil,
         reindexed: Bool? = nil,
-        conflictResolvedWith: String? = nil
+        conflictResolvedWith: String? = nil,
+        preservedOriginal: Bool? = nil,
+        sourceDeletionRequested: Bool? = nil,
+        sourceDeletionCompleted: Bool? = nil,
+        sourceDeletionOutcome: String? = nil,
+        excludedAutoCleaned: Bool? = nil,
+        userNotified: Bool? = nil
     ) async throws {
         let write = Self.makeAuditWrite(
             eventType: eventType,
@@ -414,7 +422,13 @@ public actor PrivacyActor {
             feelingAssociatedToSource: feelingAssociatedToSource,
             editedFields: editedFields,
             reindexed: reindexed,
-            conflictResolvedWith: conflictResolvedWith
+            conflictResolvedWith: conflictResolvedWith,
+            preservedOriginal: preservedOriginal,
+            sourceDeletionRequested: sourceDeletionRequested,
+            sourceDeletionCompleted: sourceDeletionCompleted,
+            sourceDeletionOutcome: sourceDeletionOutcome,
+            excludedAutoCleaned: excludedAutoCleaned,
+            userNotified: userNotified
         )
         try await db.executeWrite(sql: write.sql, bindings: write.bindings)
     }
@@ -445,14 +459,20 @@ public actor PrivacyActor {
         editedFields: [String]? = nil,
         reindexed: Bool? = nil,
         conflictResolvedWith: String? = nil,
+        preservedOriginal: Bool? = nil,
+        sourceDeletionRequested: Bool? = nil,
+        sourceDeletionCompleted: Bool? = nil,
+        sourceDeletionOutcome: String? = nil,
+        excludedAutoCleaned: Bool? = nil,
+        userNotified: Bool? = nil,
         timestamp: Date = Date()
     ) -> DatabaseManager.DBWrite {
         // Hash content fields before persistence (AGENTS.md §5.4).
         let contentHash = content.map { AuditContentHasher.sha256Hex($0) }
         return DatabaseManager.DBWrite(
             sql: """
-                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
             bindings: [
                 .text(eventType.rawValue),
@@ -481,6 +501,12 @@ public actor PrivacyActor {
                 editedFields.map { .text($0.sorted().joined(separator: ",")) } ?? .null,
                 reindexed.map { .int($0 ? 1 : 0) } ?? .null,
                 conflictResolvedWith.map { .text($0) } ?? .null,
+                preservedOriginal.map { .int($0 ? 1 : 0) } ?? .null,
+                sourceDeletionRequested.map { .int($0 ? 1 : 0) } ?? .null,
+                sourceDeletionCompleted.map { .int($0 ? 1 : 0) } ?? .null,
+                sourceDeletionOutcome.map { .text($0) } ?? .null,
+                excludedAutoCleaned.map { .int($0 ? 1 : 0) } ?? .null,
+                userNotified.map { .int($0 ? 1 : 0) } ?? .null,
             ]
         )
     }
@@ -528,7 +554,9 @@ public actor PrivacyActor {
                        frameCount, audioTranscriptLength, hasAudio, contentHash,
                        action, resumePoint, userChoiceOnRestart, outcome,
                        cardIdDigest, memoryIdDigest, feelingAssociatedToSource,
-                       editedFields, reindexed, conflictResolvedWith
+                       editedFields, reindexed, conflictResolvedWith,
+                       preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted,
+                       sourceDeletionOutcome, excludedAutoCleaned, userNotified
                 FROM AuditLog WHERE eventType = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.text(eventType.rawValue), .int(Int64(limit)), .int(Int64(offset))]
@@ -539,7 +567,9 @@ public actor PrivacyActor {
                        frameCount, audioTranscriptLength, hasAudio, contentHash,
                        action, resumePoint, userChoiceOnRestart, outcome,
                        cardIdDigest, memoryIdDigest, feelingAssociatedToSource,
-                       editedFields, reindexed, conflictResolvedWith
+                       editedFields, reindexed, conflictResolvedWith,
+                       preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted,
+                       sourceDeletionOutcome, excludedAutoCleaned, userNotified
                 FROM AuditLog ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.int(Int64(limit)), .int(Int64(offset))]

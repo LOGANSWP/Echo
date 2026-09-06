@@ -161,6 +161,8 @@ Add the production app composition root, deny-by-default consent, transactional 
 
 ## Entry: 3F.2 — PhotoKit、Share Extension 与真实来源
 
+> 2026-09-05 current-contract clarification: ADR-019 supersedes the historical host-App attribution wording below. The 3F.2 `appBundleId` evidence describes the extension-produced digest that existed at delivery; it is not proof of the sharing app's identity. Current production acceptance records `importOrigin + contentType`, with an optional trusted `sourceAppDigest` only when a public system value is actually available. Shared audio is transcript-only after ingestion.
+
 ## Phase 3F Task Evidence
 - Task / commit / branch / PR: `3F.2` / commit at delivery / `feature/phase3f-real-data-sources-3F.2` / created at delivery
 - Registered worktree path / ownership / clean rebase result: n/a — 3F.1~3F.11 use plain branches in the main repo per human approval 2026-08-04 (AGENTS.md §17.9); record branch + clean base instead

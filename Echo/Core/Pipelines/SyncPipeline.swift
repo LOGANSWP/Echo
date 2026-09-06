@@ -13,7 +13,8 @@
 //          AC-7 (进度报告: ProgressActor),
 //          AC-8 (手动触发: — Phase 3 US-SRC-013),
 //          AC-9 (审计: sourceType富化 replaced/skipped/hashSkipped — W2 fixed),
-//          US-AWK-007 AC-4 (4.0e: 持久冲突 + 外部来源变更重放)
+//          US-AWK-007 AC-4 (4.0e: persistent conflicts and source-change replay),
+//          US-PRV-007 (4.0h: pre-change observer baseline; trusted removals cascade and clean exclusions)
 // 架构约束: AGENTS.md §4.1 (Pipeline 契约), R-006 (PrivacyCheckpoint),
 //           AGENTS.md §4.4 (L1~L4 错误分级), §5.2 (ExcludedAssets 写入规则),
 //           AGENTS.md §8.3 (后台任务面板进度订阅)
@@ -341,10 +342,22 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
                 throw SyncError.cancelled
             }
 
-            // AC-5: Check ExcludedAssets — fail-closed
-            do {
-                let isExcluded = try await excludedAssets.contains(assetId: change.assetId)
-                if isExcluded {
+            // Removed is a trusted PhotoKit observation and must clean a now-invalid exclusion.
+            // Added/modified remain fail-closed against ExcludedAssets.
+            if change.changeType != .removed {
+                do {
+                    let isExcluded = try await excludedAssets.contains(assetId: change.assetId)
+                    if isExcluded {
+                        skippedCount += 1
+                        try? await progressActor.updateProgress(
+                            taskId: taskId,
+                            lastProcessedIndex: index + 1,
+                            lastProcessedId: change.assetId
+                        )
+                        continue
+                    }
+                } catch {
+                    // Fail closed: an exclusion lookup failure is a privacy risk, so skip the asset.
                     skippedCount += 1
                     try? await progressActor.updateProgress(
                         taskId: taskId,
@@ -353,15 +366,6 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
                     )
                     continue
                 }
-            } catch {
-                // fail-closed: 排除表查询失败视为安全风险，跳过该资产
-                skippedCount += 1
-                try? await progressActor.updateProgress(
-                    taskId: taskId,
-                    lastProcessedIndex: index + 1,
-                    lastProcessedId: change.assetId
-                )
-                continue
             }
 
             // AC-2: Track hash skip
@@ -530,23 +534,18 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
                             unlockMemory(memId)
                         }
                     }
-                    for memId in oldMemoryIds {
-                        if let canonicalRepository {
-                            do {
-                                let deleted = try await canonicalRepository.deleteMemory(
-                                    memoryId: try Self.requireUUID(memId),
-                                    writeExcluded: false,
-                                    traceID: traceID
-                                )
-                                guard deleted else {
-                                    throw SyncError.canonicalDeleteFailed(
-                                        underlying: CanonicalRepositoryError.memoryNotFound(memoryId: memId)
-                                    )
-                                }
-                            } catch {
-                                throw SyncError.canonicalDeleteFailed(underlying: error)
-                            }
-                        } else {
+                    if let canonicalRepository {
+                        do {
+                            _ = try await canonicalRepository.cascadeDeleteFromOriginal(
+                                assetId: change.assetId,
+                                sourceType: change.source.rawValue,
+                                traceID: traceID
+                            )
+                        } catch {
+                            throw SyncError.canonicalDeleteFailed(underlying: error)
+                        }
+                    } else {
+                        for memId in oldMemoryIds {
                             _ = await vectorStore.delete(id: try Self.requireUUID(memId))
                         }
                     }
@@ -671,10 +670,13 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
     /// 使用方（AppDelegate 启动装配）持有此 Pipeline 引用即可；observer 由 Actor 持有，防止被系统释放。
     ///
     /// 保持 actor 方法（非 @MainActor）：PHPhotoLibrary.registerChangeObserver 不需主线程
-    /// （ObjC 头），observer 不外发跨隔离域；MonitoredFetchResult 的 seed 由
-    /// `photoLibraryDidChange` 首次回调时在 MainActor 懒加载（避免同步 seed 的隔离冲突）。
-    public func registerPhotoLibraryObserver() {
+    /// （ObjC 头），observer 不外发跨隔离域；MonitoredFetchResult 在注册前于 MainActor
+    /// 建立 pre-change baseline，避免首个回调丢失删除事件。
+    public func registerPhotoLibraryObserver() async {
         guard photoObserver == nil else { return }
+        // `changeDetails(for:)` requires a fetch result from before the change.
+        // Seed it before registration so the first delivered change is not lost.
+        await MonitoredFetchResult.seedIfNeeded()
         let observer = PhotoKitChangeObserver(onPhotoLibraryChange: { [weak self] events in
             guard let self else { return }
             Task { await self.processPhotoChanges(events) }

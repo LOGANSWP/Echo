@@ -5,11 +5,11 @@
 //            §决策-3 (App Group 队列消费)
 // 任务: 1.1 - 创建 Xcode 项目，配置 Swift 6 并发严格模式
 //       3F.1 - Production composition root (ADR-007 §决策-1)
-//       3F.2 - PhotoKit、Share Extension 与真实来源 (US-SRC-001 AC-1/AC-5, US-SRC-012 AC-1)
+//       3F.2 + 4.0h - PhotoKit, Share Extension, and live source lifecycle
 // 用途: BGTask 注册 (US-SYS-001 后台任务面板) + 来源边界装配
 // 3F.8 review fix (C-1/W-4): onGeofenceEvent 回调 → eventStream for-await 消费; awakeningPipeline 属性持有
 // 架构约束: 遵循 AGENTS.md §9 (后台任务与断点续传), deny-by-default (ADR-007 §决策-2)
-// 生成时间: 2026-07-04, 2026-08-05 (3F.2 来源装配)
+// Generated: 2026-07-04 | Updated: 2026-09-05 (4.0h foreground recovery)
 // ==========================================
 
 import UIKit
@@ -58,6 +58,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                 await self?.presentLimitedLibraryPickerIfNeeded()
                 // 3F.11 fix: 回前台时排空 Share 队列 — 运行期分享的信封此前要等下次启动才消费
                 await self?.drainSharedImportsIfNeeded()
+                _ = try? await AppComposition.shared.focusSourceLifecycleActor
+                    .recoverPendingPhotoLibraryDeletions(traceID: UUID().uuidString)
             }
         }
         return true
@@ -120,15 +122,12 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
             return
         }
         let registry = composition.generationRegistry
-        let canonicalRepository = CanonicalMemoryRepositoryActor(
-            db: composition.databaseManager,
-            generationRegistry: registry
-        )
+        let canonicalRepository = composition.canonicalRepository
         let sync = SyncPipeline(
             embedder: composition.visionEmbedder,
             privacyActor: composition.privacyActor,
             vectorStore: VectorStoreActor(dimension: SigLIP2Embedder.dimension),
-            excludedAssets: .shared,
+            excludedAssets: composition.excludedAssetsActor,
             progressActor: .shared,
             canonicalRepository: canonicalRepository,
             generationRegistry: registry,
@@ -151,7 +150,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
             asrEngine: composition.asrEngine,
             privacyActor: composition.privacyActor,
             vectorStore: VectorStoreActor(dimension: E5Embedder.dimension),
-            excludedAssets: .shared,
+            excludedAssets: composition.excludedAssetsActor,
             canonicalRepository: canonicalRepository,
             generationRegistry: registry,
             taskQueue: .shared,
