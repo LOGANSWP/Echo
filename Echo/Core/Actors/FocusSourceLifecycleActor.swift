@@ -4,8 +4,9 @@
 //           docs/decisions/ADR-019-photokit-source-deletion-recovery.md
 // Task: 4.0h - Live source resolution and PhotoKit deletion saga
 // AC coverage: orthogonal source facets, PhotoKit deletion capability gate, confirmed-only D-005,
-//              full-scope foreground reconciliation, active-intent isolation, per-journal L2,
-//              non-PhotoKit D-005 recovery, hash-only identity, and structured audit
+//              tracked-ID foreground reconciliation, active-intent isolation, per-journal L2,
+//              visible-source audit suppression, non-PhotoKit D-005 recovery, hash-only identity,
+//              and structured audit
 // Architecture: AGENTS.md §4.2 actor isolation, R-001/R-005/R-006, D-002/D-003/D-005
 // Generated: 2026-09-05 | Updated: 2026-09-06 (PR #76 review)
 // ==========================================
@@ -454,11 +455,12 @@ public actor FocusSourceLifecycleActor {
         pending: inout [UUID]
     ) async throws {
         guard await photoLibrary.currentAccess() == .authorized else { return }
-        let visibleAssetIDs = await photoLibrary.visibleAssetIDs()
+        let references = try await repository.loadPhotoSourceReferences()
+        let trackedAssetIDs = Set(references.map(\.sourceLocator))
+        let visibleAssetIDs = await photoLibrary.visibleAssetIDs(trackedAssetIDs: trackedAssetIDs)
         // The full-scope set is deletion evidence only if authorization is still full
         // after enumeration; a concurrent downgrade must fail closed.
         guard await photoLibrary.currentAccess() == .authorized else { return }
-        let references = try await repository.loadPhotoSourceReferences()
         let groups = Dictionary(grouping: references) {
             PhotoSourceKey(sourceLocator: $0.sourceLocator, sourceType: $0.sourceType)
         }
@@ -470,13 +472,13 @@ public actor FocusSourceLifecycleActor {
                     && !activeDeletionMemoryIDs.contains($0.memoryID)
             }
             guard !candidates.isEmpty else { continue }
+            guard !visibleAssetIDs.contains(key.sourceLocator) else { continue }
             let sourceCheckpoint = await privacyActor.validate(
                 operation: .delete,
                 traceID: traceID,
                 sourceTypes: [key.sourceType]
             )
             guard sourceCheckpoint.decision == .allowed else { continue }
-            guard !visibleAssetIDs.contains(key.sourceLocator) else { continue }
 
             let reserved = candidates.filter {
                 activeDeletionMemoryIDs.insert($0.memoryID).inserted

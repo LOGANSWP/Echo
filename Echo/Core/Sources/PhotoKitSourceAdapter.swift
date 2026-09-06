@@ -10,7 +10,7 @@
 // AC 覆盖: US-SRC-001 AC-1 (PHAsset 读取图片/视频), AC-5 (.dataSourceConnected 审计 sourceType+itemCount),
 //          AC-6 (仅处理已下载本地资源 — isNetworkAccessAllowed=false), AC-3 (支持"仅授权部分相册"),
 //          US-SRC-008 AC-4 (排除项不重新导入), ADR-008 §决策-1/5 (全授权状态 + 撤回立即停止),
-//          US-PRV-004/007 (live canPerform(.delete) snapshot + visible-ID reconciliation),
+//          US-PRV-004/007 (live canPerform(.delete) snapshot + tracked visible-ID reconciliation),
 //          iOS 26 fix (limited 选择器主动弹出 — shouldPresentLimitedLibraryPicker, 3F.2 review)
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), §7.3 (审计事件), R-001/R-005 (零网络),
 //            R-007 (禁止 unchecked Sendable)
@@ -136,7 +136,7 @@ public nonisolated enum PhotoLibraryDeletionResult: Sendable, Equatable {
 public protocol PhotoSourceLifecycleServing: Sendable {
     func currentAccess() async -> PhotoAccess
     func assetSnapshot(assetID: String) async -> PhotoSourceSnapshot?
-    func visibleAssetIDs() async -> Set<String>
+    func visibleAssetIDs(trackedAssetIDs: Set<String>) async -> Set<String>
     func deleteAsset(assetID: String) async -> PhotoLibraryDeletionResult
 }
 
@@ -191,11 +191,15 @@ public struct RealPhotoLibrary: PhotoLibraryServing, PhotoSourceLifecycleServing
         await Self.lifecycleSnapshot(assetID)
     }
 
-    public nonisolated func visibleAssetIDs() async -> Set<String> {
+    public nonisolated func visibleAssetIDs(trackedAssetIDs: Set<String>) async -> Set<String> {
         await MainActor.run {
             let access = PhotoAccessMapper.map(PHPhotoLibrary.authorizationStatus(for: .readWrite))
             guard access == .authorized || access == .limited else { return [] }
-            let fetch = PHAsset.fetchAssets(with: nil)
+            guard !trackedAssetIDs.isEmpty else { return [] }
+            let fetch = PHAsset.fetchAssets(
+                withLocalIdentifiers: Array(trackedAssetIDs),
+                options: nil
+            )
             var identifiers: Set<String> = []
             fetch.enumerateObjects { asset, _, _ in
                 identifiers.insert(asset.localIdentifier)

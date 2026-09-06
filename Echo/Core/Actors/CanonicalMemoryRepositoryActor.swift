@@ -25,8 +25,9 @@
 //                  and remove every representation vector plus IndexBuildItem residue.
 // PR#65 third review fix: vector persistence is a fail-stop phase boundary, and resumed
 //                        deletion removes the exact persisted journal operation.
-// PR#76 review fix: external cascades are source-type scoped; incomplete journals recover;
-//                   mandatory completion audits commit atomically before journal removal.
+// PR#76 review fixes: external cascades are source-type scoped, override stale Echo-only
+//                     exclusion intents, recover incomplete journals, and commit mandatory
+//                     completion audits atomically before journal removal.
 // ==========================================
 
 import Foundation
@@ -653,6 +654,26 @@ public actor CanonicalMemoryRepositoryActor {
         return updated
     }
 
+    /// Converts only a trusted original-file cascade into the no-exclusion deletion intent.
+    private func promoteEchoOnlyJournalToExternalCascade(memoryID: UUID) async throws {
+        guard let journal = try await db.loadDeletionJournals(memoryId: memoryID).first,
+              journal.intentKind == .echoOnly else { return }
+        try await db.upsertDeletionJournal(MemoryDeletionJournal(
+            operationID: journal.operationID,
+            memoryID: journal.memoryID,
+            auditSubjectHash: journal.auditSubjectHash,
+            traceID: journal.traceID,
+            phase: journal.phase,
+            vectorIDsByGeneration: journal.vectorIDsByGeneration,
+            sourceLocator: journal.sourceLocator,
+            sourceType: journal.sourceType,
+            writeExcluded: false,
+            intentKind: .externalCascade,
+            sourceDeletionState: .confirmedDeleted,
+            sourceDeletionOutcome: .confirmedDeleted
+        ))
+    }
+
     /// WP3 steps 5a-5f：consent revoke 三接通组合入口——
     /// cache 全量失效 + AuditLog 全量 purge + deletion journal 清理。
     public func purgeEverythingForConsent() async throws {
@@ -675,9 +696,18 @@ public actor CanonicalMemoryRepositoryActor {
             sql: "SELECT memoryId FROM Memory WHERE sourceLocator = ? AND sourceType = ?",
             bindings: [.text(assetId), .text(sourceType)]
         )
+        let matchingJournalIDs: [UUID] = try await db.loadAllDeletionJournals().compactMap { journal in
+            guard journal.sourceLocator == assetId,
+                  journal.sourceType == sourceType,
+                  journal.intentKind == .echoOnly else { return nil }
+            return journal.memoryID
+        }
+        let memoryIDs = Set(rows.compactMap {
+            $0["memoryId"]?.stringValue.flatMap { UUID(uuidString: $0) }
+        } + matchingJournalIDs).sorted { $0.uuidString < $1.uuidString }
         var deleted = 0
-        for row in rows {
-            guard let mid = row["memoryId"]?.stringValue.flatMap({ UUID(uuidString: $0) }) else { continue }
+        for mid in memoryIDs {
+            try await promoteEchoOnlyJournalToExternalCascade(memoryID: mid)
             if try await deleteMemory(memoryId: mid, sourceType: sourceType, writeExcluded: false, traceID: traceID) {
                 deleted += 1
             }
