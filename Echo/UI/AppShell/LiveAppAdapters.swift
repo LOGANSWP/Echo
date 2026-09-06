@@ -2,12 +2,12 @@
 // 文件: LiveAppAdapters.swift
 // 对应规格: docs/05-planning/phase3f-execution-plan.md → 3F.7 (UI 到 Core 全域接线)
 //            docs/ui/architecture.md §7 (适配器契约)
-// 任务: 3F.7 - UI 到 Core 全域接线
+// Task: 3F.7 + 4.0h - UI-to-Core production wiring and source lifecycle
 // AC 覆盖: 默认 live adapter、无 fixture fallback、真实设置值、跨 surface journey
 // 架构约束: AGENTS.md §8.1 (@MainActor @Observable 薄适配器), §17.4 (Core 只读消费),
 //           AGENTS.md §4.2 (仅持有不可变 actor 引用), R-007
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
-// 生成时间: 2026-08-11
+// Generated: 2026-08-11 | Updated: 2026-09-05
 // ==========================================
 
 import Foundation
@@ -82,11 +82,8 @@ public enum LiveAppAdapters {
     ) -> DeviceMigrationActor {
         DeviceMigrationActor(
             db: composition.databaseManager,
-            canonicalRepository: CanonicalMemoryRepositoryActor(
-                db: composition.databaseManager,
-                generationRegistry: composition.generationRegistry
-            ),
-            excludedAssets: .shared,
+            canonicalRepository: composition.canonicalRepository,
+            excludedAssets: composition.excludedAssetsActor,
             privacyActor: composition.privacyActor,
             generationRegistry: composition.generationRegistry,
             textEmbedder: composition.textEmbedder
@@ -141,10 +138,14 @@ public enum LiveAppAdapters {
     public static func makeCanonicalRepository(
         composition: AppComposition = .shared
     ) -> CanonicalMemoryRepositoryActor {
-        CanonicalMemoryRepositoryActor(
-            db: composition.databaseManager,
-            generationRegistry: composition.generationRegistry
-        )
+        composition.canonicalRepository
+    }
+
+    /// Shared PhotoKit-backed source lifecycle used by Detail and foreground recovery.
+    public static func makeFocusSourceLifecycleActor(
+        composition: AppComposition = .shared
+    ) -> FocusSourceLifecycleActor {
+        composition.focusSourceLifecycleActor
     }
 
     /// Shared production edit boundary used by Detail and Sync.

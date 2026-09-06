@@ -3,8 +3,9 @@
 // 对应规格: docs/02-architecture/架构设计文档.md §5 (L2 可恢复错误处理)
 // 任务: 1.4 - 集成 SQLite，创建 ExcludedAssets, Feedback, TaskProgress, PendingOperations 表
 //        3F.6 - add 自动重连（DEF-37-001: DB 关闭时 L2 PendingOperations 写入存活）
+//        4.0h - L2 queue for indeterminate PhotoKit deletion results in an isolated database
 // 架构约束: AGENTS.md §4.4 (L1~L4 错误分级), AGENTS.md §4.2 (Actor 隔离)
-// 生成时间: 2026-07-04 | 更新: 2026-08-11 (3F.6 自动重连)
+// Generated: 2026-07-04 | Updated: 2026-09-05 (4.0h)
 // ==========================================
 
 import Foundation
@@ -14,7 +15,7 @@ public actor PendingOpsActor {
     public static let shared = PendingOpsActor()
     private let db: DatabaseManager
 
-    private init(db: DatabaseManager = .shared) {
+    internal init(db: DatabaseManager = .shared) {
         self.db = db
     }
 

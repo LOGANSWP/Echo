@@ -2,7 +2,7 @@
 
 > **责任**：告诉 Agent 针对 UI 任务读取哪份文档，而不是让 Agent 重读 bootstrap 全文
 > **无需读取本文全文**：按任务选择下表对应文档即可
-> **最后同步**：2026-09-03，ADR-017 将 Focus 生产边界拆为 4.0e/4.0h/4.0i/4.0j
+> **最后同步**：2026-09-05，ADR-019 收紧 4.0h PhotoKit 来源解析、外部结果门禁与恢复语义
 
 ---
 
@@ -32,7 +32,7 @@
 | Phase 4 真实断点恢复（4.0g） | architecture + testing + ADR-011 + BackgroundTask/ResumeProgress Surface/State/Action/Journey Contracts + acceptance policy + SYS-001 AC 原文；重点核对精确 taskId、checkpoint no-overwrite、Restart 分阶段语义、raw type、当前授权与幂等恢复 |
 | Phase 4 交互式唤醒卡（4.0d） | style + architecture + testing + US-AWK-005 AC 原文 + ADR-016 + Home/Detail contracts；Bundle 离线音乐、MemoryFeeling 关系、card→Focus intent 属于生产功能闭环，不是第四种 surface family |
 | Phase 4 记忆编辑与冲突（4.0e） | architecture + testing + US-AWK-007 AC 原文 + ADR-010/017 + Memory Detail contracts |
-| Phase 4 来源解析与删除（4.0h） | architecture + testing + US-PRV-004/007 AC 原文 + ADR-017 + Memory Detail delete contracts |
+| Phase 4 来源解析与删除（4.0h） | architecture + testing + US-PRV-004/007 AC 原文 + ADR-008/017/019 + Memory Detail delete contracts；重点核对 `canPerform(.delete)`、prepared/confirmed 外部门禁、limited-hidden 非删除、transcript-only Share audio 与真实通知审计 |
 | Phase 4 引用与分享（4.0i） | architecture + testing + US-SYN-002/003/004 AC 原文 + ADR-013/017 + Detail/Creation contracts |
 | Phase 4 叙事调度（4.0j） | architecture + testing + US-SYN-004 AC 原文 + ADR-011/017 |
 | UI 测试 | `testing-and-artifacts.md` |

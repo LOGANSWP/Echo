@@ -3,15 +3,16 @@
   "designProfileId": "echo-memory-canvas",
   "surfaceId": "memory-detail",
   "surfaceFamily": "focus",
-  "responsibility": "Render one production memory as a Focus surface with single-column content, persisted MemoryUserEdit/conflict state, capability-gated source actions, on-demand translation and grounded citation navigation. Original-source deletion is offered only for writable resolvable PhotoKit photo/video.",
+  "responsibility": "Render one production memory as a Focus surface with single-column content, persisted MemoryUserEdit/conflict state, typed source availability, capability-gated source actions, on-demand translation and grounded citation navigation. Original-source deletion is offered only for visible PhotoKit photo/video that pass PHAsset.canPerform(.delete).",
   "inputs": {
     "memoryId": "UUID — memory identifier",
     "memory": "MemoryDetailModel mapped from CanonicalMemory + MemoryUserEdit + MemoryEditConflict. Original source content remains separate from user title/multiline description/normalized tags.",
     "preferredLanguage": "UserPolicy.preferredLanguage (zh-Hans | en-US)",
-    "sourceDeletionCapability": "removeFromEchoOnly | photoLibraryDeletable; note/voice/thirdParty Share Extension sources never claim source-app deletion authority"
+    "contentAvailability": "available | offlineUnavailable | authorizationDenied | limitedScopeHidden | missing | unsupported",
+    "sourceDeletionCapability": "removeFromEchoOnly | photoLibraryDeletable; deletion requires current UserPolicy, authorized/limited-visible PhotoKit access and PHAsset.canPerform(.delete); Share Extension sources never claim source-app deletion authority"
   },
   "outputs": {
-    "visibleContent": "Original source content plus user edit overlay, translated text, grouped metadata, verified citation anchors and capability-gated actions. Production media is resolved under current UserPolicy; unresolved/revoked/missing media shows an honest localized fallback. Bundled samples are Preview/test-only.",
+    "visibleContent": "PhotoKit content plus user edit overlay, translated/canonical text, grouped metadata, verified citation anchors and capability-gated actions. Share text uses saved canonical content and Share audio is transcript-only because original audio is not persisted. Production media is resolved under current UserPolicy; offline, unresolved, revoked, limited-hidden and missing states remain distinct and never fall back to bundled samples.",
     "interactionTargets": "translateToggle, editButton, deleteButton, conflictActionButtons, saveButton, citationAnchor, retryButton, mediaPlayPause",
     "accessibilityTree": "Content in reading order; grouped metadata; media preview with label; each citation anchor as separate element"
   },
@@ -35,5 +36,5 @@
     "memory-detail-voice-loaded (voice transcript)",
     "memory-detail-video-loaded (video_frame)"
   ],
-  "version": "1.2.0"
+  "version": "1.3.0"
 }

@@ -1,12 +1,13 @@
 // ==========================================
 // 文件: MemoryDeletionJournal.swift
-// 对应规格: 自然语言照片检索交接计划 §7.8（D-005 可恢复删除契约）
-// 任务: WP3 - 规范身份、删除、补偿与路由回滚（步骤 0b/3 系列）
+// Spec: Photo text-search handoff plan §7.8 (D-005 recoverable deletion contract);
+//           docs/decisions/ADR-019-photokit-source-deletion-recovery.md
+// Task: WP3 - Canonical identity, deletion, compensation, and route rollback; 4.0h - PhotoKit deletion recovery
 // 架构约束: SWIFT_DEFAULT_ACTOR_ISOLATION=MainActor 下值契约显式 nonisolated；
 //           journal 先于副作用持久化，任一阶段失败保留 journal 写 PendingOperations，
 //           启动恢复从已持久化 phase 重放幂等步骤（D-005）。
-// AC 覆盖: D-005 persists deletion phase, representation vector IDs, and exclusion intent.
-// 生成时间: 2026-08-25
+// AC coverage: D-005 phase/vector/exclusion intent; 4.0h external-result gate and one active intent.
+// Generated: 2026-08-25 | Updated: 2026-09-05 (4.0h)
 // ==========================================
 
 import Foundation
@@ -30,6 +31,37 @@ public nonisolated enum MemoryDeletionPhase: String, Sendable, Codable, Equatabl
         case .completed: 5
         }
     }
+}
+
+/// Keeps deletion intent independent from D-005 so a PhotoKit request is not treated as confirmation.
+public nonisolated enum MemoryDeletionIntentKind: String, Sendable, Codable, Equatable {
+    case echoOnly
+    case externalCascade
+    case photoLibraryAndEcho
+}
+
+/// External source deletion state. Only `confirmedDeleted` unlocks D-005.
+public nonisolated enum SourceDeletionState: String, Sendable, Codable, Equatable {
+    case notApplicable
+    case prepared
+    case confirmedDeleted
+    case notDeleted
+    case indeterminate
+}
+
+/// Structured external deletion outcome; state must not be inferred from error prose.
+public nonisolated enum SourceDeletionOutcome: String, Sendable, Codable, Equatable {
+    case notRequested
+    case confirmedDeleted
+    case reconciledAbsent
+    case userCancelled
+    case authorizationDenied
+    case accessRestricted
+    case assetNotDeletable
+    case assetVisible
+    case limitedScopeHidden
+    case systemResultUnknown
+    case sourceUnavailable
 }
 
 /// 单个 generation 内待删除的向量 ID 清单。
@@ -56,6 +88,9 @@ public nonisolated struct MemoryDeletionJournal: Sendable, Codable, Equatable {
     public nonisolated let sourceLocator: String?
     public nonisolated let sourceType: String?
     public nonisolated let writeExcluded: Bool?
+    public nonisolated let intentKind: MemoryDeletionIntentKind
+    public nonisolated let sourceDeletionState: SourceDeletionState
+    public nonisolated let sourceDeletionOutcome: SourceDeletionOutcome
 
     public nonisolated init(
         operationID: String,
@@ -66,7 +101,10 @@ public nonisolated struct MemoryDeletionJournal: Sendable, Codable, Equatable {
         vectorIDsByGeneration: [GenerationVectorIDs],
         sourceLocator: String? = nil,
         sourceType: String? = nil,
-        writeExcluded: Bool? = nil
+        writeExcluded: Bool? = nil,
+        intentKind: MemoryDeletionIntentKind? = nil,
+        sourceDeletionState: SourceDeletionState? = nil,
+        sourceDeletionOutcome: SourceDeletionOutcome? = nil
     ) {
         self.operationID = operationID
         self.memoryID = memoryID
@@ -77,5 +115,11 @@ public nonisolated struct MemoryDeletionJournal: Sendable, Codable, Equatable {
         self.sourceLocator = sourceLocator
         self.sourceType = sourceType
         self.writeExcluded = writeExcluded
+        let inferredIntent = intentKind ?? (writeExcluded == true ? .echoOnly : .externalCascade)
+        self.intentKind = inferredIntent
+        self.sourceDeletionState = sourceDeletionState
+            ?? (inferredIntent == .echoOnly ? .notApplicable : .confirmedDeleted)
+        self.sourceDeletionOutcome = sourceDeletionOutcome
+            ?? (inferredIntent == .echoOnly ? .notRequested : .confirmedDeleted)
     }
 }

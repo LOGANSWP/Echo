@@ -5,7 +5,8 @@
 //            US-PRV-001 (动态授权即时生效)
 //            docs/decisions/ADR-008-source-import-boundaries.md §决策-1 (PhotoKit 授权与变更观察),
 //            §决策-5 (权限撤回停止读取)
-// 任务: 3F.2 - PhotoKit、Share Extension 与真实来源
+//            docs/decisions/ADR-019-photokit-source-deletion-recovery.md
+// Task: 3F.2 - PhotoKit, Share Extension, and live sources; 4.0h - source deletion boundary
 // AC 覆盖: US-SRC-001 AC-1 (PHAsset 读取图片/视频), AC-5 (.dataSourceConnected 审计 sourceType+itemCount),
 //          AC-6 (仅处理已下载本地资源 — isNetworkAccessAllowed=false), AC-3 (支持"仅授权部分相册"),
 //          US-SRC-008 AC-4 (排除项不重新导入), ADR-008 §决策-1/5 (全授权状态 + 撤回立即停止),
@@ -15,7 +16,7 @@
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
 //       PhotoKit SDK 将 PHPhotoLibrary/PHImageManager 标注 @MainActor，真实实现通过
 //       MainActor.run 跳转访问；协议方法均为 async，可被 Fake 注入测试
-// 生成时间: 2026-08-05
+// Generated: 2026-08-05 | Updated: 2026-09-05 (4.0h)
 // ==========================================
 
 import Foundation
@@ -97,13 +98,53 @@ public protocol PhotoLibraryServing: Sendable {
     func isAssetDownloaded(_ assetId: String) async -> Bool
 }
 
+// MARK: - Photo Source Lifecycle
+
+public nonisolated enum PhotoSourceMediaType: String, Sendable, Codable, Equatable {
+    case photo
+    case video
+}
+
+/// Minimal PHAsset lifecycle snapshot. PHAsset itself never crosses an actor boundary.
+public nonisolated struct PhotoSourceSnapshot: Sendable, Equatable {
+    public nonisolated let assetID: String
+    public nonisolated let mediaType: PhotoSourceMediaType
+    public nonisolated let isLocallyAvailable: Bool
+    public nonisolated let canDelete: Bool
+
+    public nonisolated init(
+        assetID: String,
+        mediaType: PhotoSourceMediaType,
+        isLocallyAvailable: Bool,
+        canDelete: Bool
+    ) {
+        self.assetID = assetID
+        self.mediaType = mediaType
+        self.isLocallyAvailable = isLocallyAvailable
+        self.canDelete = canDelete
+    }
+}
+
+/// Structured PhotoKit completion result. `indeterminate` requires launch or foreground recovery.
+public nonisolated enum PhotoLibraryDeletionResult: Sendable, Equatable {
+    case confirmedDeleted
+    case notDeleted(SourceDeletionOutcome)
+    case indeterminate(SourceDeletionOutcome)
+}
+
+public protocol PhotoSourceLifecycleServing: Sendable {
+    func currentAccess() async -> PhotoAccess
+    func assetSnapshot(assetID: String) async -> PhotoSourceSnapshot?
+    func deleteAsset(assetID: String) async -> PhotoLibraryDeletionResult
+}
+
 // MARK: - Real Photo Library
 
 /// 真实 PhotoKit 实现（@preconcurrency import Photos，经 MainActor.run 访问 SDK）。
 ///
 /// - 下载检测：`requestImageDataAndOrientation` + `isNetworkAccessAllowed=false`
 ///   （US-SRC-001 AC-6：返回 nil 表示未下载；家庭共享相册同理，不区分来源）
-public struct RealPhotoLibrary: PhotoLibraryServing {
+public struct RealPhotoLibrary: PhotoLibraryServing, PhotoSourceLifecycleServing {
 
     public nonisolated init() {}
 
@@ -144,6 +185,14 @@ public struct RealPhotoLibrary: PhotoLibraryServing {
         await Self.assetDownloaded(assetId)
     }
 
+    public nonisolated func assetSnapshot(assetID: String) async -> PhotoSourceSnapshot? {
+        await Self.lifecycleSnapshot(assetID)
+    }
+
+    public nonisolated func deleteAsset(assetID: String) async -> PhotoLibraryDeletionResult {
+        await Self.performDeletion(assetID)
+    }
+
     // MARK: - @MainActor SDK Helpers
 
     @MainActor
@@ -162,6 +211,67 @@ public struct RealPhotoLibrary: PhotoLibraryServing {
         return await withCheckedContinuation { continuation in
             PHImageManager.default().requestImageDataAndOrientation(for: asset, options: options) { data, _, _, _ in
                 continuation.resume(returning: data != nil)
+            }
+        }
+    }
+
+    @MainActor
+    private static func lifecycleSnapshot(_ assetID: String) async -> PhotoSourceSnapshot? {
+        let access = PhotoAccessMapper.map(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+        guard access == .authorized || access == .limited else { return nil }
+        guard let asset = PHAsset.fetchAssets(
+            withLocalIdentifiers: [assetID], options: nil
+        ).firstObject else { return nil }
+        let mediaType: PhotoSourceMediaType = asset.mediaType == .video ? .video : .photo
+        return PhotoSourceSnapshot(
+            assetID: assetID,
+            mediaType: mediaType,
+            isLocallyAvailable: await assetDownloaded(assetID),
+            canDelete: asset.canPerform(.delete)
+        )
+    }
+
+    @MainActor
+    private static func performDeletion(_ assetID: String) async -> PhotoLibraryDeletionResult {
+        let access = PhotoAccessMapper.map(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+        switch access {
+        case .authorized, .limited:
+            break
+        case .restricted:
+            return .notDeleted(.accessRestricted)
+        case .denied, .notDetermined:
+            return .notDeleted(.authorizationDenied)
+        }
+        guard let asset = PHAsset.fetchAssets(
+            withLocalIdentifiers: [assetID], options: nil
+        ).firstObject else {
+            // Missing is not proof of deletion under limited scope; the coordinator reconciles it.
+            return .indeterminate(access == .limited ? .limitedScopeHidden : .sourceUnavailable)
+        }
+        guard asset.canPerform(.delete) else {
+            return .notDeleted(.assetNotDeletable)
+        }
+        return await withCheckedContinuation { continuation in
+            PHPhotoLibrary.shared().performChanges {
+                PHAssetChangeRequest.deleteAssets([asset] as NSArray)
+            } completionHandler: { success, error in
+                if success {
+                    continuation.resume(returning: .confirmedDeleted)
+                    return
+                }
+                let code = (error as NSError?)?.code
+                // PHError.h in the active SDK: userCancelled=3072,
+                // accessRestricted=3310, accessUserDenied=3311.
+                switch code {
+                case 3072:
+                    continuation.resume(returning: .notDeleted(.userCancelled))
+                case 3310:
+                    continuation.resume(returning: .notDeleted(.accessRestricted))
+                case 3311:
+                    continuation.resume(returning: .notDeleted(.authorizationDenied))
+                default:
+                    continuation.resume(returning: .indeterminate(.systemResultUnknown))
+                }
             }
         }
     }

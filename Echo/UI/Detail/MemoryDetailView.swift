@@ -5,13 +5,13 @@
 //            §7.1 (Focus 共享表达), §10.1.2 (数据加载失败空态), §12.2 (L4 冲突全屏),
 //            §14.5 (Bad Case 标记), docs/ui/architecture.md §3 (Surface View), §8 (Focus family)
 //            docs/01-spec/用户故事与验收标准规格书.md → US-AWK-007, US-SYN-002/003, US-PRV-004, US-DIS-002
-// Task: 4.0b - Balanced Canvas Focus surfaces for Detail, Creation, and Translation
+// Task: 4.0b + 4.0h - Balanced Canvas Focus surface and live source lifecycle
 // AC coverage: US-AWK-007 AC-1 ✅ (honest edit entry), AC-4 ✅ (honest conflict UI),
 //          US-DIS-002 AC-3 ✅ (源语言检测不确定保留原文为主, ADR-005), AC-4 ✅ (原文/译文切换), US-PRV-004 AC-1 ✅ (删除双选项弹窗),
 //          US-SYN-002 AC-1 ✅ (溯源锚点渲染), US-SYN-003 AC-3 ✅ (创作预览/复制)
 // 架构约束: AGENTS.md §8.1 (ViewModel 驱动), §17.3 (Focus 禁止 masonry),
 //           echo-memory-canvas apple-native 基础; 系统容器 + semantic colors + Dynamic Type
-// 生成时间: 2026-08-01
+// Generated: 2026-08-01 | Updated: 2026-09-05
 // ==========================================
 
 import SwiftUI
@@ -60,7 +60,8 @@ struct MemoryDetailView: View {
         _viewModel = State(initialValue: MemoryDetailViewModel(
             canonicalRepository: LiveAppAdapters.makeCanonicalRepository(),
             memoryEditService: LiveAppAdapters.makeMemoryEditActor(),
-            syncLockChecker: LiveAppAdapters.makeSyncLockChecker()
+            syncLockChecker: LiveAppAdapters.makeSyncLockChecker(),
+            sourceLifecycleService: LiveAppAdapters.makeFocusSourceLifecycleActor()
         ))
         _pendingMemoryID = State(initialValue: memoryId)
     }
@@ -124,10 +125,12 @@ struct MemoryDetailView: View {
             }
             .accessibilityIdentifier("memory-delete-remove-from-echo")
 
-            Button("Delete original file too", role: .destructive) {
-                viewModel.deleteOriginal()
+            if viewModel.canDeleteOriginal {
+                Button("Delete original file too", role: .destructive) {
+                    viewModel.deleteOriginal()
+                }
+                .accessibilityIdentifier("memory-delete-delete-original")
             }
-            .accessibilityIdentifier("memory-delete-delete-original")
 
             Button("Cancel", role: .cancel) {
                 viewModel.showDeleteConfirmation = false

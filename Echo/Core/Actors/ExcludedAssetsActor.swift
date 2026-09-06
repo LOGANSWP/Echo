@@ -4,6 +4,7 @@
 //            docs/02-architecture/架构设计文档.md §2.2 (Actor 隔离服务)
 // 任务: 1.4 - 集成 SQLite，创建 ExcludedAssets 等表 (Stub)
 //       2.2 - ExcludedAssetsActor 实现（含恢复、一键恢复、变更监测）
+//       4.0h - One-time cascade cleanup notice and truthful userNotified audit
 // AC 覆盖: US-SRC-008 AC-3 (写入 ExcludedAssets), AC-4 (被排除项不重新导入),
 //          AC-5 (恢复+文件存在性校验), AC-6 (重新授权一键恢复),
 //          AC-7 (变更监测+分页), AC-8 (审计事件)
@@ -16,7 +17,7 @@
 //          本 Actor 通过 writeAuditLog() 记录操作审计，满足 §7.3 审计覆盖要求。
 // 测试策略: 核心 SQL + 审计逻辑由 ExcludedAssetsActorTests 覆盖（17 个测试）。
 //          restore()/checkForChanges() 的 PHAsset 边界场景在 Phase 4 ExcludedAssetsBoundaryTests 中覆盖。
-// 生成时间: 2026-07-04 (Stub), 2026-07-08 (Task 2.2 Full Implementation)
+// Generated: 2026-07-04 | Updated: 2026-09-05 (4.0h)
 // ==========================================
 
 import Foundation
@@ -164,6 +165,70 @@ public actor ExcludedAssetsActor {
             bindings: [.text(sourceType)]
         )
         return rows.first?["cnt"]?.intValue.map(Int.init) ?? 0
+    }
+
+    // MARK: - Cascade Cleanup Notice (4.0h / ADR-019)
+
+    /// Removes an invalid exclusion after an original-file cascade and persists a pending notice.
+    /// The notice stores only the asset digest; `userNotified` remains false at this stage.
+    @discardableResult
+    public func recordCascadeCleanup(
+        assetId: String,
+        sourceType: String,
+        traceID: String
+    ) async throws -> Bool {
+        guard try await contains(assetId: assetId) else { return false }
+        let digest = AuditContentHasher.sha256Hex(assetId)
+        try await db.executeTransaction([
+            .init(
+                sql: "DELETE FROM ExcludedAssets WHERE assetId = ?",
+                bindings: [.text(assetId)]
+            ),
+            .init(
+                sql: "INSERT OR REPLACE INTO ExcludedCleanupNotice (assetIdDigest, sourceType, createdAt, presentedAt) VALUES (?, ?, ?, NULL)",
+                bindings: [.text(digest), .text(sourceType), .double(Date().timeIntervalSince1970)]
+            ),
+        ])
+        return true
+    }
+
+    public func pendingCleanupNoticeCount() async throws -> Int {
+        let rows = try await db.executeQuery(
+            sql: "SELECT COUNT(*) AS cnt FROM ExcludedCleanupNotice WHERE presentedAt IS NULL",
+            bindings: []
+        )
+        return rows.first?["cnt"]?.intValue.map(Int.init) ?? 0
+    }
+
+    /// Called by the UI only after the notice enters the visible hierarchy.
+    @discardableResult
+    public func markCleanupNoticesPresented(traceID: String) async throws -> Int {
+        let rows = try await db.executeQuery(
+            sql: "SELECT assetIdDigest, sourceType FROM ExcludedCleanupNotice WHERE presentedAt IS NULL ORDER BY createdAt",
+            bindings: []
+        )
+        guard !rows.isEmpty else { return 0 }
+        let now = Date().timeIntervalSince1970
+        try await db.executeWrite(
+            sql: "UPDATE ExcludedCleanupNotice SET presentedAt = ? WHERE presentedAt IS NULL",
+            bindings: [.double(now)]
+        )
+        let policyVersion = await privacyActor.getPolicy().policyVersion
+        for row in rows {
+            try? await privacyActor.writeAuditLog(
+                eventType: .excludedAutoCleaned,
+                traceID: traceID,
+                policyVersion: policyVersion,
+                success: true,
+                sourceType: row["sourceType"]?.stringValue,
+                affectedCount: 1,
+                subjectKind: "asset",
+                subjectHash: row["assetIdDigest"]?.stringValue,
+                excludedAutoCleaned: true,
+                userNotified: true
+            )
+        }
+        return rows.count
     }
 
     /// 分页列出排除资产 (AC-7: 分页懒加载，默认每页 50 条)

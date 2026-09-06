@@ -3,11 +3,11 @@
 // 对应规格: docs/decisions/ADR-007-production-composition-consent.md §决策-1 (composition root),
 //            §决策-2 (deny-by-default 同意), §决策-3 (事务性撤回/清除), §决策-5 (不可用启动状态)
 //            docs/01-spec/用户故事与验收标准规格书.md → US-PRV-001, US-PRV-008, US-RES-004
-// 任务: 3F.1 + 4.0e + 4.0f + 4.0g - Production composition and recovery
+// Task: 3F.1 + 4.0e + 4.0f + 4.0g + 4.0h - Production composition and recovery
 // AC 覆盖: ADR-007 §决策-1 (唯一依赖图 + 启动状态机), §决策-2 (同意闸门装配),
 //          §决策-3 (撤回 → 事务清除 → blocked), §决策-5 (model/route/index-unavailable/bootstrap-failed)
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), §8.1 (@MainActor @Observable), R-007 (禁止 unchecked Sendable)
-// 生成时间: 2026-08-04 | 更新: 2026-09-03 (shared MemoryEditActor)
+// Generated: 2026-08-04 | Updated: 2026-09-05 (PhotoKit source lifecycle)
 // ==========================================
 
 import Foundation
@@ -59,6 +59,10 @@ public final class AppComposition {
     public let modelLoader: ModelLoaderActor
     public let generationRegistry: GenerationRegistryActor
     public let memoryEditActor: MemoryEditActor
+    public let excludedAssetsActor: ExcludedAssetsActor
+    public let pendingOpsActor: PendingOpsActor
+    public let canonicalRepository: CanonicalMemoryRepositoryActor
+    public let focusSourceLifecycleActor: FocusSourceLifecycleActor
     public let taskRecoveryRegistry: TaskRecoveryRegistry
     public let taskRecoveryCoordinator: TaskRecoveryCoordinator
     /// 文本嵌入器（E5）— 生产摄入/检索文本路径（CR-10）
@@ -111,6 +115,27 @@ public final class AppComposition {
         self.awakeningPreferenceStore = awakeningPreferenceStore ?? AwakeningPreferenceActor(db: databaseManager)
         self.modelLoader = modelLoader
         self.generationRegistry = generationRegistry
+        let excludedAssetsActor = ExcludedAssetsActor(
+            db: databaseManager,
+            privacyActor: privacyActor
+        )
+        let pendingOpsActor = PendingOpsActor(db: databaseManager)
+        let canonicalRepository = CanonicalMemoryRepositoryActor(
+            db: databaseManager,
+            generationRegistry: generationRegistry,
+            excludedAssets: excludedAssetsActor,
+            privacyActor: privacyActor
+        )
+        self.excludedAssetsActor = excludedAssetsActor
+        self.pendingOpsActor = pendingOpsActor
+        self.canonicalRepository = canonicalRepository
+        self.focusSourceLifecycleActor = FocusSourceLifecycleActor(
+            repository: canonicalRepository,
+            database: databaseManager,
+            photoLibrary: RealPhotoLibrary(),
+            privacyActor: privacyActor,
+            pendingOps: pendingOpsActor
+        )
         let taskRecoveryRegistry = TaskRecoveryRegistry()
         self.taskRecoveryRegistry = taskRecoveryRegistry
         self.taskRecoveryCoordinator = TaskRecoveryCoordinator(
@@ -159,6 +184,11 @@ public final class AppComposition {
 
             let consented = await consentStore.hasConsented()
             startupState = consented ? .ready : .requiresConsent
+            if consented {
+                _ = try? await focusSourceLifecycleActor.recoverPendingPhotoLibraryDeletions(
+                    traceID: UUID().uuidString
+                )
+            }
         } catch {
             // DB open / consent / policy load failure (L3): enter a dedicated bootstrapFailed
             // state, separated from purge failures so the UI does not misreport "cleanup incomplete"
@@ -187,6 +217,9 @@ public final class AppComposition {
     public func acceptConsent(consentVersion: Int, policyVersion: Int) async throws {
         try await consentStore.acceptConsent(consentVersion: consentVersion, policyVersion: policyVersion)
         startupState = .ready
+        _ = try? await focusSourceLifecycleActor.recoverPendingPhotoLibraryDeletions(
+            traceID: UUID().uuidString
+        )
     }
 
     /// 用户拒绝同意（US-PRV-008 AC-3）

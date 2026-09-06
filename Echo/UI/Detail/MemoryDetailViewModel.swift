@@ -5,17 +5,17 @@
 //            US-SYN-002 (溯源锚点), US-SYN-003 (创作预览), US-PRV-004 (删除确认), US-DIS-002 (按需翻译)
 //            docs/ui/echo-memory-canvas-style.md §3.2 (Focus surfaces — 单列 + grouped metadata),
 //            docs/ui/architecture.md §6 (ViewModel 契约), §7 (适配器契约)
-// 任务: 3.3 + 4.0e - MemoryDetail UI and production edit/conflict closure
+// Task: 3.3 + 4.0e + 4.0h - MemoryDetail UI, edit/conflict, and source lifecycle
 // AC coverage: US-AWK-007 editing/re-index/conflict actions use the live MemoryEditActor boundary;
 //          US-DIS-002 AC-1 ✅ (展开详情触发), AC-2 ✅ (cache-first + TranslationService fallback),
 //          AC-3 ✅ (源语言检测不确定 <0.9 保留原文为主, ADR-005), AC-4 ✅ (原文/译文切换), AC-5 ✅ (缓存写入 TTL=7d),
 //          US-PRV-004 remove-from-Echo uses CanonicalMemoryRepositoryActor in production;
-//          original-source deletion fails visibly until a source deletion boundary exists,
+//          US-PRV-004 original-source deletion is exposed only for live-deletable PhotoKit assets,
 //          US-SYN-002 AC-1 ✅ (溯源锚点展示), US-SYN-003 AC-3 ✅ (创作预览/复制)
 // 架构约束: AGENTS.md §8.1 (@MainActor + @Observable + state enum: idle/loading/completed/error/cancelled),
 //           §8.2 (状态流转), §4.2 (仅持有不可变引用), docs/ui/architecture.md §6~7 (适配器契约),
 //           §2.5 (Adapter 不保存第二份领域真相 — 仅转换展示字段)
-// 生成时间: 2026-08-01 | 更新: 2026-09-03 (4.0e production edit boundary)
+// Generated: 2026-08-01 | Updated: 2026-09-05 (4.0h source lifecycle)
 // PR#65 third review fix: production loads clear stale fixture/content state and retry the
 //                        exact requested memory through an injectable repository boundary.
 // ==========================================
@@ -45,6 +45,16 @@ protocol MemoryEditServicing: Sendable {
 }
 
 extension MemoryEditActor: MemoryEditServicing {}
+
+protocol FocusSourceLifecycleServicing: Sendable {
+    func resolveSource(memoryID: UUID, traceID: String) async throws -> FocusSourceResolution
+    func deletePhotoLibraryOriginal(
+        memoryID: UUID,
+        traceID: String
+    ) async throws -> FocusSourceDeletionResult
+}
+
+extension FocusSourceLifecycleActor: FocusSourceLifecycleServicing {}
 
 protocol MemorySyncLockChecking: Sendable {
     func isMemoryLockedForSync(memoryId: String) async -> Bool
@@ -101,6 +111,12 @@ struct MemoryDetailModel: Identifiable, Sendable, Equatable {
     var tags: [String]
     /// 用户已编辑标记 (US-AWK-007 AC-2 → userEdited=true)
     var userEdited: Bool
+    /// Original-source content availability; independent from presentation and deletion.
+    var contentAvailability: FocusContentAvailability
+    /// Focus presentation selected by the live source resolver.
+    var sourcePresentation: FocusSourcePresentation
+    /// Original-source deletion capability selected by current policy + PhotoKit state.
+    var sourceDeletionCapability: FocusSourceDeletionCapability
 
     // MARK: - Translation (US-DIS-002)
 
@@ -141,6 +157,9 @@ struct MemoryDetailModel: Identifiable, Sendable, Equatable {
         timestamp: Date,
         tags: [String] = [],
         userEdited: Bool = false,
+        contentAvailability: FocusContentAvailability = .available,
+        sourcePresentation: FocusSourcePresentation? = nil,
+        sourceDeletionCapability: FocusSourceDeletionCapability? = nil,
         translationVisible: Bool = false,
         translatedText: String? = nil,
         sourceLanguageConfidence: Double? = nil,
@@ -159,6 +178,10 @@ struct MemoryDetailModel: Identifiable, Sendable, Equatable {
         self.timestamp = timestamp
         self.tags = tags
         self.userEdited = userEdited
+        self.contentAvailability = contentAvailability
+        self.sourcePresentation = sourcePresentation ?? Self.defaultPresentation(for: sourceType)
+        self.sourceDeletionCapability = sourceDeletionCapability
+            ?? Self.defaultDeletionCapability(for: sourceType)
         self.translationVisible = translationVisible
         self.translatedText = translatedText
         self.sourceLanguageConfidence = sourceLanguageConfidence
@@ -176,12 +199,31 @@ struct MemoryDetailModel: Identifiable, Sendable, Equatable {
 
     /// 媒体预览类型 — 从 sourceType 派生，不保存第二份领域真相 (docs/ui/architecture.md §7.1)
     var mediaKind: MediaKind {
-        switch sourceType {
-        case "photo":         return .image
-        case "video_frame", "video_audio": return .video
-        case "voice":         return .audio
-        default:              return .none
+        switch sourcePresentation {
+        case .photo: return .image
+        case .video: return .video
+        case .canonicalText, .transcriptText: return .none
+        case .unavailable:
+            switch sourceType {
+            case "voice": return .audio
+            default: return .none
+            }
         }
+    }
+
+    private static func defaultPresentation(for sourceType: String) -> FocusSourcePresentation {
+        switch sourceType {
+        case "photo": .photo
+        case "video", "video_frame", "video_audio": .video
+        case "note", "thirdParty": .canonicalText
+        default: .unavailable
+        }
+    }
+
+    private static func defaultDeletionCapability(
+        for sourceType: String
+    ) -> FocusSourceDeletionCapability {
+        sourceType == "photo" || sourceType == "video" ? .photoLibraryDeletable : .unavailable
     }
 
     /// 数据源类型展示标签
@@ -332,6 +374,7 @@ final class MemoryDetailViewModel {
     private let canonicalRepository: (any MemoryDetailRepository)?
     private let memoryEditService: (any MemoryEditServicing)?
     private let syncLockChecker: (any MemorySyncLockChecking)?
+    private let sourceLifecycleService: (any FocusSourceLifecycleServicing)?
     private var isResolvingMerge = false
 
     // MARK: - Translation State (US-DIS-002)
@@ -362,13 +405,15 @@ final class MemoryDetailViewModel {
         translationCache: any TranslationCaching = MemoryDetailViewModel.defaultPersistentCache(),
         canonicalRepository: (any MemoryDetailRepository)? = nil,
         memoryEditService: (any MemoryEditServicing)? = nil,
-        syncLockChecker: (any MemorySyncLockChecking)? = nil
+        syncLockChecker: (any MemorySyncLockChecking)? = nil,
+        sourceLifecycleService: (any FocusSourceLifecycleServicing)? = nil
     ) {
         self.translationService = translationService
         self.translationCache = translationCache
         self.canonicalRepository = canonicalRepository
         self.memoryEditService = memoryEditService
         self.syncLockChecker = syncLockChecker
+        self.sourceLifecycleService = sourceLifecycleService
     }
 
     deinit {}
@@ -464,7 +509,9 @@ final class MemoryDetailViewModel {
                         return
                     }
                     guard !Task.isCancelled else { self.viewState = .cancelled; return }
-                    self.memory = Self.makeDetailModel(from: snapshot)
+                    self.memory = await self.resolvingSourceFacets(
+                        for: Self.makeDetailModel(from: snapshot)
+                    )
                     self.viewState = .completed
                 } catch is CancellationError {
                     self.viewState = .cancelled
@@ -495,7 +542,9 @@ final class MemoryDetailViewModel {
                         self.viewState = .cancelled
                         return
                     }
-                    self.memory = Self.makeDetailModel(from: memory)
+                    self.memory = await self.resolvingSourceFacets(
+                        for: Self.makeDetailModel(from: memory)
+                    )
                     self.viewState = .completed
                 } catch is CancellationError {
                     self.viewState = .cancelled
@@ -788,6 +837,11 @@ final class MemoryDetailViewModel {
         showDeleteConfirmation = true
     }
 
+    var canDeleteOriginal: Bool {
+        memory?.sourceDeletionCapability == .photoLibraryDeletable
+            && (isFixtureBacked || sourceLifecycleService != nil)
+    }
+
     /// 选择"仅从 Echo 移除" (US-PRV-004 AC-2)。
     ///
     /// Production delegates the transaction to CanonicalMemoryRepositoryActor, which removes
@@ -842,16 +896,71 @@ final class MemoryDetailViewModel {
     ///
     /// 调用系统 API 删除原始文件，级联清除 Echo 数据，不写入 ExcludedAssets。
     func deleteOriginal() {
+        viewState = .loading
         showDeleteConfirmation = false
-        guard isFixtureBacked else {
-            viewState = .error(.l3Blocking(
-                message: "Original-file deletion is unavailable because the source deletion boundary is not connected."
+        guard let current = memory else {
+            viewState = .idle
+            return
+        }
+        if isFixtureBacked {
+            hasRemovedMemory = true
+            viewState = .idle
+            memory = nil
+            return
+        }
+        guard canDeleteOriginal, let sourceLifecycleService else {
+            viewState = .error(.l2Recoverable(
+                message: EchoStrings.tr("The original source is not currently available for deletion.")
             ))
             return
         }
-        hasRemovedMemory = true
-        viewState = .idle
-        memory = nil
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                switch try await sourceLifecycleService.deletePhotoLibraryOriginal(
+                    memoryID: current.id,
+                    traceID: UUID().uuidString
+                ) {
+                case .deleted:
+                    self.hasRemovedMemory = true
+                    self.memory = nil
+                    self.viewState = .idle
+                case .retained(.userCancelled):
+                    self.viewState = .completed
+                case .retained:
+                    self.viewState = .error(.l2Recoverable(
+                        message: EchoStrings.tr("The original was not deleted. Your Echo memory was kept.")
+                    ))
+                case .pendingRecovery:
+                    self.viewState = .error(.l2Recoverable(
+                        message: EchoStrings.tr("Deletion could not be confirmed. Echo kept the memory and will check again.")
+                    ))
+                }
+            } catch {
+                self.viewState = .error(.l2Recoverable(
+                    message: EchoStrings.tr("Unable to delete the original source. Your Echo memory was kept.")
+                ))
+            }
+        }
+    }
+
+    private func resolvingSourceFacets(for model: MemoryDetailModel) async -> MemoryDetailModel {
+        guard let sourceLifecycleService else { return model }
+        do {
+            let resolution = try await sourceLifecycleService.resolveSource(
+                memoryID: model.id,
+                traceID: UUID().uuidString
+            )
+            var resolved = model
+            resolved.contentAvailability = resolution.contentAvailability
+            resolved.sourcePresentation = resolution.presentation
+            resolved.sourceDeletionCapability = resolution.sourceDeletionCapability
+            return resolved
+        } catch {
+            var unavailable = model
+            unavailable.sourceDeletionCapability = .unavailable
+            return unavailable
+        }
     }
 
     /// 解决冲突 (US-AWK-007 AC-4)。

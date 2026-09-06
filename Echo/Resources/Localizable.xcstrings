@@ -6296,6 +6296,48 @@
         "en-US": { "stringUnit": { "state": "translated", "value": "Notification services are unavailable." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "通知服务当前不可用。" } }
       }
+    },
+    "Excluded items cleaned up": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Excluded items cleaned up" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已清理无效排除项" } }
+      }
+    },
+    "%lld excluded item references were removed because their original Photo Library items no longer exist.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "%lld excluded item references were removed because their original Photo Library items no longer exist." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "由于照片图库中的原始项目已不存在，已移除 %lld 条无效排除记录。" } }
+      }
+    },
+    "Unable to Load Excluded Items": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to Load Excluded Items" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法加载已排除项目" } }
+      }
+    },
+    "The original source is not currently available for deletion.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "The original source is not currently available for deletion." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "当前无法删除原始来源。" } }
+      }
+    },
+    "The original was not deleted. Your Echo memory was kept.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "The original was not deleted. Your Echo memory was kept." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "原始项目未被删除，Echo 记忆已保留。" } }
+      }
+    },
+    "Deletion could not be confirmed. Echo kept the memory and will check again.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Deletion could not be confirmed. Echo kept the memory and will check again." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂时无法确认删除结果。Echo 已保留记忆，稍后会再次核对。" } }
+      }
+    },
+    "Unable to delete the original source. Your Echo memory was kept.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to delete the original source. Your Echo memory was kept." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法删除原始来源，Echo 记忆已保留。" } }
+      }
     }
   },
   "version": "1.0"

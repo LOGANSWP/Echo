@@ -38,13 +38,13 @@ Apple 公共 API 支持在 `PHPhotoLibrary.performChanges` 内通过 `PHAssetCha
 
 新增 `MemoryEditConflict` 关系保存 memoryId、外部版本摘要、检测时间和可重放的来源变更参数；本地草稿来自 `MemoryUserEdit`。同步遇到 `userLocked=true` 时跳过自动覆盖；未保存编辑会话或已持久化用户编辑遇到外部变化时都持久化 conflict，不覆盖本地编辑。普通保存以数据库条件事务拒绝现存 conflict。选择本地版本会在同一事务清除 conflict 并写 `userLocked=true`；手动合并在同一条件事务发布编辑、清除 conflict 并锁定。选择外部版本由 SyncPipeline 重放持久化变更，只有 canonical/representation 替换成功后才通过级联清除用户编辑关系和 conflict，并保持 `userLocked=false`；失败保留 conflict。显式“重新同步”清除锁并重新读取来源。
 
-### 4. 原始来源删除采用有序 saga
+### 4. 原始来源删除采用有序 saga（由 ADR-019 收紧）
 
-“同时删除原始文件”仅对当前授权下可解析、可写的 PhotoKit photo/video 显示。Share Extension 摄入的 note/voice/thirdParty 内容和只读或失效来源只提供“仅从 Echo 移除”，并明确 Echo 无法删除来源 App 中的原件。
+“同时删除原始文件”仅对当前 UserPolicy 允许、PhotoKit 授权范围内可获取且 `PHAsset.canPerform(.delete)` 的 photo/video 显示。Share Extension 摄入内容和只读、失效、limited-hidden 来源只提供“仅从 Echo 移除”，并明确 Echo 无法删除来源 App 中的原件。
 
-PhotoKit 删除流程为：验证来源和权限 → 先持久化既有 `MemoryDeletionJournal(.planned)` → 请求系统删除 → 系统成功后从 `.planned` 进入既有 D-005 本地清理阶段 → 清除 Echo 向量、FTS、缓存、metadata、关系数据和关联审计 → 标记完成并清理日志。系统拒绝、用户取消或删除失败时不修改 Echo canonical 状态，并将 intent 标记失败后安全清理；启动/前台恢复必须重新解析仍处于 `.planned` 的资产存在性，资产仍存在则不得清理 Echo，资产已不存在才可推进本地清理。系统删除成功但 Echo 清理失败时保留恢复日志并进入 L2 手动重试/下次前台补偿。该流程不声称可以回滚已经删除的系统资产。
+PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → 在既有 `MemoryDeletionJournal` 中持久化 `intentKind=photoLibraryAndEcho + sourceDeletionState=prepared + phase=.planned` → 请求系统删除 → completion 成功后先持久化 `confirmedDeleted` → 才允许进入既有 D-005 本地清理阶段 → 清除 Echo 向量、FTS、缓存、metadata、关系数据和关联审计 → 标记完成并清理日志。系统拒绝、用户取消或失败时不修改 Echo canonical。恢复时 full authorized 的确认缺失可推进；limited/撤权下不可见为 `indeterminate`，禁止本地清理。系统删除成功但 Echo 清理失败时保留恢复日志并进入 L2。该流程不声称可以回滚已经删除的系统资产。
 
-该 saga 复用现有 `MemoryDeletionJournal`、`.planned` 与后续 D-005 phase，不建立第二套删除状态机；`4.0h` 只补充 PhotoKit 请求前后的编排、能力解析和恢复判定。
+该 saga 复用现有 `MemoryDeletionJournal` 与后续 D-005 phase，不建立第二套本地清理状态机；但必须增加正交的外部结果门禁，不能让 `.planned` 同时承担两种语义。`4.0h` 补充 PhotoKit 请求前后的编排、能力解析、schema 演进和恢复判定，完整规则以 ADR-019 为准。
 
 ### 5. 引用必须由模型输出绑定并经过校验
 
@@ -77,7 +77,7 @@ PhotoKit 删除流程为：验证来源和权限 → 先持久化既有 `MemoryD
 - `4.0e` 仍是当前首个 ready 任务，但范围缩小为编辑/冲突闭环。
 - 需要数据库迁移与新 Actor/repository API；所有新写路径遵守 PrivacyCheckpoint、strict concurrency、D-005 和 hash-only 内容审计。
 - v1 编辑器不保留富文本样式，但标题、描述、标签和时间覆盖均可持久化、检索和恢复。
-- 只有 PhotoKit photo/video 支持从 Echo 发起原始资产删除。
+- 只有当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 支持从 Echo 发起原始资产删除；Share Extension 音频原件不持久化时只展示转写文本。
 
 ## 参考
 
@@ -86,4 +86,5 @@ PhotoKit 删除流程为：验证来源和权限 → 先持久化既有 `MemoryD
 - `docs/02-architecture/数据流全链路技术说明文档.md`
 - `docs/decisions/ADR-010-canonical-generation-lifecycle.md`
 - `docs/decisions/ADR-013-creation-export-boundary.md`
+- `docs/decisions/ADR-019-photokit-source-deletion-recovery.md`
 - Apple Developer Documentation: `PHAssetChangeRequest.deleteAssets(_:)`, `UIActivityViewController.completionWithItemsHandler`

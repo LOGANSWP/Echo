@@ -6,12 +6,13 @@
 // 任务: 3F.1 - Production composition、首次启动、同意与隐私
 //       3F.6 - 跟进查询审计事件（US-RET-005 AC-4）
 //       4.0d - 交互式唤醒卡 hash-only action audit
+//       4.0h - Structured audit for PhotoKit deletion results and exclusion cleanup notices
 // AC 覆盖: AGENTS.md §5.4 (必填字段 eventType/timestamp/traceID/policyVersion/success, hash-only, 30天, 加密),
 //          US-PRV-006 AC-6 (retentionPolicyEvaluated), ADR-007 §决策-3 (purgeFailed 审计),
 //          US-RET-005 AC-4 ✅ (followUpQuery, 2026-08-11 3F.6), US-SRC-010 AC-5 ✅ (crossAppSearch)
 // 架构约束: AGENTS.md R-007 (禁止 unchecked Sendable), 仅记录哈希摘要禁止原文
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
-// 生成时间: 2026-08-04 | 更新: 2026-09-02 (4.0d cardInteraction)
+// Generated: 2026-08-04 | Updated: 2026-09-05 (4.0h source lifecycle)
 // ==========================================
 
 import Foundation
@@ -139,6 +140,12 @@ public struct AuditLogEntry: Sendable, Codable {
     public nonisolated let editedFields: [String]?
     public nonisolated let reindexed: Bool?
     public nonisolated let conflictResolvedWith: String?
+    public nonisolated let preservedOriginal: Bool?
+    public nonisolated let sourceDeletionRequested: Bool?
+    public nonisolated let sourceDeletionCompleted: Bool?
+    public nonisolated let sourceDeletionOutcome: String?
+    public nonisolated let excludedAutoCleaned: Bool?
+    public nonisolated let userNotified: Bool?
 
     public nonisolated init(
         id: Int64 = 0,
@@ -165,7 +172,13 @@ public struct AuditLogEntry: Sendable, Codable {
         feelingAssociatedToSource: Bool? = nil,
         editedFields: [String]? = nil,
         reindexed: Bool? = nil,
-        conflictResolvedWith: String? = nil
+        conflictResolvedWith: String? = nil,
+        preservedOriginal: Bool? = nil,
+        sourceDeletionRequested: Bool? = nil,
+        sourceDeletionCompleted: Bool? = nil,
+        sourceDeletionOutcome: String? = nil,
+        excludedAutoCleaned: Bool? = nil,
+        userNotified: Bool? = nil
     ) {
         self.id = id
         self.eventType = eventType
@@ -192,6 +205,12 @@ public struct AuditLogEntry: Sendable, Codable {
         self.editedFields = editedFields
         self.reindexed = reindexed
         self.conflictResolvedWith = conflictResolvedWith
+        self.preservedOriginal = preservedOriginal
+        self.sourceDeletionRequested = sourceDeletionRequested
+        self.sourceDeletionCompleted = sourceDeletionCompleted
+        self.sourceDeletionOutcome = sourceDeletionOutcome
+        self.excludedAutoCleaned = excludedAutoCleaned
+        self.userNotified = userNotified
     }
 
     /// 从数据库查询结果行构造 AuditLogEntry（用于 fetchAuditLogs）
@@ -227,7 +246,13 @@ public struct AuditLogEntry: Sendable, Codable {
             feelingAssociatedToSource: row["feelingAssociatedToSource"]?.intValue.map { $0 != 0 },
             editedFields: row["editedFields"]?.stringValue?.split(separator: ",").map(String.init),
             reindexed: row["reindexed"]?.intValue.map { $0 != 0 },
-            conflictResolvedWith: row["conflictResolvedWith"]?.stringValue
+            conflictResolvedWith: row["conflictResolvedWith"]?.stringValue,
+            preservedOriginal: row["preservedOriginal"]?.intValue.map { $0 != 0 },
+            sourceDeletionRequested: row["sourceDeletionRequested"]?.intValue.map { $0 != 0 },
+            sourceDeletionCompleted: row["sourceDeletionCompleted"]?.intValue.map { $0 != 0 },
+            sourceDeletionOutcome: row["sourceDeletionOutcome"]?.stringValue,
+            excludedAutoCleaned: row["excludedAutoCleaned"]?.intValue.map { $0 != 0 },
+            userNotified: row["userNotified"]?.intValue.map { $0 != 0 }
         )
     }
 }

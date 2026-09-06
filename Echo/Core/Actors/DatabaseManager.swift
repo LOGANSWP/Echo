@@ -5,11 +5,13 @@
 // 任务: 1.4 - 集成 SQLite，创建 ExcludedAssets, Feedback, TaskProgress, PendingOperations 表
 //      4.0d - MemoryFeeling relationship and card interaction audit migration
 //      4.0f - Persisted awakening preferences and HealthKit request lifecycle
+//      4.0h - Source deletion saga, structured audit fields, and cleanup notices
 // 架构约束: 遵循 AGENTS.md §4.2 (Actor 隔离契约), R-007 (禁止 @unchecked Sendable)
 // AC 覆盖: D-005 deletion journal persists phase, vector plan, and exclusion intent;
 //          US-AWK-005 AC-4/5 (feeling cascade and structured interaction audit);
-//          4.0f AC-3/6 (awakening preferences and honest HealthKit request state)
-// 生成时间: 2026-07-04; 更新: 2026-09-04 (4.0f)
+//          4.0f AC-3/6 (awakening preferences and honest HealthKit request state);
+//          4.0h AC-2/3/5 (source deletion recovery and structured audit state)
+// Generated: 2026-07-04; Updated: 2026-09-05 (4.0h)
 // ==========================================
 
 import Foundation
@@ -219,6 +221,25 @@ public actor DatabaseManager {
         if !auditColumns.contains("conflictResolvedWith") {
             try execute(sql: "ALTER TABLE AuditLog ADD COLUMN conflictResolvedWith TEXT")
         }
+        // 4.0h / ADR-019: external source deletion and notice state stay structured.
+        if !auditColumns.contains("preservedOriginal") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN preservedOriginal INTEGER")
+        }
+        if !auditColumns.contains("sourceDeletionRequested") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN sourceDeletionRequested INTEGER")
+        }
+        if !auditColumns.contains("sourceDeletionCompleted") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN sourceDeletionCompleted INTEGER")
+        }
+        if !auditColumns.contains("sourceDeletionOutcome") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN sourceDeletionOutcome TEXT")
+        }
+        if !auditColumns.contains("excludedAutoCleaned") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN excludedAutoCleaned INTEGER")
+        }
+        if !auditColumns.contains("userNotified") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN userNotified INTEGER")
+        }
         try execute(sql: "CREATE INDEX IF NOT EXISTS idx_auditlog_subject_hash ON AuditLog(subjectHash)")
         // WP3 steps 3i-3t2 (photo-text-search): D-005 resumable deletion journal
         try execute(sql: """
@@ -245,6 +266,32 @@ public actor DatabaseManager {
         if !deletionJournalColumns.contains("writeExcluded") {
             try execute(sql: "ALTER TABLE MemoryDeletionJournal ADD COLUMN writeExcluded INTEGER")
         }
+        if !deletionJournalColumns.contains("intentKind") {
+            try execute(sql: "ALTER TABLE MemoryDeletionJournal ADD COLUMN intentKind TEXT")
+        }
+        if !deletionJournalColumns.contains("sourceDeletionState") {
+            try execute(sql: "ALTER TABLE MemoryDeletionJournal ADD COLUMN sourceDeletionState TEXT")
+        }
+        if !deletionJournalColumns.contains("sourceDeletionOutcome") {
+            try execute(sql: "ALTER TABLE MemoryDeletionJournal ADD COLUMN sourceDeletionOutcome TEXT")
+        }
+        // Existing databases may contain duplicate legacy operations. Keep the newest before
+        // installing the one-active-intent invariant.
+        try execute(sql: """
+            DELETE FROM MemoryDeletionJournal
+            WHERE rowid NOT IN (
+                SELECT MAX(rowid) FROM MemoryDeletionJournal GROUP BY memoryId
+            )
+            """)
+        try execute(sql: "CREATE UNIQUE INDEX IF NOT EXISTS idx_deletion_journal_memory ON MemoryDeletionJournal(memoryId)")
+        try execute(sql: """
+            CREATE TABLE IF NOT EXISTS ExcludedCleanupNotice (
+                assetIdDigest TEXT PRIMARY KEY NOT NULL,
+                sourceType TEXT NOT NULL,
+                createdAt REAL NOT NULL,
+                presentedAt REAL
+            )
+            """)
         // UserPolicy persistence table
         try execute(sql: """
             CREATE TABLE IF NOT EXISTS UserPolicyStore (
@@ -596,7 +643,7 @@ public actor DatabaseManager {
         let vecJSONData = try JSONEncoder().encode(journal.vectorIDsByGeneration)
         let vecJSON = String(data: vecJSONData, encoding: .utf8) ?? "[]"
         try executeWrite(
-            sql: "INSERT OR REPLACE INTO MemoryDeletionJournal (operationID, memoryId, auditSubjectHash, traceID, phase, vectorIDsByGenerationJSON, sourceLocator, sourceType, writeExcluded, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            sql: "INSERT OR REPLACE INTO MemoryDeletionJournal (operationID, memoryId, auditSubjectHash, traceID, phase, vectorIDsByGenerationJSON, sourceLocator, sourceType, writeExcluded, intentKind, sourceDeletionState, sourceDeletionOutcome, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             bindings: [
                 .text(journal.operationID),
                 .text(journal.memoryID.uuidString),
@@ -607,6 +654,9 @@ public actor DatabaseManager {
                 journal.sourceLocator.map(DBBinding.text) ?? .null,
                 journal.sourceType.map(DBBinding.text) ?? .null,
                 journal.writeExcluded.map { .int($0 ? 1 : 0) } ?? .null,
+                .text(journal.intentKind.rawValue),
+                .text(journal.sourceDeletionState.rawValue),
+                .text(journal.sourceDeletionOutcome.rawValue),
                 .double(Date().timeIntervalSince1970),
             ]
         )
@@ -616,6 +666,14 @@ public actor DatabaseManager {
         let rows = try executeQuery(
             sql: "SELECT * FROM MemoryDeletionJournal WHERE memoryId = ? ORDER BY updatedAt",
             bindings: [.text(memoryId.uuidString)]
+        )
+        return rows.compactMap { Self.rowToDeletionJournal($0) }
+    }
+
+    func loadAllDeletionJournals() async throws -> [MemoryDeletionJournal] {
+        let rows = try executeQuery(
+            sql: "SELECT * FROM MemoryDeletionJournal ORDER BY updatedAt, operationID",
+            bindings: []
         )
         return rows.compactMap { Self.rowToDeletionJournal($0) }
     }
@@ -646,6 +704,12 @@ public actor DatabaseManager {
             return nil
         }
         let vectors = (try? JSONDecoder().decode([GenerationVectorIDs].self, from: vecData)) ?? []
+        let writeExcluded = row["writeExcluded"]?.intValue.map { $0 != 0 }
+        let inferredIntent: MemoryDeletionIntentKind = writeExcluded == true ? .echoOnly : .externalCascade
+        let intent = row["intentKind"]?.stringValue.flatMap(MemoryDeletionIntentKind.init(rawValue:))
+            ?? inferredIntent
+        let defaultState: SourceDeletionState = intent == .echoOnly ? .notApplicable : .confirmedDeleted
+        let defaultOutcome: SourceDeletionOutcome = intent == .echoOnly ? .notRequested : .confirmedDeleted
         return MemoryDeletionJournal(
             operationID: opID,
             memoryID: memoryId,
@@ -655,7 +719,12 @@ public actor DatabaseManager {
             vectorIDsByGeneration: vectors,
             sourceLocator: row["sourceLocator"]?.stringValue,
             sourceType: row["sourceType"]?.stringValue,
-            writeExcluded: row["writeExcluded"]?.intValue.map { $0 != 0 }
+            writeExcluded: writeExcluded,
+            intentKind: intent,
+            sourceDeletionState: row["sourceDeletionState"]?.stringValue.flatMap(SourceDeletionState.init(rawValue:))
+                ?? defaultState,
+            sourceDeletionOutcome: row["sourceDeletionOutcome"]?.stringValue.flatMap(SourceDeletionOutcome.init(rawValue:))
+                ?? defaultOutcome
         )
     }
 
