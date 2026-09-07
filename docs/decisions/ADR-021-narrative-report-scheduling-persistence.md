@@ -4,6 +4,8 @@
 **日期**: 2026-09-07
 **决策人**: Codex（依人类指令执行规格合理性复审）
 
+> **范围修正（ADR-022 / PR #78 预审）**：本 ADR 定义的调度、持久化与 publication 基础由 `4.0j` 交付；ADR-009 要求的获批 bundled LLM、生产 `LLMProvider` 装配及真实分批/分层生成由 `4.0k` 交付。生成器未装配时必须在周期物化/claim 前返回 `generationUnavailable`，不得把 Stub 证据或运行时缺失伪装成 L2 自动生成失败。
+
 ## 背景
 
 US-SYN-004 与 ADR-017 已确定月报/年报采用 `earliest-eligible`、持久周期键、`TaskQueueActor` 与 `ProgressActor`，但仍缺少可实现且可测试的周期定义、首次启用基线、跨时区行为、并发 claim、报告本体存储、来源删除、空数据终态和系统后台过期语义。原任务约束还把 L2 描述为“手动重试或下一合法调度机会重建”，与 ADR-011 的“L2 仅手动重试、无自动重放”冲突。

@@ -311,7 +311,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                     .contains { $0.periodKey == periodKey }
             case .retryRequired:
                 return false
-            case .none, .noData, .deferredForResources:
+            case .none, .noData, .deferredForResources, .generationUnavailable:
                 return true
             }
         } catch {
@@ -333,11 +333,27 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     }
 
     private static func narrativeReportResourceAvailability() -> NarrativeReportResourceAvailability {
-        if ProcessInfo.processInfo.isLowPowerModeEnabled { return .lowPower }
-        switch ProcessInfo.processInfo.thermalState {
-        case .serious, .critical: return .thermalConstrained
-        default: return .available
-        }
+        narrativeReportResourceAvailability(
+            lowPowerModeEnabled: ProcessInfo.processInfo.isLowPowerModeEnabled,
+            autoPauseOnLowPowerEnabled: DegradationBannerViewModel.isAutoPauseOnLowPowerEnabled,
+            thermallyConstrained: {
+                switch ProcessInfo.processInfo.thermalState {
+                case .serious, .critical: true
+                default: false
+                }
+            }()
+        )
+    }
+
+    /// Pure policy projection used by production scheduling and AC regression tests.
+    static func narrativeReportResourceAvailability(
+        lowPowerModeEnabled: Bool,
+        autoPauseOnLowPowerEnabled: Bool,
+        thermallyConstrained: Bool
+    ) -> NarrativeReportResourceAvailability {
+        if lowPowerModeEnabled, autoPauseOnLowPowerEnabled { return .lowPower }
+        if thermallyConstrained { return .thermalConstrained }
+        return .available
     }
 
     /// iOS 26 limited 适配：授权为 limited 且尚无已选照片时，主动呈现系统照片选择器

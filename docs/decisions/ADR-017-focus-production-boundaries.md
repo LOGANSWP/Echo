@@ -24,7 +24,8 @@ Apple 公共 API 支持在 `PHPhotoLibrary.performChanges` 内通过 `PHAssetCha
 - `4.0e`：记忆编辑、重新向量化与持久冲突。
 - `4.0h`：真实来源解析、PhotoKit 原始资产删除与删除补偿。
 - `4.0i`：可验证引用、稳定 Detail 路由与系统分享审计。
-- `4.0j`：月度/年度叙事报告的持久调度、幂等生成与审计。
+- `4.0j`：月度/年度叙事报告的持久调度、存储、队列与审计基础；生成器不可用时在物化/claim 前 fail-closed。
+- `4.0k`：批准的端侧生成式模型运行时、LanguageAligner、真实分批/分层生成与无 fixture 生产闭环。
 
 后续 E2E、删除、覆盖率、本地化、文档和 RC 门禁必须依赖实际消费的全部任务，测试任务不得补写缺失生产功能。
 
@@ -58,9 +59,11 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 
 `sharePresented` 使用结构化布尔字段，不哈希；MemoryID、周期幂等键和自由文本只保存摘要。Echo 不持久化 `activityType`、目标 App、用户完成状态或导出原文。复制与所有导出准备前重新执行当前 UserPolicy + PrivacyCheckpoint，所有格式保留引用。只有系统控制器实际呈现回调后才写 true；用户关闭已呈现的 share sheet 不算失败，准备或未进入呈现回调即失败按 L2 并写 false。真实呈现后的审计写入失败不得改写事实，须进入不含原文/目标的幂等 L2 重试。审计字段必须使用专用 typed columns，不得编码进 `sourceLanguage`；完整规则见 ADR-020。
 
-### 7. 叙事报告采用持久的 earliest-eligible 调度（由 ADR-021 收紧）
+### 7. 叙事报告采用持久的 earliest-eligible 调度（由 ADR-021/022 收紧）
 
 月报和年报使用本地持久周期键保证每周期最多生成一次。ADR-021 进一步规定：月/年持久开关新安装默认开启，在同意持久化且首条可用 canonical memory 落库时建立 `eligibleFrom`，升级/关闭后重开使用新基线；只覆盖刚结束的完整公历周期；首次物化冻结时区与 UTC 边界；每次扫描只 CAS claim 一个最早周期。`NarrativeReportPeriod/Report/Source` 形成独立领域真相，成功 publication 原子写报告、来源关系、完成状态与审计。L2 仅手动重试，系统 expiration/资源不足只延后；无数据、删除与撤权分别使用 `noData`/`invalidated` 和 D-005 清除边界。详细可执行合同以 ADR-021 为准。
+
+ADR-022 进一步确认当前生产 composition 尚无批准的生成式 LLM：`4.0j` 只交付上述调度/存储基础和可注入生成器 seam，生产无生成器时不得物化、claim 或写 L2；`4.0k` 才能以批准的 Bundle 工件、真实 `LLMProvider`、`LanguageAligner` 和 no-fixture E2E 关闭自动生成 AC。Stub 仅是单元测试证据。
 
 ## 备选方案
 
@@ -73,7 +76,7 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 
 ## 后果
 
-- Phase 4 新增 `4.0h`、`4.0i`、`4.0j`，任务数由 22 增至 25。
+- Phase 4 新增 `4.0h`、`4.0i`、`4.0j`、`4.0k`，任务数由 22 增至 26。
 - `4.0e` 仍是当前首个 ready 任务，但范围缩小为编辑/冲突闭环。
 - 需要数据库迁移与新 Actor/repository API；所有新写路径遵守 PrivacyCheckpoint、strict concurrency、D-005 和 hash-only 内容审计。
 - v1 编辑器不保留富文本样式，但标题、描述、标签和时间覆盖均可持久化、检索和恢复。
@@ -89,4 +92,5 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 - `docs/decisions/ADR-019-photokit-source-deletion-recovery.md`
 - `docs/decisions/ADR-020-grounded-citation-share-audit.md`
 - `docs/decisions/ADR-021-narrative-report-scheduling-persistence.md`
+- `docs/decisions/ADR-022-offline-generation-runtime-gate.md`
 - Apple Developer Documentation: `PHAssetChangeRequest.deleteAssets(_:)`, `UIActivityViewController.completionWithItemsHandler`

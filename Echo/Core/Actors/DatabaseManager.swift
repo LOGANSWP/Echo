@@ -743,11 +743,24 @@ public actor DatabaseManager {
         do {
             let rows = try executeQuery(
                 sql: """
-                    SELECT * FROM NarrativeReportPeriod
-                    WHERE state = 'eligible'
-                    ORDER BY endInstant ASC,
-                             CASE periodType WHEN 'month' THEN 0 ELSE 1 END ASC,
-                             periodKey ASC
+                    SELECT period.*
+                    FROM NarrativeReportPeriod AS period
+                    JOIN NarrativeReportSchedule AS schedule ON schedule.id = 1
+                    WHERE period.state = 'eligible'
+                      AND (
+                        (period.periodType = 'month'
+                         AND schedule.monthlyEnabled = 1
+                         AND schedule.monthlyEligibleFrom IS NOT NULL
+                         AND period.endInstant > schedule.monthlyEligibleFrom)
+                        OR
+                        (period.periodType = 'year'
+                         AND schedule.yearlyEnabled = 1
+                         AND schedule.yearlyEligibleFrom IS NOT NULL
+                         AND period.endInstant > schedule.yearlyEligibleFrom)
+                      )
+                    ORDER BY period.endInstant ASC,
+                             CASE period.periodType WHEN 'month' THEN 0 ELSE 1 END ASC,
+                             period.periodKey ASC
                     LIMIT 1
                     """,
                 bindings: []

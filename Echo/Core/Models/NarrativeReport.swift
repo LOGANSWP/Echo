@@ -2,8 +2,10 @@
 // File: NarrativeReport.swift
 // Spec: docs/01-spec/用户故事与验收标准规格书.md → US-SYN-004
 //       docs/decisions/ADR-021-narrative-report-scheduling-persistence.md
-// Task: 4.0j - Persisted monthly and yearly narrative report scheduling
-// AC coverage: AC-1/2/3/4/5/6/7/8
+//       docs/decisions/ADR-022-offline-generation-runtime-gate.md
+// Task: 4.0j - Persisted narrative report scheduling and storage foundation
+// AC coverage: AC-1/2 plus storage/state contracts supporting AC-3/4/6/7/8;
+//              production generation and AC-5 close in task 4.0k
 // Architecture: AGENTS.md §4.2, §4.3, §4.5, §7.3
 // Generated: 2026-09-07
 // ==========================================
@@ -443,6 +445,7 @@ public nonisolated enum NarrativeReportResourceAvailability: Sendable, Equatable
 public nonisolated enum NarrativeReportScanResult: Sendable, Equatable {
     case none
     case deferredForResources
+    case generationUnavailable
     case noData(periodKey: String)
     case enqueued(taskID: String, periodKey: String)
     case retryRequired(periodKey: String)

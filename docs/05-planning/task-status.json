@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-07T21:55:19Z",
+  "last_updated": "2026-09-07T22:16:52Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2840,7 +2840,7 @@
         },
         {
           "id": "4.0j",
-          "title": "月度与年度叙事报告持久调度闭环",
+          "title": "月度与年度叙事报告持久调度与存储基础",
           "story": [
             "US-SYN-004"
           ],
@@ -2855,6 +2855,7 @@
             "docs/decisions/ADR-017-focus-production-boundaries.md",
             "docs/decisions/ADR-020-grounded-citation-share-audit.md",
             "docs/decisions/ADR-021-narrative-report-scheduling-persistence.md",
+            "docs/decisions/ADR-022-offline-generation-runtime-gate.md",
             "docs/ui/README.md",
             "docs/ui/architecture.md",
             "docs/ui/testing-and-artifacts.md",
@@ -2899,7 +2900,8 @@
             "PrivacyActor 依据当前 checkpoint 准备 content-free Sendable audit payload 且不提前写库；DatabaseManager 专用无挂起点事务原子 publication 报告、来源、period completed 与 narrativeReportGenerated，任一失败整体回滚",
             "扫描只自动处理 eligible；L2 retryRequired/PendingOperations 仅用户手动重试。system expiration、低电量和 serious/critical thermal 释放 claim 后延后，不伪装成 L2",
             "无当前授权 canonical memory 写 noData 且不生成正文/审计；可选人物/HealthKit 分区不可用时省略并在 coverage metadata 标注，禁止 fixture/占位数据",
-            "聚合按稳定顺序与版本化 NarrativeReportLimits 确定性分批/分层，限制来源、摘录、中间层、输入与输出大小，禁止无界 prompt",
+            "聚合输入按稳定顺序与版本化 NarrativeReportLimits 受限准备；4.0j 仅提供可注入 NarrativeReportGenerating seam，Stub 只可用于单元测试，真实分批/分层端侧生成、LanguageAligner 与批准模型工件由 4.0k 交付",
+            "生产 composition 无已批准生成器时必须在物化/claim 前返回 generationUnavailable，不写 NarrativeReportPeriod、TaskProgress 或 PendingOperations，也不得把无生成器误报为 L2",
             "用户删除报告或 Memory 删除时级联删除 NarrativeReportSource/派生报告并将周期置 v1 不可重建的 invalidated；全量撤权清除 schedule/period/report/source 及相关恢复/待处理描述",
             "narrativeReportGenerated 使用 typed periodType、canonical JSON 排序去重 source-type enum 数组 dataSourcesUsed、唯一 64 字符 hash-only periodKeyDigest，不记录正文、标题、MemoryID、locator 或目标 App"
           ],
@@ -2908,14 +2910,64 @@
             "启动/前台/BG 并发 CAS、重复扫描、错过多个周期与成功后 exactly-once 证据",
             "PrivacyActor payload 准备与 DatabaseManager 专用 publication 不构成跨 Actor 伪原子；report/source/period/audit 每个事务写入故障点整体回滚及重启一致性证明",
             "TaskQueueActor/ProgressActor typed descriptor、用户取消恢复、system expiration/low-power/thermal 延后与 L2 自动扫描跳过矩阵",
-            "NarrativeReportLimits 边界/确定性、noData、授权来源组合、人物/HealthKit 省略、coverage metadata 与零 fixture/占位输入证明",
+            "NarrativeReportLimits 输入边界/确定性、noData、授权来源组合、人物/HealthKit 省略、coverage metadata 与生成器注入 seam 测试；明确 Stub 不构成生产生成证据",
+            "生产 generationUnavailable 在 materialize/claim 前 fail-closed，NarrativeReportPeriod、TaskProgress、PendingOperations 均零新增的证明",
             "用户删除报告、Memory 删除、全量撤权、invalidated 在 v1 禁止自动/手动重生及 NSFileProtectionComplete 证明",
             "Creation report-library 真实持久状态、月/年独立开关、打开/删除/手动重试动作与无 fixture fallback 的 Surface Contract/UI 证据",
             "BGProcessingTask 注册/permitted identifier/expiration/completion/resubmission 静态与行为证据，不包含精确时刻断言",
             "narrativeReportGenerated typed 字段、periodKeyDigest 唯一与报告正文/标题/MemoryID/locator 零审计落库证明"
           ],
-          "last_updated": "2026-09-07T21:55:19Z",
-          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77. Specification reasonableness review completed at 2026-09-07T19:46:11Z under user instruction; ADR-021 now defines new-install-default-on persisted switches and independent per-period-type eligibleFrom baselines, completed-calendar periods, frozen timezone bounds, one-period CAS claims, persistent report/source relations, atomic publication, bounded aggregation, noData/manual-L2/resource-defer states, opportunistic BGProcessingTask behavior and D-005 invalidation. TDD review further clarified that re-enabling one period type must not mutate the other type's baseline. Task moved from ready to in_progress at 2026-09-07T20:21:41Z after dependency, entry-gate and deferred-item checks passed. Production implementation completed with NarrativeReportActor/model/schema, independent schedules, deterministic period planning, queue/recovery, atomic publication and typed audit, BGProcessingTask integration, D-005 invalidation, Creation report library UI, bilingual localization and UI contracts. Final verification: 4.0j focused suite 11/11 passed; full EchoTests 1403 tests in 162 suites passed with 5 pre-existing known issues; SwiftLint 0; accessibility contracts, localization, static bans, JSON/plist, release compliance and diff checks passed. Coverage gate passed at 76% excluding declarative Views against the repository-configured 65% threshold. Task moved to review at 2026-09-07T21:47:34Z. Implementation commit d84ce58 was pushed and PR #78 was created against dev-1.0 at 2026-09-07T21:55:19Z; merge remains human-only."
+          "last_updated": "2026-09-07T22:16:52Z",
+          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77. Specification reasonableness review completed at 2026-09-07T19:46:11Z under user instruction; ADR-021 now defines new-install-default-on persisted switches and independent per-period-type eligibleFrom baselines, completed-calendar periods, frozen timezone bounds, one-period CAS claims, persistent report/source relations, atomic publication, bounded aggregation, noData/manual-L2/resource-defer states, opportunistic BGProcessingTask behavior and D-005 invalidation. TDD review further clarified that re-enabling one period type must not mutate the other type's baseline. Task moved from ready to in_progress at 2026-09-07T20:21:41Z after dependency, entry-gate and deferred-item checks passed. Production implementation completed with NarrativeReportActor/model/schema, independent schedules, deterministic period planning, queue/recovery, atomic publication and typed audit, BGProcessingTask integration, D-005 invalidation, Creation report library UI, bilingual localization and UI contracts. Final verification before PR review: 4.0j focused suite 11/11 passed; full EchoTests 1403 tests in 162 suites passed with 5 pre-existing known issues; SwiftLint 0; accessibility contracts, localization, static bans, JSON/plist, release compliance and diff checks passed. Coverage gate passed at 76% excluding declarative Views against the repository-configured 65% threshold. Task moved to review at 2026-09-07T21:47:34Z. Implementation commit d84ce58 was pushed and PR #78 was created against dev-1.0 at 2026-09-07T21:55:19Z; merge remains human-only. PR #78 review found and fixed stale claims after schedule disable/re-enable, claimed periods stranded by prepare/enqueue failures, disabled-baseline revision churn, and low-power deferral bypassing the user's auto-pause setting. The same review proved LiveAppAdapters has no approved production generative LLM provider; ADR-022 therefore narrows 4.0j to the persisted scheduling/storage foundation and creates 4.0k for the approved bundled runtime, LanguageAligner, true bounded batch/layer generation and no-fixture E2E. Production generationUnavailable now fails closed before period materialization/claim with no L2 record. Stub-based tests remain unit evidence only and cannot satisfy the US-SYN-004 production-generation ACs. Deferred finding DEF-78-001 tracks the 4.0k closure. Review-fix verification passed the 4.0j suite 16/16 and related Creation/degradation suites 39/39; SwiftLint reported 0 violations, 178 accessibility contracts and 446 localization keys validated, static bans/JSON/diff checks passed."
+        },
+        {
+          "id": "4.0k",
+          "title": "端侧生成式模型运行时与叙事报告生成闭环",
+          "story": [
+            "US-SYN-003",
+            "US-SYN-004"
+          ],
+          "owner": "On-device ML Lead",
+          "documents_required": [
+            "AGENTS.md",
+            "docs/01-spec/用户故事与验收标准规格书.md",
+            "docs/02-architecture/架构设计文档.md",
+            "docs/02-architecture/技术选型文档.md",
+            "docs/02-architecture/数据流全链路技术说明文档.md",
+            "docs/03-implementation/双语言实现说明文档.md",
+            "docs/03-implementation/开发避坑与关键注意点手册.md",
+            "docs/decisions/ADR-009-offline-model-runtime.md",
+            "docs/decisions/ADR-020-grounded-citation-share-audit.md",
+            "docs/decisions/ADR-021-narrative-report-scheduling-persistence.md",
+            "docs/decisions/ADR-022-offline-generation-runtime-gate.md",
+            "docs/05-planning/model-provenance-register.md",
+            "UIAutomation/Policies/acceptance-policy.json",
+            "docs/05-planning/deferred-items.json",
+            "docs/05-planning/task-status.json"
+          ],
+          "status": "backlog",
+          "dependencies": [
+            "4.0j"
+          ],
+          "test_file": "EchoTests/Phase4/4.0k_OfflineGenerationRuntimeTests.swift",
+          "implementation_constraints": [
+            "只允许经 ModelManifestActor 与 model-provenance-register 批准、固定 revision/SHA-256/license/SBOM 且随 App 分发的端侧生成工件；禁止运行时下载、云端 AI 或测试 Stub 进入生产 composition",
+            "LiveAppAdapters 必须提供真实 LLMProvider 并接入 CreativePipeline、LanguageAligner 与 NarrativeReportActor；缺失、损坏或未批准工件进入诚实 L3 阻断/手动恢复，不伪造生成成功",
+            "叙事报告使用真实 sourceBatches 与版本化 NarrativeReportLimits 做确定性有界分批/分层生成；每层严格限制来源、摘录、输入、输出和中间结果，禁止无界 prompt",
+            "输出只允许 zh-Hans/en-US，LanguageAligner 最多重试一次；每段结构化 sourceMemoryIDs 必须来自当前策略过滤后实际提交模型的 opaque allow-list",
+            "继续消费 4.0j 的周期键、CAS、TaskQueue、原子 publication、审计和 D-005 边界，不另建第二套调度/存储真相"
+          ],
+          "acceptance_evidence": [
+            "批准模型工件、manifest、bundle、SHA-256、license、NOTICE 与 SBOM 一一对应且 verify-only 100% 通过",
+            "默认 App 无 -ui-fixture 参数的 CreativePipeline 与月报/年报真实端侧生成 E2E，证明生产 composition 不含 Stub/placeholder/cloud fallback",
+            "sourceBatches 多批次与年度分层生成的稳定顺序、大小上限、取消、资源压力和恢复测试",
+            "LanguageAligner zh-Hans/en-US 匹配、严格一次重试与降级模板测试",
+            "未知/越界/未提交 sourceMemoryID fail-closed、多引用/noSource/partialNoSource 与当前策略重校验测试",
+            "模型缺失、损坏、许可/校验和不通过时零网络、零报告 publication、L3 阻断与手动重试恢复证据"
+          ],
+          "pr": null,
+          "last_updated": "2026-09-07T22:16:52Z",
+          "notes": "Created by ADR-022 during PR #78 review. The repository has scheduling/storage infrastructure but LiveAppAdapters.resolveLLMProvider() still returns nil and no approved bundled generative artifact is registered, so Stub-backed tests cannot truthfully close US-SYN-004 automatic production generation. This task is the only owner of that runtime closure; downstream production E2E, performance, recovery, static/privacy, localization, documentation, release-compliance, RC and Phase integration gates must consume it rather than implement it."
         },
         {
           "id": "4.1",
@@ -3029,7 +3081,8 @@
             "4.0g",
             "4.0h",
             "4.0i",
-            "4.0j"
+            "4.0j",
+            "4.0k"
           ],
           "test_file": "EchoTests/Phase4/AllPipelinesTests.swift",
           "acceptance_evidence": [
@@ -3046,7 +3099,7 @@
             "4.2"
           ],
           "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "ADR-017 adds 4.0h/4.0i/4.0j as required production prerequisites; verification tasks consume rather than implement them."
+          "notes": "ADR-017 adds 4.0h/4.0i/4.0j and ADR-022 adds 4.0k as required production prerequisites; verification tasks consume rather than implement them."
         },
         {
           "id": "4.3",
@@ -3065,10 +3118,11 @@
             "docs/05-planning/开发计划安排文档.md",
             "docs/05-planning/task-status.json"
           ],
-          "status": "ready",
+          "status": "backlog",
           "dependencies": [
             "4.0a",
-            "4.0b"
+            "4.0b",
+            "4.0k"
           ],
           "test_file": "EchoTests/Phase4/BenchmarkTests.swift",
           "acceptance_evidence": [
@@ -3082,8 +3136,8 @@
           "migrated_from": [
             "4.3"
           ],
-          "last_updated": "2026-09-02T00:06:54Z",
-          "notes": "Automatically promoted from backlog to ready after dependencies 4.0a and 4.0b completed."
+          "last_updated": "2026-09-07T22:16:52Z",
+          "notes": "Automatically promoted from backlog to ready after dependencies 4.0a and 4.0b completed. ADR-022 added 4.0k because model/runtime performance cannot be verified before the approved bundled generative runtime exists; task returned to backlog."
         },
         {
           "id": "4.4",
@@ -3103,10 +3157,11 @@
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "ready",
+          "status": "backlog",
           "dependencies": [
             "4.0c",
-            "4.0g"
+            "4.0g",
+            "4.0k"
           ],
           "test_file": "EchoTests/Phase4/DegradationRecoveryTests.swift",
           "acceptance_evidence": [
@@ -3119,8 +3174,8 @@
             "4.4",
             "4.5"
           ],
-          "last_updated": "2026-09-04T22:58:27Z",
-          "notes": "Automatically promoted from backlog to ready after dependencies 4.0c and 4.0g completed."
+          "last_updated": "2026-09-07T22:16:52Z",
+          "notes": "Automatically promoted from backlog to ready after dependencies 4.0c and 4.0g completed. ADR-022 added 4.0k because generative-model load failure and recovery require the approved runtime; task returned to backlog."
         },
         {
           "id": "4.5",
@@ -3184,7 +3239,8 @@
             "4.0g",
             "4.0h",
             "4.0i",
-            "4.0j"
+            "4.0j",
+            "4.0k"
           ],
           "test_file": "EchoTests/Phase4/QualityGateTests.swift",
           "acceptance_evidence": [
@@ -3195,7 +3251,7 @@
           ],
           "migrated_from": [],
           "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "ADR-017 adds 4.0h/4.0i/4.0j as required production prerequisites; verification tasks consume rather than implement them."
+          "notes": "ADR-017 adds 4.0h/4.0i/4.0j and ADR-022 adds 4.0k as required production prerequisites; verification tasks consume rather than implement them."
         },
         {
           "id": "4.7",
@@ -3232,7 +3288,8 @@
             "4.0g",
             "4.0h",
             "4.0i",
-            "4.0j"
+            "4.0j",
+            "4.0k"
           ],
           "test_file": "EchoTests/Phase4/LocalizationAccessibilityTests.swift",
           "acceptance_evidence": [
@@ -3245,7 +3302,7 @@
           ],
           "migrated_from": [],
           "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "ADR-017 adds 4.0h/4.0i/4.0j as required production prerequisites; verification tasks consume rather than implement them."
+          "notes": "ADR-017 adds 4.0h/4.0i/4.0j and ADR-022 adds 4.0k as required production prerequisites; verification tasks consume rather than implement them."
         },
         {
           "id": "4.8",
@@ -3284,7 +3341,8 @@
             "4.0g",
             "4.0h",
             "4.0i",
-            "4.0j"
+            "4.0j",
+            "4.0k"
           ],
           "test_file": null,
           "acceptance_evidence": [
@@ -3299,7 +3357,7 @@
             "4.8"
           ],
           "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "ADR-017 adds 4.0h/4.0i/4.0j as required production prerequisites; verification tasks consume rather than implement them."
+          "notes": "ADR-017 adds 4.0h/4.0i/4.0j and ADR-022 adds 4.0k as required production prerequisites; verification tasks consume rather than implement them."
         },
         {
           "id": "4.9",
@@ -3322,10 +3380,11 @@
             "docs/05-planning/phase3f-evidence-index.md",
             "docs/05-planning/task-status.json"
           ],
-          "status": "ready",
+          "status": "backlog",
           "dependencies": [
             "3F.11",
-            "4.0f"
+            "4.0f",
+            "4.0k"
           ],
           "test_file": "EchoTests/Phase4/ReleaseComplianceTests.swift",
           "acceptance_evidence": [
@@ -3335,8 +3394,8 @@
             "Release 包零运行时下载、零分析 SDK、零用户数据外传的网络与依赖扫描报告"
           ],
           "migrated_from": [],
-          "last_updated": "2026-09-04T16:13:45Z",
-          "notes": "2026-09-02 permission reasonableness review added 4.0f as a release-compliance prerequisite; task returned from ready to backlog until the consent-first contextual permission flow is complete."
+          "last_updated": "2026-09-07T22:16:52Z",
+          "notes": "2026-09-02 permission reasonableness review added 4.0f as a release-compliance prerequisite. ADR-022 added 4.0k because model artifact, license, checksum and SBOM release compliance cannot be closed before the approved bundled generative runtime exists; task is backlog."
         },
         {
           "id": "4.10",
@@ -3365,6 +3424,7 @@
             "4.0h",
             "4.0i",
             "4.0j",
+            "4.0k",
             "4.1",
             "4.2",
             "4.3",
@@ -3390,7 +3450,7 @@
           ],
           "migrated_from": [],
           "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "ADR-017 adds 4.0h/4.0i/4.0j as required production prerequisites; verification tasks consume rather than implement them."
+          "notes": "ADR-017 adds 4.0h/4.0i/4.0j and ADR-022 adds 4.0k as required production prerequisites; verification tasks consume rather than implement them."
         },
         {
           "id": "4.11",
@@ -3503,6 +3563,7 @@
             "4.0h",
             "4.0i",
             "4.0j",
+            "4.0k",
             "4.1",
             "4.2",
             "4.3",
@@ -3519,7 +3580,7 @@
           ],
           "test_file": "EchoTests/Phase4/Phase4IntegrationTests.swift",
           "acceptance_evidence": [
-            "4.0、4.0a、4.0b、4.0c、4.0d、4.0e、4.0f、4.0g、4.0h、4.0i、4.0j 与 4.1 至 4.13 全部为 done，且每项 acceptance_evidence 均有可定位制品",
+            "4.0、4.0a、4.0b、4.0c、4.0d、4.0e、4.0f、4.0g、4.0h、4.0i、4.0j、4.0k 与 4.1 至 4.13 全部为 done，且每项 acceptance_evidence 均有可定位制品",
             "EchoTests/Phase4/Phase4IntegrationTests.swift 在最终 RC 上 exit code 0",
             "Phase 1、2、3、3F、4 的累计单元与集成测试均为 0 failure",
             "最终 RC 身份、签名、SBOM、隐私、文档、P0=0 和 P1=0 的发布证据索引",
@@ -3529,7 +3590,7 @@
             "4.11"
           ],
           "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "ADR-017 adds 4.0h/4.0i/4.0j as required production prerequisites; verification tasks consume rather than implement them."
+          "notes": "ADR-017 adds 4.0h/4.0i/4.0j and ADR-022 adds 4.0k as required production prerequisites; verification tasks consume rather than implement them."
         }
       ]
     },
@@ -4189,6 +4250,38 @@
         "UIAutomation/Contracts/instances/creation-journey-report-library-basic.json",
         "UIAutomation/Fixtures/creation/creation-generated-report.json",
         "UIAutomation/Policies/acceptance-policy.json",
+        "docs/05-planning/开发计划安排文档.md",
+        "docs/05-planning/phase3f-execution-plan.md",
+        "docs/05-planning/phase3f-story-matrix.md",
+        "docs/05-planning/task-status.json"
+      ]
+    },
+    {
+      "id": "DOC-20260907-4-0J-RUNTIME-GATE",
+      "status": "resolved",
+      "detected_at": "2026-09-07T22:16:52Z",
+      "resolved_at": "2026-09-07T22:16:52Z",
+      "decision_maker": "Codex spec review under human instruction",
+      "selected_option": "split-scheduler-foundation-from-approved-offline-generation-runtime",
+      "decision": "Keep US-SYN-004 product acceptance criteria unchanged, narrow 4.0j to persistent scheduling, storage, queueing, audit and fail-closed generator integration, and create 4.0k as the sole owner of the approved bundled generative runtime, LanguageAligner, true bounded batch/layer generation and no-fixture production E2E. Downstream production and release gates depend on 4.0k.",
+      "reason": "PR #78 review proved LiveAppAdapters.resolveLLMProvider() returns nil and the model provenance register has no approved bundled generative LLM artifact. Stub-backed unit tests validate the scheduler seam but cannot establish automatic production generation. Treating generator absence as an L2 retry would also create unrecoverable PendingOperations noise, so production now fails closed before materialization or claim.",
+      "affected_documents": [
+        "AGENTS.md",
+        "docs/INDEX.md",
+        "docs/01-spec/用户故事与验收标准规格书.md",
+        "docs/02-architecture/架构设计文档.md",
+        "docs/02-architecture/数据流全链路技术说明文档.md",
+        "docs/03-implementation/开发避坑与关键注意点手册.md",
+        "docs/decisions/ADR-009-offline-model-runtime.md",
+        "docs/decisions/ADR-017-focus-production-boundaries.md",
+        "docs/decisions/ADR-021-narrative-report-scheduling-persistence.md",
+        "docs/decisions/ADR-022-offline-generation-runtime-gate.md",
+        "docs/ui/README.md",
+        "docs/ui/architecture.md",
+        "docs/ui/testing-and-artifacts.md",
+        "UIAutomation/Contracts/instances/creation-surface.json",
+        "UIAutomation/Policies/acceptance-policy.json",
+        "docs/05-planning/deferred-items.json",
         "docs/05-planning/开发计划安排文档.md",
         "docs/05-planning/phase3f-execution-plan.md",
         "docs/05-planning/phase3f-story-matrix.md",

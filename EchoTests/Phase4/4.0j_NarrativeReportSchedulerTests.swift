@@ -140,6 +140,129 @@ struct NarrativeReportSchedulerTests {
         #expect(reopened.yearlyEligibleFrom == firstBaseline)
     }
 
+    @Test("AC-1: disabled schedules cannot claim stale periods or backfill after re-enable")
+    func test_AC1_disabledScheduleSkipsMaterializedPeriods() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let queue = TaskQueueActor(progressActor: ProgressActor(db: database))
+        let actor = NarrativeReportActor(
+            database: database,
+            privacyActor: privacy,
+            taskQueue: queue,
+            pendingOps: PendingOpsActor(db: database)
+        )
+        let baseline = try #require(ISO8601DateFormatter().date(from: "2025-11-15T12:00:00Z"))
+        let now = try #require(ISO8601DateFormatter().date(from: "2026-01-15T12:00:00Z"))
+        try await database.executeWrite(
+            sql: "UPDATE NarrativeReportSchedule SET monthlyEligibleFrom = ?, yearlyEligibleFrom = ? WHERE id = 1",
+            bindings: [.double(baseline.timeIntervalSince1970), .double(baseline.timeIntervalSince1970)]
+        )
+        let calendar = NarrativeReportCalendarContext(timeZoneIdentifier: "America/Chicago")
+
+        let first = try #require(try await actor.materializeAndClaimNext(
+            at: now,
+            calendarContext: calendar,
+            trigger: .foreground,
+            taskID: "disabled-schedule-first"
+        ))
+        #expect(first.periodKey == "month:2025-11")
+        try await actor.setEnabled(false, for: .month, at: now)
+        try await actor.releaseClaimForResource(taskID: "disabled-schedule-first")
+
+        let whileDisabled = try #require(try await actor.materializeAndClaimNext(
+            at: now,
+            calendarContext: calendar,
+            trigger: .foreground,
+            taskID: "disabled-schedule-year"
+        ))
+        #expect(whileDisabled.periodKey == "year:2025")
+
+        let reenabledAt = now.addingTimeInterval(60)
+        try await actor.setEnabled(true, for: .month, at: reenabledAt)
+        let afterReenable = try await actor.materializeAndClaimNext(
+            at: reenabledAt,
+            calendarContext: calendar,
+            trigger: .foreground,
+            taskID: "disabled-schedule-after-reenable"
+        )
+        #expect(afterReenable == nil)
+        let staleMonthlyRows = try await database.executeQuery(
+            sql: "SELECT state FROM NarrativeReportPeriod WHERE periodType = 'month'",
+            bindings: []
+        )
+        #expect(!staleMonthlyRows.isEmpty)
+        #expect(staleMonthlyRows.allSatisfy { $0["state"]?.stringValue == "eligible" })
+    }
+
+    @Test("AC-1: eligibility establishment is a no-op when only a disabled baseline is missing")
+    func test_AC1_disabledMissingBaselineDoesNotAdvanceRevision() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let actor = NarrativeReportActor(database: database, privacyActor: privacy)
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        try await database.executeWrite(
+            sql: "INSERT OR REPLACE INTO ConsentStore (id, hasConsented, consentVersion, consentedAt, policyVersion, updatedAt) VALUES (1, 1, 1, ?, 11, ?)",
+            bindings: [.double(now.timeIntervalSince1970), .double(now.timeIntervalSince1970)]
+        )
+        try await insertMemory(UUID(), into: database, at: now)
+        try await actor.setEnabled(false, for: .month, at: now)
+
+        #expect(try await actor.establishEligibilityIfNeeded(at: now))
+        #expect(try await actor.loadSchedule().monthlyEligibleFrom == nil)
+        #expect(try await actor.loadSchedule().yearlyEligibleFrom == now)
+        #expect(try await actor.establishEligibilityIfNeeded(at: now.addingTimeInterval(60)) == false)
+    }
+
+    @Test("AC-4: low-power deferral respects the user's independent auto-pause setting")
+    func test_AC4_lowPowerResourcePolicyRespectsUserSetting() async {
+        let deferred = await AppDelegate.narrativeReportResourceAvailability(
+            lowPowerModeEnabled: true,
+            autoPauseOnLowPowerEnabled: true,
+            thermallyConstrained: false
+        )
+        let userAllowsWork = await AppDelegate.narrativeReportResourceAvailability(
+            lowPowerModeEnabled: true,
+            autoPauseOnLowPowerEnabled: false,
+            thermallyConstrained: false
+        )
+        let thermalStillDefers = await AppDelegate.narrativeReportResourceAvailability(
+            lowPowerModeEnabled: true,
+            autoPauseOnLowPowerEnabled: false,
+            thermallyConstrained: true
+        )
+
+        #expect(deferred == .lowPower)
+        #expect(userAllowsWork == .available)
+        #expect(thermalStillDefers == .thermalConstrained)
+    }
+
+    @Test("AC-4: unavailable production generation fails closed before claiming a period")
+    func test_AC4_unavailableGeneratorDoesNotCreateFalseL2Work() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let pending = PendingOpsActor(db: database)
+        let actor = NarrativeReportActor(
+            database: database,
+            privacyActor: privacy,
+            taskQueue: TaskQueueActor(progressActor: ProgressActor(db: database)),
+            pendingOps: pending
+        )
+        let baseline = try #require(ISO8601DateFormatter().date(from: "2025-12-01T06:00:00Z"))
+        let now = try #require(ISO8601DateFormatter().date(from: "2026-01-15T12:00:00Z"))
+        try await database.executeWrite(
+            sql: "UPDATE NarrativeReportSchedule SET monthlyEligibleFrom = ?, yearlyEnabled = 0",
+            bindings: [.double(baseline.timeIntervalSince1970)]
+        )
+        try await insertMemory(UUID(), into: database, at: baseline.addingTimeInterval(3_600))
+
+        let result = try await actor.scanAndEnqueue(
+            at: now,
+            calendarContext: .init(timeZoneIdentifier: "America/Chicago"),
+            trigger: .foreground
+        )
+
+        #expect(result == .generationUnavailable)
+        #expect(try await count("NarrativeReportPeriod", in: database) == 0)
+        #expect(try await pending.count() == 0)
+    }
+
     @Test("AC-2: concurrent scans CAS-claim only one earliest eligible period")
     func test_AC2_concurrentScansClaimOneEarliestPeriod() async throws {
         let (database, privacy) = try await makeDatabase()
@@ -428,6 +551,44 @@ struct NarrativeReportSchedulerTests {
         #expect(try await pending.count() == 0)
     }
 
+    @Test("AC-4: retry enqueue failure returns the period to manual L2")
+    func test_AC4_retryEnqueueFailureDoesNotLeaveClaimOrphaned() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let pending = PendingOpsActor(db: database)
+        let unopenedDatabase = DatabaseManager(
+            databaseURL: FileManager.default.temporaryDirectory
+                .appendingPathComponent("echo-4-0j-unopened-\(UUID().uuidString)")
+                .appendingPathExtension("sqlite")
+        )
+        let actor = NarrativeReportActor(
+            database: database,
+            privacyActor: privacy,
+            taskQueue: TaskQueueActor(progressActor: ProgressActor(db: unopenedDatabase)),
+            pendingOps: pending,
+            generator: StubNarrativeReportGenerator(mode: .success)
+        )
+        let now = Date(timeIntervalSince1970: 1_767_268_800)
+        let sourceID = UUID()
+        try await insertMemory(sourceID, into: database, at: now.addingTimeInterval(-3_600))
+        let period = try await insertClaimedPeriod(into: database, now: now)
+        try await database.executeWrite(
+            sql: "UPDATE NarrativeReportPeriod SET state = 'retryRequired', claimedAt = NULL, taskId = NULL WHERE periodType = ? AND periodKey = ?",
+            bindings: [.text(period.periodType.rawValue), .text(period.periodKey)]
+        )
+
+        await #expect(throws: (any Error).self) {
+            try await actor.retryReport(periodType: period.periodType, periodKey: period.periodKey)
+        }
+
+        let rows = try await database.executeQuery(
+            sql: "SELECT state, taskId FROM NarrativeReportPeriod WHERE periodType = ? AND periodKey = ?",
+            bindings: [.text(period.periodType.rawValue), .text(period.periodKey)]
+        )
+        #expect(rows.first?["state"]?.stringValue == "retryRequired")
+        #expect(rows.first?["taskId"]?.stringValue == nil)
+        #expect(try await pending.count() == 1)
+    }
+
     @Test("AC-4: system expiration cancels before releasing claim and creates no L2")
     func test_AC4_systemExpirationDefersWithoutFalseRetry() async throws {
         let (database, privacy) = try await makeDatabase()
@@ -477,7 +638,11 @@ struct NarrativeReportSchedulerTests {
     func test_AC7_reportAndMemoryDeletionInvalidatePeriod() async throws {
         for deleteSource in [false, true] {
             let (database, privacy) = try await makeDatabase()
-            let actor = NarrativeReportActor(database: database, privacyActor: privacy)
+            let actor = NarrativeReportActor(
+                database: database,
+                privacyActor: privacy,
+                generator: StubNarrativeReportGenerator(mode: .success)
+            )
             let sourceID = UUID()
             let now = Date(timeIntervalSince1970: 1_767_268_800)
             try await insertMemory(sourceID, into: database, at: now)

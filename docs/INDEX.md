@@ -64,6 +64,7 @@
 | Focus 编辑、来源删除、引用分享与叙事调度边界 | `decisions/ADR-017-focus-production-boundaries.md` |
 | PhotoKit 来源能力、删除外部结果门禁与崩溃恢复 | `decisions/ADR-019-photokit-source-deletion-recovery.md` |
 | 月/年叙事报告周期、持久化、后台机会与删除边界 | `decisions/ADR-021-narrative-report-scheduling-persistence.md` |
+| 离线生成运行时门禁与 4.0j/4.0k 证据拆分 | `decisions/ADR-022-offline-generation-runtime-gate.md` |
 | Phase 3/4 UI 设计配置与规范                | `ui/echo-memory-canvas-style.md`（方案 B「平衡画布」） |
 | UI 自动化工作流与试点选择                  | `ui/automation-workflow.md`                            |
 | UI 架构边界与保护路径                      | `ui/architecture.md`                                   |
@@ -102,7 +103,7 @@
 | **PrivacyCheckpoint**  | 强制隐私校验，所有 Pipeline 入口必须调用                     | `架构设计文档.md` §7.1 |
 | **统一错误矩阵**       | L1~L4 分级，L2 仅手动重试                                    | `架构设计文档.md` §5   |
 | **TaskProgress**       | SQLite 仅存断点进度；跨进程执行需 task reconstruction registry | `架构设计文档.md` §6.1~6.2 |
-| **NarrativeReport**    | 完整周期 + 冻结边界 + 单周期 CAS claim；报告/来源/完成/审计原子 publication | `架构设计文档.md` §2.6 + ADR-021 |
+| **NarrativeReport**    | 4.0j 完整周期/CAS/原子 publication；4.0k 获批 bundled LLM 与真实有界分层生成 | `架构设计文档.md` §2.6 + ADR-021/022 |
 
 ---
 

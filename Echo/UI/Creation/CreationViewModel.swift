@@ -356,12 +356,20 @@ final class CreationViewModel: CreationSharePresentationReporting {
             guard let self else { return }
             do {
                 _ = try await narrativeReportActor.establishEligibilityIfNeeded()
-                _ = try await narrativeReportActor.scanAndEnqueue(
+                let result = try await narrativeReportActor.scanAndEnqueue(
                     calendarContext: .init(
                         timeZoneIdentifier: TimeZone.autoupdatingCurrent.identifier
                     ),
                     trigger: .userInitiated
                 )
+                guard result != .generationUnavailable else {
+                    self.reportLibraryState = .error(
+                        message: EchoStrings.tr(
+                            "Offline generation runtime is not available. Please try again."
+                        )
+                    )
+                    return
+                }
                 self.recoverableReportPeriods = try await narrativeReportActor
                     .listRecoverablePeriods()
                 self.narrativeReports = try await narrativeReportActor.listReports()

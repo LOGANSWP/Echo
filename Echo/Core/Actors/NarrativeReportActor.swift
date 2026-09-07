@@ -2,8 +2,10 @@
 // File: NarrativeReportActor.swift
 // Spec: docs/01-spec/用户故事与验收标准规格书.md → US-SYN-004
 //       docs/decisions/ADR-021-narrative-report-scheduling-persistence.md
-// Task: 4.0j - Persisted monthly and yearly narrative report scheduling
-// AC coverage: AC-1 through AC-8
+//       docs/decisions/ADR-022-offline-generation-runtime-gate.md
+// Task: 4.0j - Persisted narrative report scheduling and storage foundation
+// AC coverage: AC-1/2 plus the scheduling/publication seams for AC-3/4/6/7/8;
+//              production generation and AC-5 close in task 4.0k
 // Architecture: AGENTS.md §4.2, §4.3, §4.5, §7.3
 // Generated: 2026-09-07
 // ==========================================
@@ -141,7 +143,8 @@ public actor NarrativeReportActor {
                     revision = revision + 1,
                     updatedAt = ?
                 WHERE id = 1
-                  AND (monthlyEligibleFrom IS NULL OR yearlyEligibleFrom IS NULL)
+                  AND ((monthlyEnabled = 1 AND monthlyEligibleFrom IS NULL)
+                    OR (yearlyEnabled = 1 AND yearlyEligibleFrom IS NULL))
                   AND EXISTS (SELECT 1 FROM ConsentStore WHERE id = 1 AND hasConsented = 1)
                   AND EXISTS (SELECT 1 FROM Memory LIMIT 1)
                 """,
@@ -262,6 +265,7 @@ public actor NarrativeReportActor {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed else { throw NarrativeReportError.privacyDenied }
         guard resources.canStart else { return .deferredForResources }
+        guard generator != nil else { return .generationUnavailable }
         let taskID = "narrative-report-\(UUID().uuidString.lowercased())"
         guard let period = try await materializeAndClaimNext(
             at: now,
@@ -271,12 +275,14 @@ public actor NarrativeReportActor {
             traceID: traceID
         ) else { return .none }
 
-        let prepared = try await prepareInput(for: period)
-        guard !prepared.sources.isEmpty else {
-            try await completeWithoutData(period: period, now: now)
-            return .noData(periodKey: period.periodKey)
-        }
         do {
+            try Task.checkCancellation()
+            let prepared = try await prepareInput(for: period)
+            try Task.checkCancellation()
+            guard !prepared.sources.isEmpty else {
+                try await completeWithoutData(period: period, now: now)
+                return .noData(periodKey: period.periodKey)
+            }
             let job = try makeJob(
                 period: period,
                 taskID: taskID,
@@ -286,6 +292,9 @@ public actor NarrativeReportActor {
             )
             try await taskQueue.enqueue(job)
             return .enqueued(taskID: taskID, periodKey: period.periodKey)
+        } catch is CancellationError {
+            try await releaseClaimForResource(taskID: taskID, traceID: traceID)
+            throw CancellationError()
         } catch {
             try await markRetryRequired(period: period, error: error)
             return .retryRequired(periodKey: period.periodKey)
@@ -300,6 +309,7 @@ public actor NarrativeReportActor {
     ) async throws -> String {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed else { throw NarrativeReportError.privacyDenied }
+        guard generator != nil else { throw NarrativeReportError.generationUnavailable }
         let taskID = "narrative-report-\(UUID().uuidString.lowercased())"
         let changed = try await database.executeWrite(
             sql: """
@@ -319,20 +329,30 @@ public actor NarrativeReportActor {
               let period = try await loadPeriod(type: periodType, key: periodKey) else {
             throw NarrativeReportError.invalidatedPeriod
         }
-        let prepared = try await prepareInput(for: period)
-        guard !prepared.sources.isEmpty else {
-            try await completeWithoutData(period: period, now: Date())
+        do {
+            try Task.checkCancellation()
+            let prepared = try await prepareInput(for: period)
+            try Task.checkCancellation()
+            guard !prepared.sources.isEmpty else {
+                try await completeWithoutData(period: period, now: Date())
+                return taskID
+            }
+            let job = try makeJob(
+                period: period,
+                taskID: taskID,
+                sourceTypes: prepared.sources.map(\.sourceType),
+                totalCount: prepared.sources.count,
+                traceID: traceID
+            )
+            try await taskQueue.enqueue(job)
             return taskID
+        } catch is CancellationError {
+            try await releaseClaimForResource(taskID: taskID, traceID: traceID)
+            throw CancellationError()
+        } catch {
+            try await markRetryRequired(period: period, error: error)
+            throw error
         }
-        let job = try makeJob(
-            period: period,
-            taskID: taskID,
-            sourceTypes: prepared.sources.map(\.sourceType),
-            totalCount: prepared.sources.count,
-            traceID: traceID
-        )
-        try await taskQueue.enqueue(job)
-        return taskID
     }
 
     /// Releases a system-owned execution claim. This is a defer, never an L2 failure.
