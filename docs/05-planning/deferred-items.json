@@ -2,7 +2,7 @@
   "_description": "Echo 项目延期/暂缓条目追踪。仅记录当前确实无法解决的任务。与 task-status.json 同级维护。",
   "_rule": "每次 Phase 集成测试时必须扫描本文件，检查延期任务是否已被顺带解决或当前可解决。",
   "_version": "1.4.1",
-  "_last_updated": "2026-09-07T22:16:52Z",
+  "_last_updated": "2026-09-07T23:27:57Z",
   "deferred_to_phase_4": [
     {
       "id": "DEF-001",
@@ -1484,7 +1484,7 @@
       "reason": "PR #78 review confirmed resolveLLMProvider() returns nil and the model provenance register contains no approved bundled generative LLM artifact. The scheduler and persistence seam is real, but StubNarrativeGenerator only proves unit behavior and cannot satisfy US-SYN-004 automatic production generation or the true bounded batch/layer aggregation path. ADR-022 narrows 4.0j accordingly and requires generator absence to fail closed before materialization/claim without L2 noise; task 4.0k owns the real hierarchical generator and actual aggregation-layer evidence.",
       "defer_to": "4.0k approved offline generation runtime and narrative report production closure",
       "deferred_at": "2026-09-07T22:16:52Z",
-      "last_checked_at": "2026-09-07T22:16:52Z",
+      "last_checked_at": "2026-09-07T23:27:57Z",
       "owners": [
         "On-device ML Lead",
         "Model Legal and Privacy Approver"

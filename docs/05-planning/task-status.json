@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-07T22:16:52Z",
+  "last_updated": "2026-09-07T23:27:57Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2042,7 +2042,7 @@
       "integration_test": "pending",
       "integration_test_file": "EchoTests/Phase4/Phase4IntegrationTests.swift",
       "entry_gate": "3F.11",
-      "last_updated": "2026-09-07T17:35:29Z",
+      "last_updated": "2026-09-07T23:27:57Z",
       "tasks": [
         {
           "id": "4.0",
@@ -2873,16 +2873,16 @@
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "review",
+          "status": "done",
           "pr": {
             "number": 78,
             "url": "https://github.com/logan-suu/Echo/pull/78",
             "head": "feature/narrative-report-scheduling-US-SYN-004",
             "base": "dev-1.0",
             "created_at": "2026-09-07T21:55:19Z",
-            "merged_at": null,
-            "merge_commit": null,
-            "merged_by": null
+            "merged_at": "2026-09-07T23:24:49Z",
+            "merge_commit": "93014c5c45fd79ba5a42344394c5593f96baf3c5",
+            "merged_by": "logan-suu"
           },
           "dependencies": [
             "4.0i"
@@ -2917,7 +2917,10 @@
             "BGProcessingTask 注册/permitted identifier/expiration/completion/resubmission 静态与行为证据，不包含精确时刻断言",
             "narrativeReportGenerated typed 字段、periodKeyDigest 唯一与报告正文/标题/MemoryID/locator 零审计落库证明"
           ],
-          "last_updated": "2026-09-07T22:59:28Z",
+          "last_updated": "2026-09-07T23:27:57Z",
+          "merged_at": "2026-09-07T23:24:49Z",
+          "merge_commit": "93014c5c45fd79ba5a42344394c5593f96baf3c5",
+          "merged_by": "logan-suu",
           "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77. Specification reasonableness review completed at 2026-09-07T19:46:11Z under user instruction; ADR-021 now defines new-install-default-on persisted switches and independent per-period-type eligibleFrom baselines, completed-calendar periods, frozen timezone bounds, one-period CAS claims, persistent report/source relations, atomic publication, bounded aggregation, noData/manual-L2/resource-defer states, opportunistic BGProcessingTask behavior and D-005 invalidation. TDD review further clarified that re-enabling one period type must not mutate the other type's baseline. Task moved from ready to in_progress at 2026-09-07T20:21:41Z after dependency, entry-gate and deferred-item checks passed. Production implementation completed with NarrativeReportActor/model/schema, independent schedules, deterministic period planning, queue/recovery, atomic publication and typed audit, BGProcessingTask integration, D-005 invalidation, Creation report library UI, bilingual localization and UI contracts. Final verification before PR review: 4.0j focused suite 11/11 passed; full EchoTests 1403 tests in 162 suites passed with 5 pre-existing known issues; SwiftLint 0; accessibility contracts, localization, static bans, JSON/plist, release compliance and diff checks passed. Coverage gate passed at 76% excluding declarative Views against the repository-configured 65% threshold. Task moved to review at 2026-09-07T21:47:34Z. Implementation commit d84ce58 was pushed and PR #78 was created against dev-1.0 at 2026-09-07T21:55:19Z; merge remains human-only. PR #78 review found and fixed stale claims after schedule disable/re-enable, claimed periods stranded by prepare/enqueue failures, disabled-baseline revision churn, and low-power deferral bypassing the user's auto-pause setting. The same review proved LiveAppAdapters has no approved production generative LLM provider; ADR-022 therefore narrows 4.0j to the persisted scheduling/storage foundation and creates 4.0k for the approved bundled runtime, LanguageAligner, true bounded batch/layer generation and no-fixture E2E. Production generationUnavailable now fails closed before period materialization/claim with no L2 record. Stub-based tests remain unit evidence only and cannot satisfy the US-SYN-004 production-generation ACs. Deferred finding DEF-78-001 tracks the 4.0k closure. Initial review-fix verification passed the 4.0j suite 16/16 and related Creation/degradation suites 39/39; SwiftLint reported 0 violations, 178 accessibility contracts and 446 localization keys validated, static bans/JSON/diff checks passed. Follow-up CodeRabbit triage fixed six additional valid findings: background expiration/task-ID assignment races, same-pass schedule recreation after purge, current-policy report redaction after source revocation, per-paragraph character limits, the missing bilingual narrative-task label, and stale report-library UI publication from overlapping requests. One claim-cleanup finding was already resolved by commit 1e59ce9. True model batch/layer aggregation was not duplicated into 4.0j and remains tracked by DEF-78-001/task 4.0k. Final focused verification passed 64 tests across NarrativeReportScheduler, CreationViewModel and BackgroundTaskPanel; SwiftLint reported 0 violations, localization validated 447 keys at 100% parity, and static bans/JSON/diff checks passed."
         },
         {
@@ -2945,7 +2948,7 @@
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "backlog",
+          "status": "ready",
           "dependencies": [
             "4.0j"
           ],
@@ -2966,7 +2969,7 @@
             "模型缺失、损坏、许可/校验和不通过时零网络、零报告 publication、L3 阻断与手动重试恢复证据"
           ],
           "pr": null,
-          "last_updated": "2026-09-07T22:16:52Z",
+          "last_updated": "2026-09-07T23:27:57Z",
           "notes": "Created by ADR-022 during PR #78 review. The repository has scheduling/storage infrastructure but LiveAppAdapters.resolveLLMProvider() still returns nil and no approved bundled generative artifact is registered, so Stub-backed tests cannot truthfully close US-SYN-004 automatic production generation. This task is the only owner of that runtime closure; downstream production E2E, performance, recovery, static/privacy, localization, documentation, release-compliance, RC and Phase integration gates must consume it rather than implement it."
         },
         {
