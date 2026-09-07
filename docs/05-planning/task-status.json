@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-07T15:19:14Z",
+  "last_updated": "2026-09-07T17:35:29Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2042,7 +2042,7 @@
       "integration_test": "pending",
       "integration_test_file": "EchoTests/Phase4/Phase4IntegrationTests.swift",
       "entry_gate": "3F.11",
-      "last_updated": "2026-09-06T16:40:42Z",
+      "last_updated": "2026-09-07T17:35:29Z",
       "tasks": [
         {
           "id": "4.0",
@@ -2791,7 +2791,7 @@
             "UIAutomation/Policies/acceptance-policy.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "review",
+          "status": "done",
           "dependencies": [
             "4.0h"
           ],
@@ -2823,10 +2823,20 @@
             "url": "https://github.com/logan-suu/Echo/pull/77",
             "head": "feature/grounded-citation-share-US-SYN-002",
             "base": "dev-1.0",
-            "created_at": "2026-09-07T14:17:35Z"
+            "created_at": "2026-09-07T14:17:35Z",
+            "merged_at": "2026-09-07T17:32:55Z",
+            "merge_commit": "9e4e13aa53e962d2e83bcdc051f9f80b1e6e7af0",
+            "merged_by": "logan-suu"
           },
-          "last_updated": "2026-09-07T15:19:14Z",
-          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed. The 2026-09-07 reasonableness review (ADR-020) corrected the overclaim that provenance proves factual accuracy, added a versioned bounded JSON envelope and multi-anchor partialNoSource semantics, required current-policy revalidation for copy/export/share, made actual controller presentation the only true sharePresented=true trigger, required citation-preserving multipage exports, and assigned dedicated typed audit columns with failure-truth and idempotent-retry behavior. Task moved from ready to in_progress at 2026-09-07T13:14:25Z after dependency, entry-gate and deferred-item checks passed. Implementation completed with grounded multi-source parsing, fail-closed protocol limits, stable source navigation, current-policy action authorization, citation-preserving text/Markdown/multipage PDF export, actual share-controller presentation reporting, typed audit persistence, and content-free idempotent audit retry. Focused and affected regression suites passed 65 tests with zero failures; the mandatory pre-commit 4.0i suite was rerun on iPhone 17 Pro and passed 10 tests with zero failures. SwiftLint, accessibility contracts, localization parity, production static bans, JSON validation, and diff checks passed. Pull request #77 was created against dev-1.0 at 2026-09-07T14:17:35Z. PR review on 2026-09-07 independently audited GitHub CodeRabbit and authenticated CodeRabbit CLI findings. Seven unique valid defects were fixed: exact share-handoff audit identity outside the former 100-row scan, pre-queue period validation, available/unavailable citation accessibility semantics, citation-specific navigation errors, a meaningful no-source export assertion, truthful generated-state Notes handoff semantics, and stale share ownership cleanup on errors/disappearance. AuditLog now persists a unique 64-character hash-only shareHandoffIdDigest and retry uses exact lookup; specifications and ADR-020 were synchronized. No finding was deferred. Review-fix verification passed 30 focused tests and 81 affected regressions with zero failures; SwiftLint, 426-key localization parity, 170 accessibility contracts, static bans, JSON parsing, and diff checks passed. CodeRabbit's generic 80% docstring-coverage warning was rejected because it is not an Echo quality gate or task AC and identifies no behavioral defect. CI will rerun after the review-fix push; merge remains human-only."
+          "last_updated": "2026-09-07T17:35:29Z",
+          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed. The 2026-09-07 reasonableness review (ADR-020) corrected the overclaim that provenance proves factual accuracy, added a versioned bounded JSON envelope and multi-anchor partialNoSource semantics, required current-policy revalidation for copy/export/share, made actual controller presentation the only true sharePresented=true trigger, required citation-preserving multipage exports, and assigned dedicated typed audit columns with failure-truth and idempotent-retry behavior. Task moved from ready to in_progress at 2026-09-07T13:14:25Z after dependency, entry-gate and deferred-item checks passed. Implementation completed with grounded multi-source parsing, fail-closed protocol limits, stable source navigation, current-policy action authorization, citation-preserving text/Markdown/multipage PDF export, actual share-controller presentation reporting, typed audit persistence, and content-free idempotent audit retry. Focused and affected regression suites passed 65 tests with zero failures; the mandatory pre-commit 4.0i suite was rerun on iPhone 17 Pro and passed 10 tests with zero failures. SwiftLint, accessibility contracts, localization parity, production static bans, JSON validation, and diff checks passed. Pull request #77 was created against dev-1.0 at 2026-09-07T14:17:35Z. PR review on 2026-09-07 independently audited GitHub CodeRabbit and authenticated CodeRabbit CLI findings. Seven unique valid defects were fixed: exact share-handoff audit identity outside the former 100-row scan, pre-queue period validation, available/unavailable citation accessibility semantics, citation-specific navigation errors, a meaningful no-source export assertion, truthful generated-state Notes handoff semantics, and stale share ownership cleanup on errors/disappearance. AuditLog now persists a unique 64-character hash-only shareHandoffIdDigest and retry uses exact lookup; specifications and ADR-020 were synchronized. No finding was deferred. Review-fix verification passed 30 focused tests and 81 affected regressions with zero failures; SwiftLint, 426-key localization parity, 170 accessibility contracts, static bans, JSON parsing, and diff checks passed. CodeRabbit's generic 80% docstring-coverage warning was rejected because it is not an Echo quality gate or task AC and identifies no behavioral defect. Post-fix GitHub checks completed successfully; merge remained human-only. PR #77 was human-merged by logan-suu at 2026-09-07T17:32:55Z with merge commit 9e4e13aa53e962d2e83bcdc051f9f80b1e6e7af0. Post-merge deferred-item scan found no PR #77 entries and no unresolved item targeted to 4.0i; task 4.0j was promoted to ready after dependency convergence.",
+          "status_transitions": {
+            "merged_at": "2026-09-07T17:32:55Z",
+            "done_at": "2026-09-07T17:35:29Z"
+          },
+          "merged_at": "2026-09-07T17:32:55Z",
+          "merge_commit": "9e4e13aa53e962d2e83bcdc051f9f80b1e6e7af0",
+          "merged_by": "logan-suu"
         },
         {
           "id": "4.0j",
@@ -2846,7 +2856,7 @@
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "backlog",
+          "status": "ready",
           "dependencies": [
             "4.0i"
           ],
@@ -2869,8 +2879,8 @@
             "TaskQueueActor/ProgressActor 串行与故障矩阵",
             "narrativeReportGenerated 审计字段及报告原文零落库证明"
           ],
-          "last_updated": "2026-09-03T16:00:00Z",
-          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation."
+          "last_updated": "2026-09-07T17:35:29Z",
+          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77."
         },
         {
           "id": "4.1",
