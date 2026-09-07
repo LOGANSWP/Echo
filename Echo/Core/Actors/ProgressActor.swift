@@ -15,7 +15,7 @@ public actor ProgressActor {
     public static let shared = ProgressActor()
     private let db: DatabaseManager
 
-    private init(db: DatabaseManager = .shared) {
+    internal init(db: DatabaseManager = .shared) {
         self.db = db
     }
 

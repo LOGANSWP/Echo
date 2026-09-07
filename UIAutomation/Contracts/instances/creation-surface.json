@@ -3,18 +3,20 @@
   "designProfileId": "echo-memory-canvas",
   "surfaceId": "creation",
   "surfaceFamily": "focus",
-  "responsibility": "Render provenance-grounded creation from a versioned bounded JSON envelope whose opaque paragraph source IDs were explicitly emitted and validated against the exact currently authorized submitted-input allow-list. Express multiple anchors plus cited/noSource/partialNoSource, route through current-policy revalidation, and preserve citation semantics across copy/export/share. Never infer sources by position, claim automatic fact verification, or claim a saved Note.",
+  "responsibility": "Render provenance-grounded creation from a versioned bounded JSON envelope and project the persisted narrative-report library/schedule defined by ADR-021. Opaque paragraph source IDs are explicitly emitted and validated against the exact currently authorized submitted-input allow-list. Express multiple anchors plus cited/noSource/partialNoSource, route through current-policy revalidation, and preserve citation semantics across copy/export/share. Never infer sources by position, claim automatic fact verification, treat fixtures as scheduled reports, or claim a saved Note.",
   "inputs": {
     "templateType": "Preset creation template: letter | report | poem | timeline (US-SYN-003 AC-1)",
     "sourceMemories": "Current-policy-filtered retrieved memory summaries with opaque MemoryIDs; assetID/sourceLocator/source App identity never enters the model envelope",
     "generatedContent": "Versioned JSON CreativePipeline output bounded by raw bytes, paragraph count, paragraph characters and references per paragraph. Each paragraph has text + sourceMemoryIDs[]. Unknown version, malformed root or any limit breach fails the whole generation as L2. Validated output carries [SourceAnchor] plus cited/noSource/partialNoSource; fixture output is Preview/test-only.",
     "preferredLanguage": "UserPolicy.preferredLanguage (zh-Hans | en-US) — output language",
-    "promptDraft": "Personalized System Prompt draft (US-SYN-005) — editable, confirm/reset"
+    "promptDraft": "Personalized System Prompt draft (US-SYN-005) — editable, confirm/reset",
+    "reportSchedule": "Persisted monthly/yearly switches, eligibleFrom baselines and honest eligible/claimed/retryRequired/completed/noData/invalidated state from NarrativeReportActor; new-install defaults are on but no historical backfill precedes the baseline",
+    "persistedReports": "Versioned bounded NarrativeReport records and current source availability projected by a thin adapter; fixture reports are Preview/test-only"
   },
   "outputs": {
-    "visibleContent": "Template picker, generation progress, provenance-labelled source anchors, NoSource/partial-NoSource warnings, copy/export/share/Save to Notes handoff actions and honest error states. Allow-list membership is labelled Source memory, never Verified fact. Copy and export preparation revalidate current UserPolicy + PrivacyCheckpoint; revoked sources block derived-body handoff. Successful share-controller presentation callback writes creationSharePresented with structured sharePresented=true; Echo does not record activityType, target App, completion, content or source locators.",
-    "interactionTargets": "creation-generate, creation-copy, creation-export, creation-save-to-notes, creation-retry, creation-edit-prompt, creation-confirm-prompt, creation-reset-prompt, creation-citation-anchor-*",
-    "accessibilityTree": "Generated content exposes cited/noSource/partialNoSource and each valid source anchor without claiming factual verification; system share handoff is announced only after actual presentation and without claiming a final save result; prompt editor is editable text with confirm/reset actions"
+    "visibleContent": "Template picker, generation progress, provenance-labelled source anchors, NoSource/partial-NoSource warnings, copy/export/share/Save to Notes handoff actions, persisted monthly/yearly report rows, separate schedule switches, period status and honest error states. Allow-list membership is labelled Source memory, never Verified fact. Copy and export preparation revalidate current UserPolicy + PrivacyCheckpoint; revoked sources block derived-body handoff. Successful share-controller presentation callback writes creationSharePresented with structured sharePresented=true; Echo does not record activityType, target App, completion, content or source locators.",
+    "interactionTargets": "creation-generate, creation-copy, creation-export, creation-save-to-notes, creation-retry, creation-edit-prompt, creation-confirm-prompt, creation-reset-prompt, creation-citation-anchor-*, creation-report-monthly-toggle, creation-report-yearly-toggle, creation-report-scan, creation-report-open-*, creation-report-delete-*, creation-report-retry-*",
+    "accessibilityTree": "Generated content exposes cited/noSource/partialNoSource and each valid source anchor without claiming factual verification; report rows announce period type, date range, generation state and current source availability; schedule switches expose independent monthly/yearly values; destructive report deletion requires confirmation; system share handoff is announced only after actual presentation and without claiming a final save result; prompt editor is editable text with confirm/reset actions"
   },
   "systemContainer": "NavigationStack (pushed from MemoryDetailView creation entry) + ScrollView + Form sheet (prompt editor) + confirmationDialog (export format) + item-driven system share handoff",
   "layoutMode": "single_column",
@@ -26,9 +28,10 @@
     "idle",
     "generating",
     "generated",
+    "report-library",
     "empty",
     "error",
     "share-handoff"
   ],
-  "version": "1.3.0"
+  "version": "1.4.0"
 }

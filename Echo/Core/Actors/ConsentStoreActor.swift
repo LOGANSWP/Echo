@@ -7,7 +7,8 @@
 // Task: 3F.1 + 4.0f - Production consent and progressive permission cleanup
 // AC 覆盖: ADR-007 §决策-2 (同意版本与时间戳持久化), §决策-3 (事务清除 + blocked + 审计),
 //          US-PRV-005 AC-5/AC-7 (冷却期满异步擦除 + 审计自擦除), US-PRV-008 AC-4/AC-5,
-//          4.0f AC-3 (consent revocation also purges persisted awakening preferences)
+//          4.0f AC-3 (consent revocation also purges persisted awakening preferences),
+//          4.0j AC-7 (consent revocation purges all persisted narrative-report state)
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), §5.4 (审计 hash-only), R-007 (禁止 unchecked Sendable)
 // Generated: 2026-08-04; updated: 2026-09-04 (4.0f)
 // ==========================================
@@ -167,6 +168,10 @@ public actor ConsentStoreActor {
             )
             var affected = 0
             if boundary.purgeMetadata {
+                affected += try await purgeTable("NarrativeReportSource")
+                affected += try await purgeTable("NarrativeReport")
+                affected += try await purgeTable("NarrativeReportPeriod")
+                affected += try await purgeTable("NarrativeReportSchedule")
                 affected += try await purgeTable("Memory")
                 affected += try await purgeTable("Representation")
                 affected += try await purgeTable("ExcludedAssets")

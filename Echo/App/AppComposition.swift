@@ -3,11 +3,11 @@
 // 对应规格: docs/decisions/ADR-007-production-composition-consent.md §决策-1 (composition root),
 //            §决策-2 (deny-by-default 同意), §决策-3 (事务性撤回/清除), §决策-5 (不可用启动状态)
 //            docs/01-spec/用户故事与验收标准规格书.md → US-PRV-001, US-PRV-008, US-RES-004
-// Task: 3F.1 + 4.0e + 4.0f + 4.0g + 4.0h + 4.0i - Production composition and recovery
+// Task: 3F.1 + 4.0e + 4.0f + 4.0g + 4.0h + 4.0i + 4.0j - Production composition and recovery
 // AC 覆盖: ADR-007 §决策-1 (唯一依赖图 + 启动状态机), §决策-2 (同意闸门装配),
 //          §决策-3 (撤回 → 事务清除 → blocked), §决策-5 (model/route/index-unavailable/bootstrap-failed)
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), §8.1 (@MainActor @Observable), R-007 (禁止 unchecked Sendable)
-// Generated: 2026-08-04 | Updated: 2026-09-07 (grounded export coordinator)
+// Generated: 2026-08-04 | Updated: 2026-09-07 (narrative report scheduler)
 // ==========================================
 
 import Foundation
@@ -64,6 +64,7 @@ public final class AppComposition {
     public let canonicalRepository: CanonicalMemoryRepositoryActor
     public let focusSourceLifecycleActor: FocusSourceLifecycleActor
     public let creationExportCoordinator: CreationExportCoordinator
+    public let narrativeReportActor: NarrativeReportActor
     public let taskRecoveryRegistry: TaskRecoveryRegistry
     public let taskRecoveryCoordinator: TaskRecoveryCoordinator
     /// 文本嵌入器（E5）— 生产摄入/检索文本路径（CR-10）
@@ -142,6 +143,12 @@ public final class AppComposition {
             sourceResolver: self.focusSourceLifecycleActor,
             pendingOps: pendingOpsActor
         )
+        self.narrativeReportActor = NarrativeReportActor(
+            database: databaseManager,
+            privacyActor: privacyActor,
+            taskQueue: .shared,
+            pendingOps: pendingOpsActor
+        )
         let taskRecoveryRegistry = TaskRecoveryRegistry()
         self.taskRecoveryRegistry = taskRecoveryRegistry
         self.taskRecoveryCoordinator = TaskRecoveryCoordinator(
@@ -177,6 +184,10 @@ public final class AppComposition {
             try await databaseManager.open()
             try await consentStore.loadState()
             try await privacyActor.loadPolicy()
+            await taskRecoveryRegistry.register(taskType: .narrativeReport) {
+                [narrativeReportActor] request in
+                try await narrativeReportActor.makeRecoveryJob(for: request)
+            }
             // UI tests/previews (DEBUG only): -ui-skip-consent bypasses the deny-by-default
             // gate and lands in .ready (fixture-driven XCUITest relies on the ungated path)
             #if DEBUG

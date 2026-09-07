@@ -1,6 +1,6 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v5.49
+**版本**：v5.51
 **生效日期**：2026-09-07
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（Codex / OpenCode / Cursor / Claude）及人类开发者
 **优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
@@ -106,7 +106,7 @@ Echo 是一个 **本地优先、隐私可审计、完全离线可用** 的端侧
 | **D-002** | ExcludedAssets 写入条件：仅用户主动“仅从 Echo 移除”          | 单元测试覆盖所有写入路径 |
 | **D-003** | 级联删除时同时清理 ExcludedAssets 无效记录                   | 文件系统模拟测试         |
 | **D-004** | 重新授权数据源时提供一键恢复排除项选项                       | UI 测试                  |
-| **D-005** | 删除操作事务性覆盖：向量、索引、缓存、元数据、审计日志、translationCache | 故障注入测试             |
+| **D-005** | 删除操作事务性覆盖：向量、索引、缓存、元数据、审计日志、translationCache、叙事报告设置/正文/来源关系/周期状态 | 故障注入测试             |
 
 ---
 
@@ -379,6 +379,8 @@ TaskQueue 契约:
   - 取消保留进度: 运行任务先协作式终止并持久化最后 checkpoint；未开始且 index=0 的排队任务可直接移除
   - 暂停保留 job: 暂停必须保留同一 in-memory job 和 checkpoint，禁止抛错后丢弃 job 却报告 paused
   - 恢复入队不覆盖: Continue 入队不得把已保存 checkpoint 重置为 0
+  - 调度状态独立: TaskProgress 只保存执行进度，不得替代领域周期/幂等完成状态
+  - 资源延后非 L2: 系统后台 expiration、低电量或 serious/critical thermal 可在安全 checkpoint 释放领域 claim 后等待下一合法机会；一旦进入 L2/PendingOperations，禁止生命周期扫描自动重放
 ```
 
 ### 4.4 错误分级契约（L1~L4）
@@ -424,6 +426,8 @@ TaskQueue 契约:
 | SQLite - ModelManifest     | 模型身份与许可登记      | `ModelManifestActor`  |
 | SQLite - IndexGeneration / IndexBuildItem | 分代索引管理与逐项构建 | `GenerationRegistryActor` |
 | SQLite - ActiveRouteSet    | 原子服务路由            | `GenerationRegistryActor` |
+| SQLite - NarrativeReportSchedule / NarrativeReportPeriod | 月/年开关与各自 eligibleFrom；周期冻结边界、claim revision 与终态 | `NarrativeReportActor` |
+| SQLite - NarrativeReport / NarrativeReportSource | 版本化有界报告正文与 opaque MemoryID 来源关系 | `NarrativeReportActor` |
 
 ### 5.2 ExcludedAssets 契约（核心）
 
@@ -462,7 +466,7 @@ ExcludedAssets 禁止写入条件:
 ```yaml
 审计日志契约:
   - 强制字段: eventType, timestamp, traceID, policyVersion, success
-  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest
+  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest, dataSourcesUsed, periodKeyDigest
   - 隐私保护: 标识符和内容仅记录哈希摘要，禁止原文；枚举/布尔/进度整数可作为结构化字段
   - 保留期: 30 天，超期自动清理
   - 加密: NSFileProtectionComplete
@@ -563,7 +567,7 @@ let checkpoint = await PrivacyActor.shared.validate(
 | `.synthesis`                      | 来源锚点解析与校验       | citationCount, noSourceCount；MemoryID 仅 hash digest     |
 | `.creativeGeneration`             | 创作生成完成             | templateType, sourceMemoryCount, citationCount, noSourceCount；不记录正文 |
 | `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat=`plainText/markdown/pdf`, sharePresented, periodType=`month/year`（可选）, shareHandoffIdDigest；不记录 activityType、目标 App、完成状态、原文或 source locator |
-| `.narrativeReportGenerated`       | 月度/年度报告生成         | periodType, dataSourcesUsed, periodKeyDigest               |
+| `.narrativeReportGenerated`       | 月度/年度报告原子 publication 成功 | periodType=`month/year`、canonical JSON 编码且排序去重的真实 source-type enum 数组 dataSourcesUsed、64 字符 hash-only periodKeyDigest；digest 事件范围内唯一，不记录标题/正文/MemoryID/locator |
 | `.cardInteraction`               | 交互式唤醒卡动作       | action=next/record/jump, cardIdDigest, memoryIdDigest, feelingAssociatedToSource（hash-only，禁止感受原文） |
 | `.feedbackReceived`               | 反馈收集                 | sentiment, decayFactor                                    |
 | `.feedbackReset`                  | 清除所有反馈             | -                                                         |
@@ -1418,7 +1422,7 @@ Echo 固定采用用户已批准的 **`echo-memory-canvas`** 设计配置，扩�
 
 **4.0d 交互式唤醒卡边界（2026-09-02 规格审查）**：音乐建议默认且始终可从随 App 打包的离线年份曲库产生；仅当用户在卡片中显式选择“匹配此设备音乐”后，才可请求媒体库权限并通过 `MPMediaQuery` 读取 `isCloudItem == false` 的本地曲目元数据。禁止 `MusicCatalog*`、personal recommendations、recently played 和任意 MusicKit Web Service，禁止上传记忆派生数据。领域 API 可暴露 `userFeelings` 集合，但物理存储必须为以 `memoryId` 为外键的 `MemoryFeeling` 关系表；感受不创建 Memory/Representation，不进入搜索或翻译索引。`next` 按稳定唤醒顺序前进，`record` 仅在事务成功后成立；`.cardInteraction` 仅记录 action、hash-only card/memory digest 与布尔 `feelingAssociatedToSource`。`4.0d` 只负责 card→typed Focus 路由，Focus 内真实来源解析/删除由 `4.0h` 交付，可验证 source anchor 与分享审计由 `4.0i` 交付。详见 ADR-016/017。
 
-**4.0e~4.0j Focus 生产边界（2026-09-07 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 使用版本化、有大小/数量上限的结构化生成 envelope；每段显式返回 `sourceMemoryIDs[]`，仅接受当前策略过滤后实际提交模型的 opaque MemoryID allow-list，禁止暴露 source locator 或 round-robin 伪绑定。allow-list 只验证 provenance 身份，不自动证明事实语义；多引用、`NoSource` 与 `partialNoSource` 必须类型化表达。锚点导航及复制、Markdown/PDF/plain-text 分享准备前均重新执行当前 UserPolicy/PrivacyCheckpoint；所有格式保留可理解引用。`.synthesis`、`.creativeGeneration` 与 `.creationSharePresented` 使用专用结构化审计列；每个 share handoff 以 hash-only `shareHandoffIdDigest` 和唯一索引提供无窗口幂等性。只有系统面板实际呈现回调后才写 `sharePresented=true`，准备/呈现失败写 false，呈现后取消不算失败，呈现后的审计写入失败不得改写呈现事实；无效 `periodType` 在入队前 fail-closed，不得伪装成持久化故障。`4.0j` 以持久周期键和 TaskQueueActor earliest-eligible 生成月报/年报，不承诺精确后台时刻或伪造不可用分区。详见 ADR-017/019/020。
+**4.0e~4.0j Focus 生产边界（2026-09-07 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 使用版本化、有大小/数量上限的结构化生成 envelope；每段显式返回 `sourceMemoryIDs[]`，仅接受当前策略过滤后实际提交模型的 opaque MemoryID allow-list，禁止暴露 source locator 或 round-robin 伪绑定。allow-list 只验证 provenance 身份，不自动证明事实语义；多引用、`NoSource` 与 `partialNoSource` 必须类型化表达。锚点导航及复制、Markdown/PDF/plain-text 分享准备前均重新执行当前 UserPolicy/PrivacyCheckpoint；所有格式保留可理解引用。`.synthesis`、`.creativeGeneration` 与 `.creationSharePresented` 使用专用结构化审计列；每个 share handoff 以 hash-only `shareHandoffIdDigest` 和唯一索引提供无窗口幂等性。只有系统面板实际呈现回调后才写 `sharePresented=true`，准备/呈现失败写 false，呈现后取消不算失败，呈现后的审计写入失败不得改写呈现事实；无效 `periodType` 在入队前 fail-closed，不得伪装成持久化故障。`4.0j` 的月/年持久开关新安装默认开启，在同意持久化且首条可用 canonical memory 落库时建立各自的 eligibleFrom；关闭后重开只重设对应类型基线；只为刚结束的完整月/年建立冻结时区边界，一次扫描 CAS claim 一个最早周期；`NarrativeReportSchedule/Period/Report/Source` 与审计在无挂起点事务中 publication，L2 仅手动重试，system expiration/资源不足只延后，无数据写 `noData`；用户删除报告或来源删除将周期置 v1 不可重建的 `invalidated`。详见 ADR-017/019/020/021。
 
 ### 17.3 双状态模型
 
@@ -1556,3 +1560,5 @@ $init-session-echo → $next-task-echo → $ui-bootstrap-build-echo <task-id>
 | v5.47 | 2026-09-06 | 4.0h PR 预审修订：统一删除审计字段为生产 schema 的 `excludedWritten`；补齐 observer 注册前基线、全量 PhotoKit 前台补偿、活跃删除竞态隔离、逐 journal 容错、通知确认事务与非阻断 UI 结果；同步修复 Share Extension 备忘录 AC 和 Phase 3F 基线状态一致性。 | Codex |
 | v5.48 | 2026-09-07 | 4.0i 规格合理性复审（ADR-020）：明确 allow-list 只验证来源身份、不自动证明事实；采用版本化有界 JSON、多引用与 partialNoSource；复制/导出前重验当前授权；以真实系统呈现回调区分准备/呈现/取消/审计失败；新增专用结构化生成与分享审计字段，并澄清用户主动复制或系统 share/export 是 R-001 允许的受控外部交接。 | Codex |
 | v5.49 | 2026-09-07 | 4.0i PR 预审修订：为每次系统分享增加 hash-only `shareHandoffIdDigest` 与唯一索引，移除 100 条扫描窗口和复用 traceID 误判；无效 periodType 不进入持久化重试；清理陈旧 handoff ownership，并补齐来源可用性无障碍语义、导航专用错误与 Notes 合约措辞。 | Codex |
+| v5.50 | 2026-09-07 | 4.0j 规格合理性复审（ADR-021）：定义默认开启的持久月/年开关与 eligibleFrom、完整公历周期、冻结时区边界、单周期 CAS claim、持久报告/来源关系与原子 publication；修正 L2 自动重建冲突，区分系统 expiration/资源延后；补齐有界聚合、noData、D-005 派生报告删除与 typed audit 幂等。 | Codex |
+| v5.51 | 2026-09-07 | 4.0j TDD 发现独立开关与单一 eligibleFrom 冲突；改为月/年分别持有基线，关闭后重开只重设对应类型，不影响仍开启的另一类调度。 | Codex |

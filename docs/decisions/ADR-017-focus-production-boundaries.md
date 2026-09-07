@@ -58,9 +58,9 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 
 `sharePresented` 使用结构化布尔字段，不哈希；MemoryID、周期幂等键和自由文本只保存摘要。Echo 不持久化 `activityType`、目标 App、用户完成状态或导出原文。复制与所有导出准备前重新执行当前 UserPolicy + PrivacyCheckpoint，所有格式保留引用。只有系统控制器实际呈现回调后才写 true；用户关闭已呈现的 share sheet 不算失败，准备或未进入呈现回调即失败按 L2 并写 false。真实呈现后的审计写入失败不得改写事实，须进入不含原文/目标的幂等 L2 重试。审计字段必须使用专用 typed columns，不得编码进 `sourceLanguage`；完整规则见 ADR-020。
 
-### 7. 叙事报告采用持久的 earliest-eligible 调度
+### 7. 叙事报告采用持久的 earliest-eligible 调度（由 ADR-021 收紧）
 
-月报和年报使用本地持久周期键保证每周期最多生成一次。App 启动、进入前台或系统提供后台执行机会时，处理最早符合条件但尚未完成的周期；不承诺精确时刻。任务经 `TaskQueueActor` 串行执行，进度经 `ProgressActor` 持久化，所有异步入口执行 PrivacyCheckpoint。缺少人物身份等不可用输入时省略该分区并明确标注，不能伪造 Top5 人物或数据点。
+月报和年报使用本地持久周期键保证每周期最多生成一次。ADR-021 进一步规定：月/年持久开关新安装默认开启，在同意持久化且首条可用 canonical memory 落库时建立 `eligibleFrom`，升级/关闭后重开使用新基线；只覆盖刚结束的完整公历周期；首次物化冻结时区与 UTC 边界；每次扫描只 CAS claim 一个最早周期。`NarrativeReportPeriod/Report/Source` 形成独立领域真相，成功 publication 原子写报告、来源关系、完成状态与审计。L2 仅手动重试，系统 expiration/资源不足只延后；无数据、删除与撤权分别使用 `noData`/`invalidated` 和 D-005 清除边界。详细可执行合同以 ADR-021 为准。
 
 ## 备选方案
 
@@ -88,4 +88,5 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 - `docs/decisions/ADR-013-creation-export-boundary.md`
 - `docs/decisions/ADR-019-photokit-source-deletion-recovery.md`
 - `docs/decisions/ADR-020-grounded-citation-share-audit.md`
+- `docs/decisions/ADR-021-narrative-report-scheduling-persistence.md`
 - Apple Developer Documentation: `PHAssetChangeRequest.deleteAssets(_:)`, `UIActivityViewController.completionWithItemsHandler`

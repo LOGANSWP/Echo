@@ -1,0 +1,8 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/action/v1",
+  "actionId": "creation.retryReport",
+  "source": "user",
+  "targetIntent": "CreationViewModel.retryReport(_:)",
+  "expectedOutcome": "For retryRequired or noData without prior success, revalidate current policy and request exact-period queue ownership; invalidated and completed periods reject retry",
+  "version": "1.0.0"
+}

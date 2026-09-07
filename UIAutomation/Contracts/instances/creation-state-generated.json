@@ -3,7 +3,7 @@
   "stateId": "generated",
   "surfaceId": "creation",
   "dataConditions": {
-    "templateType": "letter",
+    "templateType": "letter | report | poem | timeline; a persisted narrative report uses report",
     "generationPhase": "generated",
     "generatedContent": "non-empty validated structured output with [SourceAnchor] and typed cited/noSource/partialNoSource provenance",
     "sourceMemoryCount": ">= 1"
@@ -15,7 +15,7 @@
     "copyButton": "Revalidate current policy, then copy citation-preserving content or show a recoverable authorization error",
     "exportButton": "Revalidate current policy, then export citation-preserving PDF/Markdown; PDF supports multiple pages without truncation",
     "saveToNotesButton": "Revalidate current policy, prepare a citation-preserving local export, and present the user-mediated system share controller without claiming the content was saved to Notes",
-    "shareButton": "Share/export/print narrative report (US-SYN-004 AC-4)"
+    "shareButton": "Share/export/print a persisted narrative report under current-policy revalidation (US-SYN-004 AC-6/7)"
   },
-  "version": "1.1.1"
+  "version": "1.1.2"
 }

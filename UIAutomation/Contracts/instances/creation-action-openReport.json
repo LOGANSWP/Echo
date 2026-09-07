@@ -1,0 +1,8 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/action/v1",
+  "actionId": "creation.openReport",
+  "source": "user",
+  "targetIntent": "CreationViewModel.openReport(_:)",
+  "expectedOutcome": "Open the persisted report by stable ID with typed provenance and honest current source availability; do not read a fixture fallback",
+  "version": "1.0.0"
+}

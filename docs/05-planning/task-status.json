@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-07T17:35:29Z",
+  "last_updated": "2026-09-07T21:52:24Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2853,10 +2853,26 @@
             "docs/03-implementation/开发避坑与关键注意点手册.md",
             "docs/decisions/ADR-011-task-progress-boundary.md",
             "docs/decisions/ADR-017-focus-production-boundaries.md",
+            "docs/decisions/ADR-020-grounded-citation-share-audit.md",
+            "docs/decisions/ADR-021-narrative-report-scheduling-persistence.md",
+            "docs/ui/README.md",
+            "docs/ui/architecture.md",
+            "docs/ui/testing-and-artifacts.md",
+            "UIAutomation/Contracts/instances/creation-surface.json",
+            "UIAutomation/Contracts/instances/creation-state-generated.json",
+            "UIAutomation/Contracts/instances/creation-state-report-library.json",
+            "UIAutomation/Contracts/instances/creation-action-toggleMonthlyReportSchedule.json",
+            "UIAutomation/Contracts/instances/creation-action-toggleYearlyReportSchedule.json",
+            "UIAutomation/Contracts/instances/creation-action-openReport.json",
+            "UIAutomation/Contracts/instances/creation-action-deleteReport.json",
+            "UIAutomation/Contracts/instances/creation-action-retryReport.json",
+            "UIAutomation/Contracts/instances/creation-journey-report-library-basic.json",
+            "UIAutomation/Fixtures/creation/creation-generated-report.json",
+            "UIAutomation/Policies/acceptance-policy.json",
             "docs/05-planning/deferred-items.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "ready",
+          "status": "review",
           "dependencies": [
             "4.0i"
           ],
@@ -2866,21 +2882,30 @@
             "Creation"
           ],
           "implementation_constraints": [
-            "月报/年报使用本地持久 period key 幂等；App 启动、前台或系统提供后台机会时执行最早符合条件且未完成的周期，不承诺精确时刻",
-            "任务通过 TaskQueueActor 串行执行并由 ProgressActor 持久化；所有异步入口执行 PrivacyCheckpoint，取消与重启可恢复",
-            "只消费当前授权且生产可用的数据分区；人物身份或 HealthKit 等不可用时省略并明确标注，禁止 fixture/占位数据",
-            "每周期最多成功生成一次；失败不写完成键，L2 仅手动重试或下一合法调度机会重建",
-            "narrativeReportGenerated 记录 periodType、实际 dataSourcesUsed 和 periodKeyDigest，不记录报告原文"
+            "月/年调度使用持久开关且新安装默认开启；分别持久化 monthlyEligibleFrom/yearlyEligibleFrom，同意持久化并有首条可用 canonical memory 时或升级迁移时设置各自基线，关闭后重开只更新对应类型且不得截断另一类型；只物化 end>baseline 的周期，首周期从 max(start,baseline) 取数并标注 partialBaseline，不读取基线前历史",
+            "启动、前台、获准 BGProcessingTask 或用户动作每次最多 CAS claim 一个最早 eligible 周期；相同结束边界先月后年，不承诺精确后台时刻",
+            "新增 NarrativeReportSchedule、NarrativeReportPeriod、版本化有界 NarrativeReport、NarrativeReportSource 与 NarrativeReportActor；唯一周期键和 revision 排除并发重复 claim",
+            "任务经 TaskQueueActor 串行、ProgressActor 只保存有界版本化游标；所有异步入口重做当前 PrivacyCheckpoint/UserPolicy，resumeData 禁止原文、输出和授权快照",
+            "PrivacyActor 依据当前 checkpoint 准备 content-free Sendable audit payload 且不提前写库；DatabaseManager 专用无挂起点事务原子 publication 报告、来源、period completed 与 narrativeReportGenerated，任一失败整体回滚",
+            "扫描只自动处理 eligible；L2 retryRequired/PendingOperations 仅用户手动重试。system expiration、低电量和 serious/critical thermal 释放 claim 后延后，不伪装成 L2",
+            "无当前授权 canonical memory 写 noData 且不生成正文/审计；可选人物/HealthKit 分区不可用时省略并在 coverage metadata 标注，禁止 fixture/占位数据",
+            "聚合按稳定顺序与版本化 NarrativeReportLimits 确定性分批/分层，限制来源、摘录、中间层、输入与输出大小，禁止无界 prompt",
+            "用户删除报告或 Memory 删除时级联删除 NarrativeReportSource/派生报告并将周期置 v1 不可重建的 invalidated；全量撤权清除 schedule/period/report/source 及相关恢复/待处理描述",
+            "narrativeReportGenerated 使用 typed periodType、canonical JSON 排序去重 source-type enum 数组 dataSourcesUsed、唯一 64 字符 hash-only periodKeyDigest，不记录正文、标题、MemoryID、locator 或目标 App"
           ],
           "acceptance_evidence": [
-            "月/年边界、跨时区、重复启动、错过多个周期与开关关闭的确定性 period-key 测试",
-            "最早符合周期入队、取消、进程终止、重启恢复与成功后不重复生成证据",
-            "授权来源组合、人物/HealthKit 不可用时省略、无 fixture/占位输入证明",
-            "TaskQueueActor/ProgressActor 串行与故障矩阵",
-            "narrativeReportGenerated 审计字段及报告原文零落库证明"
+            "默认开启的月/年持久开关、首条可用 memory/升级迁移/关闭后重开各自 eligibleFrom、重开一种时另一种基线不变、首周期 max(start,baseline)+partialBaseline、跨时区冻结、同结束边界顺序与一次扫描一个周期测试",
+            "启动/前台/BG 并发 CAS、重复扫描、错过多个周期与成功后 exactly-once 证据",
+            "PrivacyActor payload 准备与 DatabaseManager 专用 publication 不构成跨 Actor 伪原子；report/source/period/audit 每个事务写入故障点整体回滚及重启一致性证明",
+            "TaskQueueActor/ProgressActor typed descriptor、用户取消恢复、system expiration/low-power/thermal 延后与 L2 自动扫描跳过矩阵",
+            "NarrativeReportLimits 边界/确定性、noData、授权来源组合、人物/HealthKit 省略、coverage metadata 与零 fixture/占位输入证明",
+            "用户删除报告、Memory 删除、全量撤权、invalidated 在 v1 禁止自动/手动重生及 NSFileProtectionComplete 证明",
+            "Creation report-library 真实持久状态、月/年独立开关、打开/删除/手动重试动作与无 fixture fallback 的 Surface Contract/UI 证据",
+            "BGProcessingTask 注册/permitted identifier/expiration/completion/resubmission 静态与行为证据，不包含精确时刻断言",
+            "narrativeReportGenerated typed 字段、periodKeyDigest 唯一与报告正文/标题/MemoryID/locator 零审计落库证明"
           ],
-          "last_updated": "2026-09-07T17:35:29Z",
-          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77."
+          "last_updated": "2026-09-07T21:52:24Z",
+          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77. Specification reasonableness review completed at 2026-09-07T19:46:11Z under user instruction; ADR-021 now defines new-install-default-on persisted switches and independent per-period-type eligibleFrom baselines, completed-calendar periods, frozen timezone bounds, one-period CAS claims, persistent report/source relations, atomic publication, bounded aggregation, noData/manual-L2/resource-defer states, opportunistic BGProcessingTask behavior and D-005 invalidation. TDD review further clarified that re-enabling one period type must not mutate the other type's baseline. Task moved from ready to in_progress at 2026-09-07T20:21:41Z after dependency, entry-gate and deferred-item checks passed. Production implementation completed with NarrativeReportActor/model/schema, independent schedules, deterministic period planning, queue/recovery, atomic publication and typed audit, BGProcessingTask integration, D-005 invalidation, Creation report library UI, bilingual localization and UI contracts. Final verification: 4.0j focused suite 11/11 passed; full EchoTests 1403 tests in 162 suites passed with 5 pre-existing known issues; SwiftLint 0; accessibility contracts, localization, static bans, JSON/plist, release compliance and diff checks passed. Coverage gate passed at 76% excluding declarative Views against the repository-configured 65% threshold. Task moved to review at 2026-09-07T21:47:34Z; commit/PR intentionally left for $commit-pr-echo."
         },
         {
           "id": "4.1",
@@ -4117,6 +4142,45 @@
         "UIAutomation/Policies/acceptance-policy.json",
         "docs/05-planning/开发计划安排文档.md",
         "docs/05-planning/phase3f-evidence-index.md",
+        "docs/05-planning/phase3f-story-matrix.md",
+        "docs/05-planning/task-status.json"
+      ]
+    },
+    {
+      "id": "DOC-20260907-4-0J-REASONABLENESS",
+      "status": "resolved",
+      "detected_at": "2026-09-07T19:46:11Z",
+      "resolved_at": "2026-09-07T19:46:11Z",
+      "decision_maker": "Codex spec review under human instruction",
+      "selected_option": "persisted-switch-baseline-completed-period-cas-manual-l2-opportunistic-bg",
+      "decision": "Retain task 4.0j while defining new-install-default-on persisted monthly/yearly switches and independent per-period-type eligibleFrom baselines; re-enabling one type cannot mutate the other; completed Gregorian periods with frozen timezone and UTC bounds; one-period compare-and-set claiming; persistent period/report/source state; atomic report, source, completion and audit publication; bounded deterministic aggregation; noData and invalidated terminal states; manual-only L2 retry; opportunistic BGProcessingTask expiration handling; and D-005 cleanup for derived reports.",
+      "reason": "The prior specification did not define which month/year is generated, first-enable backfill, timezone changes, simultaneous launch/foreground/background triggers, report storage, empty-period behavior, bounded annual aggregation, or derived-report deletion. It also allowed L2 work to be rebuilt on a later scheduling opportunity, contradicting ADR-011 and AGENTS.md §4.4. The current code has queue/recovery infrastructure but no narrative task type, period/report/source schema, scheduler, BGProcessingTask registration or complete narrative audit columns.",
+      "affected_documents": [
+        "AGENTS.md",
+        "docs/INDEX.md",
+        "docs/01-spec/用户故事与验收标准规格书.md",
+        "docs/02-architecture/架构设计文档.md",
+        "docs/02-architecture/数据流全链路技术说明文档.md",
+        "docs/03-implementation/开发避坑与关键注意点手册.md",
+        "docs/decisions/ADR-011-task-progress-boundary.md",
+        "docs/decisions/ADR-017-focus-production-boundaries.md",
+        "docs/decisions/ADR-021-narrative-report-scheduling-persistence.md",
+        "docs/ui/README.md",
+        "docs/ui/architecture.md",
+        "docs/ui/testing-and-artifacts.md",
+        "UIAutomation/Contracts/instances/creation-surface.json",
+        "UIAutomation/Contracts/instances/creation-state-generated.json",
+        "UIAutomation/Contracts/instances/creation-state-report-library.json",
+        "UIAutomation/Contracts/instances/creation-action-toggleMonthlyReportSchedule.json",
+        "UIAutomation/Contracts/instances/creation-action-toggleYearlyReportSchedule.json",
+        "UIAutomation/Contracts/instances/creation-action-openReport.json",
+        "UIAutomation/Contracts/instances/creation-action-deleteReport.json",
+        "UIAutomation/Contracts/instances/creation-action-retryReport.json",
+        "UIAutomation/Contracts/instances/creation-journey-report-library-basic.json",
+        "UIAutomation/Fixtures/creation/creation-generated-report.json",
+        "UIAutomation/Policies/acceptance-policy.json",
+        "docs/05-planning/开发计划安排文档.md",
+        "docs/05-planning/phase3f-execution-plan.md",
         "docs/05-planning/phase3f-story-matrix.md",
         "docs/05-planning/task-status.json"
       ]

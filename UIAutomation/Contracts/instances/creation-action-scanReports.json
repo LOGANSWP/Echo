@@ -1,0 +1,8 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/action/v1",
+  "actionId": "creation.scanReports",
+  "source": "user",
+  "targetIntent": "CreationViewModel.scanNarrativeReportsNow()",
+  "expectedOutcome": "Revalidate current policy and request at most one earliest eligible completed period; no data remains honest and fixture content is never substituted",
+  "version": "1.0.0"
+}

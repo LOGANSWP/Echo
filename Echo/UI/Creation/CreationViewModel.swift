@@ -5,7 +5,7 @@
 //            US-SYN-004 (月度/年度叙事报告), US-SYN-005 (私有 Prompt 草稿编辑确认)
 //            docs/ui/echo-memory-canvas-style.md §3.2 (Focus surfaces — 单列 + grouped metadata),
 //            docs/ui/architecture.md §6 (ViewModel 契约), §7 (适配器契约)
-// 任务: 3.9 + 4.0i - Grounded creation, stable citation navigation, and truthful share audit
+// 任务: 3.9 + 4.0i + 4.0j - Grounded creation, report library, and truthful share audit
 // AC coverage: US-SYN-003 AC-1 ✅ (template selection), AC-2 ✅ (grounded citations),
 //              AC-3 ✅ (preview/copy/export), AC-4 ✅ (system share handoff),
 //              AC-5 ✅ (visible L2 recovery when payload preparation fails),
@@ -15,7 +15,7 @@
 // 架构约束: AGENTS.md §8.1 (@MainActor + @Observable + state enum: idle/loading/completed/error/cancelled),
 //           §8.2 (状态流转), docs/ui/architecture.md §6~7 (适配器契约),
 //           §2.5 (Adapter 不保存第二份领域真相 — 仅转换展示字段)
-// 生成时间: 2026-08-02 | Updated: 2026-09-07 (4.0i, ADR-020)
+// 生成时间: 2026-08-02 | Updated: 2026-09-07 (4.0j report library)
 // ==========================================
 
 import Foundation
@@ -122,6 +122,13 @@ final class CreationViewModel: CreationSharePresentationReporting {
         case l2Recoverable(message: String)
     }
 
+    enum ReportLibraryState: Equatable, Sendable {
+        case idle
+        case loading
+        case loaded
+        case error(message: String)
+    }
+
     /// 导出格式 (US-SYN-003 AC-3)
     enum ExportFormat: String, CaseIterable, Sendable {
         case pdf
@@ -143,6 +150,10 @@ final class CreationViewModel: CreationSharePresentationReporting {
     private(set) var creation: CreationModel?
     /// 已选模板
     private(set) var selectedTemplate: CreationTemplate?
+    private(set) var reportLibraryState: ReportLibraryState = .idle
+    private(set) var reportSchedule: NarrativeReportSchedule?
+    private(set) var narrativeReports: [PersistedNarrativeReport] = []
+    private(set) var recoverableReportPeriods: [NarrativeReportPeriod] = []
 
     // MARK: - Prompt Editor State (US-SYN-005 AC-4)
 
@@ -196,18 +207,201 @@ final class CreationViewModel: CreationSharePresentationReporting {
     private let creativePipeline: CreativePipeline?
     /// Production action boundary. Fixtures may bypass it but cannot serve as production evidence.
     private let exportCoordinator: CreationExportCoordinator?
+    private let narrativeReportActor: NarrativeReportActor?
     /// 创作源记忆（grounded 输入，经检索结果映射）— 3F.9 生产路径
     private var sourceMemories: [CreativeSource] = []
 
     init(
         creativePipeline: CreativePipeline? = nil,
-        exportCoordinator: CreationExportCoordinator? = nil
+        exportCoordinator: CreationExportCoordinator? = nil,
+        narrativeReportActor: NarrativeReportActor? = nil
     ) {
         self.creativePipeline = creativePipeline
         self.exportCoordinator = exportCoordinator
+        self.narrativeReportActor = narrativeReportActor
     }
 
     // MARK: - Actions
+
+    func loadReportLibrary() {
+        reportLibraryState = .loading
+        guard let narrativeReportActor else {
+            reportLibraryState = .idle
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                async let schedule = narrativeReportActor.loadSchedule()
+                async let reports = narrativeReportActor.listReports()
+                async let recoverable = narrativeReportActor.listRecoverablePeriods()
+                self.reportSchedule = try await schedule
+                self.narrativeReports = try await reports
+                self.recoverableReportPeriods = try await recoverable
+                self.reportLibraryState = .loaded
+            } catch {
+                self.reportLibraryState = .error(
+                    message: EchoStrings.tr("Unable to load narrative reports. Please try again.")
+                )
+            }
+        }
+    }
+
+    func setReportSchedule(_ enabled: Bool, for periodType: NarrativeReportPeriodType) {
+        reportLibraryState = .loading
+        guard let narrativeReportActor else {
+            reportLibraryState = .error(
+                message: EchoStrings.tr("Narrative report scheduling is unavailable.")
+            )
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await narrativeReportActor.setEnabled(enabled, for: periodType)
+                self.reportSchedule = try await narrativeReportActor.loadSchedule()
+                self.reportLibraryState = .loaded
+            } catch {
+                self.reportLibraryState = .error(
+                    message: EchoStrings.tr("Unable to update narrative report scheduling.")
+                )
+            }
+        }
+    }
+
+    func openReport(_ reportID: UUID) {
+        reportLibraryState = .loading
+        guard let narrativeReportActor else {
+            reportLibraryState = .error(
+                message: EchoStrings.tr("Narrative report is unavailable.")
+            )
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                guard let report = try await narrativeReportActor.loadReport(reportID: reportID) else {
+                    throw NarrativeReportError.periodUnavailable
+                }
+                self.creation = Self.creationModel(from: report)
+                self.selectedTemplate = .report
+                self.isFixtureBacked = false
+                self.reportLibraryState = .loaded
+                self.viewState = .generated
+            } catch {
+                self.reportLibraryState = .error(
+                    message: EchoStrings.tr("Unable to open this narrative report.")
+                )
+            }
+        }
+    }
+
+    func deleteReport(_ reportID: UUID) {
+        reportLibraryState = .loading
+        guard let narrativeReportActor else {
+            reportLibraryState = .error(
+                message: EchoStrings.tr("Unable to delete this narrative report.")
+            )
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await narrativeReportActor.deleteReport(reportID: reportID)
+                self.narrativeReports = try await narrativeReportActor.listReports()
+                self.recoverableReportPeriods = try await narrativeReportActor.listRecoverablePeriods()
+                self.reportLibraryState = .loaded
+            } catch {
+                self.reportLibraryState = .error(
+                    message: EchoStrings.tr("Unable to delete this narrative report.")
+                )
+            }
+        }
+    }
+
+    func retryReport(_ period: NarrativeReportPeriod) {
+        reportLibraryState = .loading
+        guard let narrativeReportActor else {
+            reportLibraryState = .error(
+                message: EchoStrings.tr("Unable to retry this narrative report.")
+            )
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                _ = try await narrativeReportActor.retryReport(
+                    periodType: period.periodType,
+                    periodKey: period.periodKey
+                )
+                self.recoverableReportPeriods = try await narrativeReportActor.listRecoverablePeriods()
+                self.reportLibraryState = .loaded
+            } catch {
+                self.reportLibraryState = .error(
+                    message: EchoStrings.tr("Unable to retry this narrative report.")
+                )
+            }
+        }
+    }
+
+    func scanNarrativeReportsNow() {
+        reportLibraryState = .loading
+        guard let narrativeReportActor else {
+            reportLibraryState = .error(
+                message: EchoStrings.tr("Narrative report scheduling is unavailable.")
+            )
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                _ = try await narrativeReportActor.establishEligibilityIfNeeded()
+                _ = try await narrativeReportActor.scanAndEnqueue(
+                    calendarContext: .init(
+                        timeZoneIdentifier: TimeZone.autoupdatingCurrent.identifier
+                    ),
+                    trigger: .userInitiated
+                )
+                self.recoverableReportPeriods = try await narrativeReportActor
+                    .listRecoverablePeriods()
+                self.narrativeReports = try await narrativeReportActor.listReports()
+                self.reportLibraryState = .loaded
+            } catch {
+                self.reportLibraryState = .error(
+                    message: EchoStrings.tr("Unable to start narrative report generation.")
+                )
+            }
+        }
+    }
+
+    private static func creationModel(from report: PersistedNarrativeReport) -> CreationModel {
+        let sourcesByID = Dictionary(uniqueKeysWithValues: report.sources.map {
+            ($0.memoryID, $0)
+        })
+        return CreationModel(
+            selectedTemplate: .report,
+            title: report.envelope.title,
+            periodType: report.periodType.rawValue,
+            paragraphs: report.envelope.paragraphs.map { paragraph in
+                CreationParagraph(
+                    id: paragraph.id,
+                    text: paragraph.text,
+                    citations: paragraph.sourceMemoryIDs.map { memoryID in
+                        let source = sourcesByID[memoryID]
+                        return CreationCitation(
+                            memoryId: memoryID,
+                            sourceType: source?.sourceType,
+                            availability: source?.availability ?? .missing
+                        )
+                    },
+                    groundingStatus: paragraph.groundingStatus
+                )
+            },
+            sourceMemoryCount: report.sources.count,
+            sourceTypes: report.sourceTypes,
+            emptyReason: nil
+        )
+    }
 
     /// 选择创作模板 (US-SYN-003 AC-1)。
     func selectTemplate(_ template: CreationTemplate) {

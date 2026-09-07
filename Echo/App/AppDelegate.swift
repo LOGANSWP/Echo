@@ -6,19 +6,23 @@
 // 任务: 1.1 - 创建 Xcode 项目，配置 Swift 6 并发严格模式
 //       3F.1 - Production composition root (ADR-007 §决策-1)
 //       3F.2 + 4.0h - PhotoKit, Share Extension, and live source lifecycle
+//       4.0j - Opportunistic persisted narrative-report scheduling (ADR-021)
 // 用途: BGTask 注册 (US-SYS-001 后台任务面板) + 来源边界装配
 // 3F.8 review fix (C-1/W-4): onGeofenceEvent 回调 → eventStream for-await 消费; awakeningPipeline 属性持有
 // 架构约束: 遵循 AGENTS.md §9 (后台任务与断点续传), deny-by-default (ADR-007 §决策-2)
-// Generated: 2026-07-04 | Updated: 2026-09-05 (4.0h foreground recovery)
+// Generated: 2026-07-04 | Updated: 2026-09-07 (4.0j BGProcessingTask lifecycle)
 // ==========================================
 
 import UIKit
 import Photos
 import PhotosUI
+import BackgroundTasks
 
 /// Echo 应用代理 — 负责后台任务注册与生命周期管理
 /// 后台任务包括：定时扫描、数据同步、索引构建（US-SYS-001）
 final class AppDelegate: NSObject, UIApplicationDelegate {
+
+    private static let narrativeReportBackgroundIdentifier = "com.echo.narrative-report-processing"
 
     /// 相册变更同步管线（US-SRC-012 AC-1）— 持有防释放
     private var syncPipeline: SyncPipeline?
@@ -38,11 +42,15 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     private let awakeningCardRepository = AwakeningCardRepositoryActor()
     /// 3F.8: 唤醒管线（含地理围栏事件流消费）— 持有防释放（W-4 review fix）
     private var awakeningPipeline: AwakeningPipeline?
+    private var narrativeReportBackgroundWork: Task<Void, Never>?
+    private var narrativeReportBackgroundTaskID: String?
 
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        registerNarrativeReportBackgroundTask()
+        scheduleNarrativeReportBackgroundTask()
         // 生产装配：确保 composition root 已初始化（幂等，主装配在 EchoApp.task）
         _ = AppComposition.shared
         Task { @MainActor in
@@ -60,6 +68,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                 await self?.drainSharedImportsIfNeeded()
                 _ = try? await AppComposition.shared.focusSourceLifecycleActor
                     .recoverPendingPhotoLibraryDeletions(traceID: UUID().uuidString)
+                await self?.scanNarrativeReports(trigger: .foreground)
             }
         }
         return true
@@ -162,6 +171,14 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         await composition.attachProductionIngestPipeline(ingest)
         _ = try? await ingest.drainSharedImports(from: .shared)
 
+        if let creativePipeline = await LiveAppAdapters.makeCreativePipeline(composition: composition) {
+            try? await composition.narrativeReportActor.attachGenerator(
+                CreativeNarrativeReportGenerator(pipeline: creativePipeline)
+            )
+        }
+        _ = try? await composition.narrativeReportActor.establishEligibilityIfNeeded()
+        await scanNarrativeReports(trigger: .launch)
+
         // 3F.8: 唤醒系统适配器装配（ADR-012 决策-3: 真实系统适配器接入生产）。
         // - 定位服务: CoreLocationProvider 地理围栏 enter/exit 事件 → AwakeningPipeline
         // - HealthKit: HealthKitSystemProvider 同时符合 HealthKitProvider（情绪）与
@@ -214,6 +231,113 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         // 兜底补弹：didBecomeActive 可能早于本方法执行（configureSources 异步），
         // 此处确保装配完成后仍未弹出时补一次（3F.2 review fix #2）
         await presentLimitedLibraryPickerIfNeeded()
+    }
+
+    // MARK: - Narrative report background scheduling (4.0j / ADR-021)
+
+    private func registerNarrativeReportBackgroundTask() {
+        BGTaskScheduler.shared.register(
+            forTaskWithIdentifier: Self.narrativeReportBackgroundIdentifier,
+            using: nil
+        ) { [weak self] task in
+            guard let processingTask = task as? BGProcessingTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
+            Task { @MainActor [weak self] in
+                self?.handleNarrativeReportBackgroundTask(processingTask)
+            }
+        }
+    }
+
+    private func scheduleNarrativeReportBackgroundTask() {
+        let request = BGProcessingTaskRequest(
+            identifier: Self.narrativeReportBackgroundIdentifier
+        )
+        request.requiresNetworkConnectivity = false
+        request.requiresExternalPower = false
+        request.earliestBeginDate = Date().addingTimeInterval(12 * 60 * 60)
+        try? BGTaskScheduler.shared.submit(request)
+    }
+
+    private func handleNarrativeReportBackgroundTask(_ backgroundTask: BGProcessingTask) {
+        scheduleNarrativeReportBackgroundTask()
+        narrativeReportBackgroundWork?.cancel()
+        let work = Task { @MainActor [weak self] in
+            guard let self else {
+                backgroundTask.setTaskCompleted(success: false)
+                return
+            }
+            let success = await runNarrativeReportBackgroundScan()
+            narrativeReportBackgroundTaskID = nil
+            backgroundTask.setTaskCompleted(success: success)
+        }
+        narrativeReportBackgroundWork = work
+        backgroundTask.expirationHandler = { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                narrativeReportBackgroundWork?.cancel()
+                if let taskID = narrativeReportBackgroundTaskID {
+                    try? await AppComposition.shared.narrativeReportActor.releaseClaimForResource(
+                        taskID: taskID
+                    )
+                }
+            }
+        }
+    }
+
+    private func runNarrativeReportBackgroundScan() async -> Bool {
+        let composition = AppComposition.shared
+        await composition.bootstrap()
+        await composition.awaitBootstrapCompletion()
+        guard composition.startupState == .ready
+                || composition.startupState == .modelUnavailable
+                || composition.startupState == .indexUnavailable else { return false }
+        _ = try? await composition.narrativeReportActor.establishEligibilityIfNeeded()
+        do {
+            let result = try await composition.narrativeReportActor.scanAndEnqueue(
+                calendarContext: .init(timeZoneIdentifier: TimeZone.autoupdatingCurrent.identifier),
+                trigger: .background,
+                resources: Self.narrativeReportResourceAvailability()
+            )
+            switch result {
+            case .enqueued(let taskID, let periodKey):
+                narrativeReportBackgroundTaskID = taskID
+                while await TaskQueueActor.shared.activeTaskIDs().contains(taskID) {
+                    try Task.checkCancellation()
+                    try await Task.sleep(for: .milliseconds(100))
+                }
+                return try await composition.narrativeReportActor.listReports()
+                    .contains { $0.periodKey == periodKey }
+            case .retryRequired:
+                return false
+            case .none, .noData, .deferredForResources:
+                return true
+            }
+        } catch {
+            return false
+        }
+    }
+
+    private func scanNarrativeReports(trigger: NarrativeReportScanTrigger) async {
+        let composition = AppComposition.shared
+        guard composition.startupState == .ready
+                || composition.startupState == .modelUnavailable
+                || composition.startupState == .indexUnavailable else { return }
+        _ = try? await composition.narrativeReportActor.establishEligibilityIfNeeded()
+        _ = try? await composition.narrativeReportActor.scanAndEnqueue(
+            calendarContext: .init(timeZoneIdentifier: TimeZone.autoupdatingCurrent.identifier),
+            trigger: trigger,
+            resources: Self.narrativeReportResourceAvailability()
+        )
+    }
+
+    private static func narrativeReportResourceAvailability() -> NarrativeReportResourceAvailability {
+        if ProcessInfo.processInfo.isLowPowerModeEnabled { return .lowPower }
+        switch ProcessInfo.processInfo.thermalState {
+        case .serious, .critical: return .thermalConstrained
+        default: return .available
+        }
     }
 
     /// iOS 26 limited 适配：授权为 limited 且尚无已选照片时，主动呈现系统照片选择器

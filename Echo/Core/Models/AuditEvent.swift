@@ -8,13 +8,15 @@
 //       4.0d - 交互式唤醒卡 hash-only action audit
 //       4.0h - Structured audit for PhotoKit deletion results and exclusion cleanup notices
 //       4.0i - Typed grounded-generation and system-share audit
+//       4.0j - Typed narrative-report publication audit
 // AC 覆盖: AGENTS.md §5.4 (必填字段 eventType/timestamp/traceID/policyVersion/success, hash-only, 30天, 加密),
 //          US-PRV-006 AC-6 (retentionPolicyEvaluated), ADR-007 §决策-3 (purgeFailed 审计),
 //          US-RET-005 AC-4 ✅ (followUpQuery, 2026-08-11 3F.6), US-SRC-010 AC-5 ✅ (crossAppSearch),
-//          4.0i AC-5/6 (typed creation audit and exact hash-only share handoff identity)
+//          4.0i AC-5/6 (typed creation audit and exact hash-only share handoff identity),
+//          4.0j AC-8 (typed source set and unique hash-only period identity)
 // 架构约束: AGENTS.md R-007 (禁止 unchecked Sendable), 仅记录哈希摘要禁止原文
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
-// Generated: 2026-08-04 | Updated: 2026-09-07 (4.0i typed creation/share audit)
+// Generated: 2026-08-04 | Updated: 2026-09-07 (4.0j narrative report audit)
 // ==========================================
 
 import Foundation
@@ -111,6 +113,7 @@ public enum AuditEvent: String, Sendable, Codable {
 
 public nonisolated enum AuditValidationError: Error, Sendable, Equatable {
     case invalidCreationFields
+    case invalidNarrativeReportFields
 }
 
 // MARK: - Audit Log Entry
@@ -165,6 +168,10 @@ public struct AuditLogEntry: Sendable, Codable {
     public nonisolated let periodType: String?
     /// Hash-only identity for one system-share handoff; used for durable idempotency.
     public nonisolated let shareHandoffIdDigest: String?
+    /// Canonical JSON array of normalized source-type enums; never contains source identities.
+    public nonisolated let dataSourcesUsed: String?
+    /// Hash-only stable period identity for exactly-once narrative publication.
+    public nonisolated let periodKeyDigest: String?
 
     public nonisolated init(
         id: Int64 = 0,
@@ -205,7 +212,9 @@ public struct AuditLogEntry: Sendable, Codable {
         exportFormat: String? = nil,
         sharePresented: Bool? = nil,
         periodType: String? = nil,
-        shareHandoffIdDigest: String? = nil
+        shareHandoffIdDigest: String? = nil,
+        dataSourcesUsed: String? = nil,
+        periodKeyDigest: String? = nil
     ) {
         self.id = id
         self.eventType = eventType
@@ -246,6 +255,8 @@ public struct AuditLogEntry: Sendable, Codable {
         self.sharePresented = sharePresented
         self.periodType = periodType
         self.shareHandoffIdDigest = shareHandoffIdDigest
+        self.dataSourcesUsed = dataSourcesUsed
+        self.periodKeyDigest = periodKeyDigest
     }
 
     /// 从数据库查询结果行构造 AuditLogEntry（用于 fetchAuditLogs）
@@ -295,7 +306,9 @@ public struct AuditLogEntry: Sendable, Codable {
             exportFormat: row["exportFormat"]?.stringValue,
             sharePresented: row["sharePresented"]?.intValue.map { $0 != 0 },
             periodType: row["periodType"]?.stringValue,
-            shareHandoffIdDigest: row["shareHandoffIdDigest"]?.stringValue
+            shareHandoffIdDigest: row["shareHandoffIdDigest"]?.stringValue,
+            dataSourcesUsed: row["dataSourcesUsed"]?.stringValue,
+            periodKeyDigest: row["periodKeyDigest"]?.stringValue
         )
     }
 }

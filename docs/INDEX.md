@@ -22,7 +22,7 @@
 | **Phase 3F 执行计划**  | `05-planning/phase3f-execution-plan.md`           | Phase 3F 开发 Agent 执行指令与任务账本迁移契约    |
 | **Phase 3F 故事矩阵**  | `05-planning/phase3f-story-matrix.md`             | 66 个用户故事的 Phase 3F 归属矩阵                 |
 | **Phase 3F 证据索引**  | `05-planning/phase3f-evidence-index.md`           | Phase 3F 预合并证据索引                           |
-| **决策记录 (ADR)**     | `decisions/ADR-001~020`                            | SQLite/并发、Phase 3F、检索、唤醒卡、Focus 写入/来源/创作、渐进式权限、PhotoKit 删除恢复与来源锚点/分享审计边界等决策 |
+| **决策记录 (ADR)**     | `decisions/ADR-001~021`                            | SQLite/并发、Phase 3F、检索、唤醒卡、Focus 写入/来源/创作、渐进式权限、PhotoKit 删除恢复、来源锚点/分享审计与叙事报告调度持久化边界等决策 |
 | **疑难杂症问题**       | `06-troubleshooting/`                              | 架构性限制/难解问题的定位与根因分析（如照片文本搜索跨模态限制） |
 | **UI 文档路由**        | `ui/README.md`                                     | Phase 3 UI 设计配置、自动化工作流、架构边界、测试 |
 | **UI 设计风格**        | `ui/echo-memory-canvas-style.md`                   | 全 App 方案 B「平衡画布」、共享 profile/token/component、Discovery masonry 与 Focus/Task 同源表达 |
@@ -63,6 +63,7 @@
 | 唤醒卡感受存储与全离线音乐边界 | `decisions/ADR-016-awakening-card-feelings-offline-music.md` |
 | Focus 编辑、来源删除、引用分享与叙事调度边界 | `decisions/ADR-017-focus-production-boundaries.md` |
 | PhotoKit 来源能力、删除外部结果门禁与崩溃恢复 | `decisions/ADR-019-photokit-source-deletion-recovery.md` |
+| 月/年叙事报告周期、持久化、后台机会与删除边界 | `decisions/ADR-021-narrative-report-scheduling-persistence.md` |
 | Phase 3/4 UI 设计配置与规范                | `ui/echo-memory-canvas-style.md`（方案 B「平衡画布」） |
 | UI 自动化工作流与试点选择                  | `ui/automation-workflow.md`                            |
 | UI 架构边界与保护路径                      | `ui/architecture.md`                                   |
@@ -101,6 +102,7 @@
 | **PrivacyCheckpoint**  | 强制隐私校验，所有 Pipeline 入口必须调用                     | `架构设计文档.md` §7.1 |
 | **统一错误矩阵**       | L1~L4 分级，L2 仅手动重试                                    | `架构设计文档.md` §5   |
 | **TaskProgress**       | SQLite 仅存断点进度；跨进程执行需 task reconstruction registry | `架构设计文档.md` §6.1~6.2 |
+| **NarrativeReport**    | 完整周期 + 冻结边界 + 单周期 CAS claim；报告/来源/完成/审计原子 publication | `架构设计文档.md` §2.6 + ADR-021 |
 
 ---
 

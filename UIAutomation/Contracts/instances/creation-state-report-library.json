@@ -1,0 +1,28 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/state/v1",
+  "stateId": "report-library",
+  "surfaceId": "creation",
+  "dataConditions": {
+    "monthlySchedule": "persisted enabled value plus eligibleFrom",
+    "yearlySchedule": "persisted enabled value plus eligibleFrom",
+    "periodStates": "zero or more eligible | claimed | retryRequired | completed | noData | invalidated rows",
+    "persistedReports": "zero or more live NarrativeReport rows; fixture reports are excluded"
+  },
+  "allowedActions": [
+    "creation.toggleMonthlyReportSchedule",
+    "creation.toggleYearlyReportSchedule",
+    "creation.scanReports",
+    "creation.openReport",
+    "creation.deleteReport",
+    "creation.retryReport"
+  ],
+  "expectedSemantics": {
+    "scheduleControls": "Independent monthly and yearly switches announce persisted on/off values without requesting a system permission",
+    "reportRows": "Each row announces report period, date range, status and honest current source availability",
+    "noData": "No report body is claimed; explicit retry is available because no prior success exists",
+    "retryRequired": "Manual retry is available and lifecycle scans do not auto-replay it",
+    "invalidated": "Deleted-source/report state is terminal in v1 and exposes no retry action",
+    "deleteConfirmation": "Deleting a completed report requires destructive confirmation and explains that the period cannot be regenerated in v1"
+  },
+  "version": "1.0.0"
+}

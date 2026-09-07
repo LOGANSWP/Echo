@@ -12,6 +12,19 @@
     "title": "Your 2025 Narrative Report",
     "periodType": "year",
     "period": "2025",
+    "reportSchedule": {
+      "monthly": { "enabled": true, "eligibleFrom": "2025-01-15T12:00:00Z" },
+      "yearly": { "enabled": true, "eligibleFrom": "2025-01-15T12:00:00Z" }
+    },
+    "persistedReports": [
+      {
+        "reportId": "77777777-7777-4777-8777-777777777777",
+        "periodKey": "year:2025",
+        "periodType": "year",
+        "state": "completed",
+        "sourceAvailability": "available"
+      }
+    ],
     "generatedContent": [
       {
         "paragraph": "This year had three clear chapters: a quiet winter, an active spring in the park, and a reflective autumn.",
@@ -25,6 +38,6 @@
     "sourceMemoryCount": 2,
     "promptDraft": "You are Echo, a local AI memory assistant. Focus on recent queries and feelings."
   },
-  "controlledVariables": ["period", "memoryId", "generatedContent"],
-  "version": "1.0.0"
+  "controlledVariables": ["period", "memoryId", "generatedContent", "reportSchedule", "persistedReports"],
+  "version": "1.1.0"
 }
