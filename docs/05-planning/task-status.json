@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-07T14:17:55Z",
+  "last_updated": "2026-09-07T15:19:14Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2807,7 +2807,8 @@
             "锚点导航、复制、Markdown/PDF/plain-text 分享准备均重新执行当前 UserPolicy + PrivacyCheckpoint；撤权阻止派生正文交接，仍授权但离线的来源保留诚实不可用标记",
             "所有导出格式保留可理解引用，PDF 支持多页且不截断；不得暴露 assetID、sourceLocator 或猜测来源 App；Notes 仅为系统 share/export 交接",
             "creativeGeneration 与 creationSharePresented 分离；只有系统控制器真实呈现回调写 sharePresented=true，payload 就绪不是证据，呈现后关闭不是失败，呈现后审计写入失败不得反写 false",
-            "AuditLog 通过幂等 migration 使用 templateType/sourceMemoryCount/citationCount/noSourceCount/exportFormat/sharePresented/periodType 专用 typed columns，禁止塞入 sourceLanguage"
+            "AuditLog 通过幂等 migration 使用 templateType/sourceMemoryCount/citationCount/noSourceCount/exportFormat/sharePresented/periodType/shareHandoffIdDigest 专用 typed columns；shareHandoffIdDigest 为 64 位 hash-only 精确交接身份并受唯一索引约束，禁止塞入 sourceLanguage",
+            "非法 periodType 在任何审计写入或 L2 入队前 fail-closed；pending retry 按精确 handoff digest 查重，不扫描固定窗口或猜测 traceID"
           ],
           "acceptance_evidence": [
             "版本化 envelope 的正常、未知版本、畸形、字节/段落/字符/引用超限测试；未校验输出不展示且无 round-robin fallback",
@@ -2815,7 +2816,7 @@
             "有效 citation 经当前策略复验进入真实 Detail；导航或导出前撤权被阻止，资产离线/消失但仍授权时保持诚实不可用",
             "plainText/Markdown/PDF/share payload 均保留引用，PDF 多页无截断，且零 assetID/sourceLocator/来源 App 身份",
             "payload 就绪但未呈现、准备失败、呈现失败、真实呈现、呈现后关闭及呈现后审计失败的状态与 L2 行为",
-            "专用 typed audit columns、固定计数语义、sourceLanguage 无 metadata、幂等 audit retry 及零目标 App/原文证明"
+            "专用 typed audit columns、固定计数语义、sourceLanguage 无 metadata、唯一 hash-only handoff digest、跨旧扫描窗口幂等 retry、非法 periodType 不入队及零目标 App/原文证明"
           ],
           "pr": {
             "number": 77,
@@ -2824,8 +2825,8 @@
             "base": "dev-1.0",
             "created_at": "2026-09-07T14:17:35Z"
           },
-          "last_updated": "2026-09-07T14:17:55Z",
-          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed. The 2026-09-07 reasonableness review (ADR-020) corrected the overclaim that provenance proves factual accuracy, added a versioned bounded JSON envelope and multi-anchor partialNoSource semantics, required current-policy revalidation for copy/export/share, made actual controller presentation the only true sharePresented=true trigger, required citation-preserving multipage exports, and assigned dedicated typed audit columns with failure-truth and idempotent-retry behavior. Task moved from ready to in_progress at 2026-09-07T13:14:25Z after dependency, entry-gate and deferred-item checks passed. Implementation completed with grounded multi-source parsing, fail-closed protocol limits, stable source navigation, current-policy action authorization, citation-preserving text/Markdown/multipage PDF export, actual share-controller presentation reporting, typed audit persistence, and content-free idempotent audit retry. Focused and affected regression suites passed 65 tests with zero failures; the mandatory pre-commit 4.0i suite was rerun on iPhone 17 Pro and passed 10 tests with zero failures. SwiftLint, accessibility contracts, localization parity, production static bans, JSON validation, and diff checks passed. Pull request #77 was created against dev-1.0 at 2026-09-07T14:17:35Z. CI and CodeRabbit are pending; merge remains human-only."
+          "last_updated": "2026-09-07T15:19:14Z",
+          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed. The 2026-09-07 reasonableness review (ADR-020) corrected the overclaim that provenance proves factual accuracy, added a versioned bounded JSON envelope and multi-anchor partialNoSource semantics, required current-policy revalidation for copy/export/share, made actual controller presentation the only true sharePresented=true trigger, required citation-preserving multipage exports, and assigned dedicated typed audit columns with failure-truth and idempotent-retry behavior. Task moved from ready to in_progress at 2026-09-07T13:14:25Z after dependency, entry-gate and deferred-item checks passed. Implementation completed with grounded multi-source parsing, fail-closed protocol limits, stable source navigation, current-policy action authorization, citation-preserving text/Markdown/multipage PDF export, actual share-controller presentation reporting, typed audit persistence, and content-free idempotent audit retry. Focused and affected regression suites passed 65 tests with zero failures; the mandatory pre-commit 4.0i suite was rerun on iPhone 17 Pro and passed 10 tests with zero failures. SwiftLint, accessibility contracts, localization parity, production static bans, JSON validation, and diff checks passed. Pull request #77 was created against dev-1.0 at 2026-09-07T14:17:35Z. PR review on 2026-09-07 independently audited GitHub CodeRabbit and authenticated CodeRabbit CLI findings. Seven unique valid defects were fixed: exact share-handoff audit identity outside the former 100-row scan, pre-queue period validation, available/unavailable citation accessibility semantics, citation-specific navigation errors, a meaningful no-source export assertion, truthful generated-state Notes handoff semantics, and stale share ownership cleanup on errors/disappearance. AuditLog now persists a unique 64-character hash-only shareHandoffIdDigest and retry uses exact lookup; specifications and ADR-020 were synchronized. No finding was deferred. Review-fix verification passed 30 focused tests and 81 affected regressions with zero failures; SwiftLint, 426-key localization parity, 170 accessibility contracts, static bans, JSON parsing, and diff checks passed. CodeRabbit's generic 80% docstring-coverage warning was rejected because it is not an Echo quality gate or task AC and identifies no behavioral defect. CI will rerun after the review-fix push; merge remains human-only."
         },
         {
           "id": "4.0j",

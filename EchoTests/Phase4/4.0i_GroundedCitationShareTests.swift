@@ -244,6 +244,7 @@ struct GroundedCitationShareTests {
             "exportFormat",
             "sharePresented",
             "periodType",
+            "shareHandoffIdDigest",
         ]))
 
         await #expect(throws: AuditValidationError.invalidCreationFields) {
@@ -336,7 +337,93 @@ struct GroundedCitationShareTests {
         #expect(event.exportFormat == "markdown")
         #expect(event.sharePresented == true)
         #expect(event.periodType == "month")
+        #expect(event.shareHandoffIdDigest == AuditContentHasher.sha256Hex(
+            payloadID.uuidString.lowercased()
+        ))
         #expect(event.sourceLanguage == nil)
+    }
+
+    @Test("AC-6: share audit idempotency uses the exact handoff digest without a scan window")
+    func shareAuditUsesExactHandoffIdentity() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let pending = PendingOpsActor(db: database)
+        let coordinator = CreationExportCoordinator(
+            privacyActor: privacy,
+            sourceResolver: SourceResolverFake(availability: .available),
+            pendingOps: pending
+        )
+        let firstPayloadID = UUID()
+        let reusedTraceID = "reused-share-trace"
+
+        try await coordinator.recordSharePresentation(
+            payloadID: firstPayloadID,
+            format: .plainText,
+            periodType: nil,
+            traceID: reusedTraceID,
+            presented: true
+        )
+        try await coordinator.recordSharePresentation(
+            payloadID: firstPayloadID,
+            format: .plainText,
+            periodType: nil,
+            traceID: reusedTraceID,
+            presented: true
+        )
+
+        for index in 0...CreativeGenerationLimits.maximumParagraphs {
+            try await coordinator.recordSharePresentation(
+                payloadID: UUID(),
+                format: .plainText,
+                periodType: nil,
+                traceID: "newer-share-\(index)",
+                presented: true
+            )
+        }
+
+        let operationID = "creation-share-audit-\(firstPayloadID.uuidString.lowercased())"
+        let retryData = try JSONSerialization.data(withJSONObject: [
+            "schemaVersion": 1,
+            "payloadID": firstPayloadID.uuidString,
+            "traceID": reusedTraceID,
+            "exportFormat": "plainText",
+            "sharePresented": true,
+        ])
+        try await pending.add(operation: PendingOperation(
+            operationId: operationID,
+            operationType: "creationShareAudit",
+            parameters: retryData
+        ))
+
+        #expect(try await coordinator.retryPendingShareAudit(operationID: operationID) == false)
+        let events = try await privacy.fetchAuditLogs(
+            limit: CreativeGenerationLimits.maximumParagraphs + 10,
+            eventType: .creationSharePresented
+        )
+        #expect(events.count == CreativeGenerationLimits.maximumParagraphs + 2)
+        #expect(Set(events.compactMap(\.shareHandoffIdDigest)).count == events.count)
+        #expect(try await pending.count() == 0)
+    }
+
+    @Test("AC-6: invalid report periods fail validation without entering persistence retry")
+    func invalidPeriodDoesNotQueueAuditRetry() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let pending = PendingOpsActor(db: database)
+        let coordinator = CreationExportCoordinator(
+            privacyActor: privacy,
+            sourceResolver: SourceResolverFake(availability: .available),
+            pendingOps: pending
+        )
+
+        await #expect(throws: CreationExportError.invalidPeriodType) {
+            try await coordinator.recordSharePresentation(
+                payloadID: UUID(),
+                format: .pdf,
+                periodType: "quarter",
+                traceID: "invalid-period",
+                presented: true
+            )
+        }
+        #expect(try await pending.count() == 0)
     }
 
     @Test("AC-5/6: post-presentation audit failure queues one content-free retry and never writes false")
@@ -453,5 +540,20 @@ struct GroundedCitationShareTests {
         } else {
             Issue.record("Expected an L2 error after presentation failed")
         }
+    }
+
+    @Test("AC-5: disappearing creation UI clears stale handoff ownership")
+    @MainActor
+    func viewModelClearsStaleHandoffOnDisappear() throws {
+        let viewModel = CreationViewModel()
+        viewModel.loadPreloaded(CreationFixtureLoader.load("creation-generated-letter")!)
+        viewModel.presentShare()
+        #expect(viewModel.sharePayload != nil)
+
+        viewModel.onDisappear()
+        viewModel.shareSheetDidDismiss()
+
+        #expect(viewModel.sharePayload == nil)
+        #expect(viewModel.viewState == .generated)
     }
 }

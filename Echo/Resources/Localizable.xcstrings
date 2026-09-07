@@ -6362,6 +6362,42 @@
         "en-US": { "stringUnit": { "state": "translated", "value": "Unable to present the system share sheet. Please try again." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法显示系统分享面板，请重试。" } }
       }
+    },
+    "Unable to prepare this creation for sharing. Please try again.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to prepare this creation for sharing. Please try again." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法准备此创作内容用于分享，请重试。" } }
+      }
+    },
+    "Open source memory citation": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Open source memory citation" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "打开来源记忆引用" } }
+      }
+    },
+    "Source available": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Source available" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "来源可用" } }
+      }
+    },
+    "Source currently unavailable": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Source currently unavailable" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "来源当前不可用" } }
+      }
+    },
+    "The current privacy policy no longer permits opening this source.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "The current privacy policy no longer permits opening this source." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "当前隐私策略已不允许打开此来源。" } }
+      }
+    },
+    "This source memory is currently unavailable.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "This source memory is currently unavailable." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "此来源记忆当前不可用。" } }
+      }
     }
   },
   "version": "1.0"

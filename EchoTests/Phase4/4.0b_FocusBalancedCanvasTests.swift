@@ -72,12 +72,19 @@ struct FocusBalancedCanvasTests {
     @Test("AC-4: citations revalidate before stable MemoryID routing and NoSource is non-interactive")
     func test_AC4_creationCitationRouting() throws {
         let source = try loadSource("Echo/UI/Creation/CreationView.swift")
+        let viewModel = try loadSource("Echo/UI/Creation/CreationViewModel.swift")
 
         #expect(source.contains("viewModel.openCitation(citation)"))
         #expect(source.contains("navigationDestination(item: $viewModel.navigationMemoryID)"))
         #expect(source.contains("MemoryDetailView(memoryId: memoryID)"))
         #expect(source.contains("creation-citation-no-source"))
         #expect(source.contains("No source for part or all of this paragraph"))
+        #expect(source.contains(".accessibilityValue("))
+        #expect(source.contains("Source currently unavailable"))
+        #expect(viewModel.contains("showCitationError"))
+        #expect(viewModel.contains("current privacy policy no longer permits opening"))
+        #expect(viewModel.contains("This source memory is currently unavailable."))
+        #expect(!viewModel.contains("showHandoffError(error)\n            }\n            return"))
     }
 
     @Test("AC-4: Notes handoff never exposes a fabricated saved state or link")
@@ -136,7 +143,6 @@ struct FocusBalancedCanvasTests {
     @Test("AC-4: Markdown export distinguishes unavailable provenance from a source anchor")
     func test_AC4_markdownExportPreservesNoSourceTruth() throws {
         let viewModel = CreationViewModel()
-        let memoryID = UUID()
         viewModel.loadPreloaded(CreationModel(
             selectedTemplate: .letter,
             title: "Grounded draft",
@@ -158,8 +164,18 @@ struct FocusBalancedCanvasTests {
         let payload = try #require(viewModel.sharePayload)
         #expect(payload.kind == .markdown)
         #expect(payload.text.contains("NoSource"))
-        #expect(!payload.text.contains(memoryID.uuidString))
+        #expect(!payload.text.contains("MemoryID:"))
         #expect(payload.attachmentURL == nil)
+    }
+
+    @Test("AC-4: generated-state contract describes user-mediated Notes handoff")
+    func test_AC4_generatedContractDoesNotClaimNotesWasSaved() throws {
+        let contract = try loadJSON("UIAutomation/Contracts/instances/creation-state-generated.json")
+        let semantics = try #require(contract["expectedSemantics"] as? [String: Any])
+        let notesOutcome = try #require(semantics["saveToNotesButton"] as? String)
+
+        #expect(notesOutcome.contains("system share controller"))
+        #expect(!notesOutcome.contains("Save to Apple Notes"))
     }
 
     @Test("AC-4: PDF export prepares a real local PDF attachment")

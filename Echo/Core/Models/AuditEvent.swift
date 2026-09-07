@@ -10,7 +10,8 @@
 //       4.0i - Typed grounded-generation and system-share audit
 // AC 覆盖: AGENTS.md §5.4 (必填字段 eventType/timestamp/traceID/policyVersion/success, hash-only, 30天, 加密),
 //          US-PRV-006 AC-6 (retentionPolicyEvaluated), ADR-007 §决策-3 (purgeFailed 审计),
-//          US-RET-005 AC-4 ✅ (followUpQuery, 2026-08-11 3F.6), US-SRC-010 AC-5 ✅ (crossAppSearch)
+//          US-RET-005 AC-4 ✅ (followUpQuery, 2026-08-11 3F.6), US-SRC-010 AC-5 ✅ (crossAppSearch),
+//          4.0i AC-5/6 (typed creation audit and exact hash-only share handoff identity)
 // 架构约束: AGENTS.md R-007 (禁止 unchecked Sendable), 仅记录哈希摘要禁止原文
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
 // Generated: 2026-08-04 | Updated: 2026-09-07 (4.0i typed creation/share audit)
@@ -162,6 +163,8 @@ public struct AuditLogEntry: Sendable, Codable {
     public nonisolated let exportFormat: String?
     public nonisolated let sharePresented: Bool?
     public nonisolated let periodType: String?
+    /// Hash-only identity for one system-share handoff; used for durable idempotency.
+    public nonisolated let shareHandoffIdDigest: String?
 
     public nonisolated init(
         id: Int64 = 0,
@@ -201,7 +204,8 @@ public struct AuditLogEntry: Sendable, Codable {
         noSourceCount: Int? = nil,
         exportFormat: String? = nil,
         sharePresented: Bool? = nil,
-        periodType: String? = nil
+        periodType: String? = nil,
+        shareHandoffIdDigest: String? = nil
     ) {
         self.id = id
         self.eventType = eventType
@@ -241,6 +245,7 @@ public struct AuditLogEntry: Sendable, Codable {
         self.exportFormat = exportFormat
         self.sharePresented = sharePresented
         self.periodType = periodType
+        self.shareHandoffIdDigest = shareHandoffIdDigest
     }
 
     /// 从数据库查询结果行构造 AuditLogEntry（用于 fetchAuditLogs）
@@ -289,7 +294,8 @@ public struct AuditLogEntry: Sendable, Codable {
             noSourceCount: row["noSourceCount"]?.intValue.map(Int.init),
             exportFormat: row["exportFormat"]?.stringValue,
             sharePresented: row["sharePresented"]?.intValue.map { $0 != 0 },
-            periodType: row["periodType"]?.stringValue
+            periodType: row["periodType"]?.stringValue,
+            shareHandoffIdDigest: row["shareHandoffIdDigest"]?.stringValue
         )
     }
 }

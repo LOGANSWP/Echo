@@ -348,7 +348,12 @@ struct CreationView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("creation-citation-anchor-\(citation.memoryId.uuidString.prefix(8))")
-        .accessibilityLabel("Open source memory citation")
+        .accessibilityLabel(Text(EchoStrings.tr("Open source memory citation")))
+        .accessibilityValue(Text(
+            citation.availability == .available
+                ? EchoStrings.tr("Source available")
+                : EchoStrings.tr("Source currently unavailable")
+        ))
     }
 
     /// 操作按钮行 — 复制 / 导出 / 保存 / 分享。

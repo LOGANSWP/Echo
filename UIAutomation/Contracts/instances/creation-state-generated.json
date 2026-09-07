@@ -14,8 +14,8 @@
     "citationAnchors": "zero or more valid Source memory anchors per paragraph plus explicit noSource/partialNoSource status; no Verified fact claim",
     "copyButton": "Revalidate current policy, then copy citation-preserving content or show a recoverable authorization error",
     "exportButton": "Revalidate current policy, then export citation-preserving PDF/Markdown; PDF supports multiple pages without truncation",
-    "saveToNotesButton": "Save to Apple Notes (US-SYN-003 AC-4)",
+    "saveToNotesButton": "Revalidate current policy, prepare a citation-preserving local export, and present the user-mediated system share controller without claiming the content was saved to Notes",
     "shareButton": "Share/export/print narrative report (US-SYN-004 AC-4)"
   },
-  "version": "1.1.0"
+  "version": "1.1.1"
 }

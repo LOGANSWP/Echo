@@ -64,8 +64,11 @@
 - `exportFormat TEXT`，allow-list 为 `plainText | markdown | pdf`
 - `sharePresented INTEGER`
 - `periodType TEXT`，可选，allow-list 为 `month | year`
+- `shareHandoffIdDigest TEXT`，对 payload UUID 小写字符串计算 SHA-256；`.creationSharePresented` 必填并以 partial unique index 保证每次 handoff 至多一条审计记录
 
 禁止把这些字段编码进 `sourceLanguage`、`contentHash` 或通用自由文本。`.creationSharePresented` 不记录 `activityType`、目标 App、用户完成状态、导出原文、`assetID` 或 `sourceLocator`。
+
+幂等重试必须按 `shareHandoffIdDigest` 精确查询，不得扫描固定数量的最近记录，也不得以可复用的 `traceID + exportFormat + sharePresented` 代替 handoff 身份。无效 `periodType` 属于输入校验失败，在任何审计写入或 `PendingOperations` 入队前 fail-closed；只有真实数据库写入失败才进入持久化重试。
 
 ## 备选方案
 

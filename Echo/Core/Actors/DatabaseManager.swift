@@ -11,7 +11,8 @@
 // AC 覆盖: D-005 deletion journal persists phase, vector plan, and exclusion intent;
 //          US-AWK-005 AC-4/5 (feeling cascade and structured interaction audit);
 //          4.0f AC-3/6 (awakening preferences and honest HealthKit request state);
-//          4.0h AC-2/3/5 (source deletion recovery and structured audit state)
+//          4.0h AC-2/3/5 (source deletion recovery and structured audit state);
+//          4.0i AC-6 (unique exact share handoff audit identity)
 // Generated: 2026-07-04; Updated: 2026-09-07 (4.0i)
 // ==========================================
 
@@ -263,6 +264,14 @@ public actor DatabaseManager {
         if !auditColumns.contains("periodType") {
             try execute(sql: "ALTER TABLE AuditLog ADD COLUMN periodType TEXT")
         }
+        if !auditColumns.contains("shareHandoffIdDigest") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN shareHandoffIdDigest TEXT")
+        }
+        try execute(sql: """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_auditlog_share_handoff
+            ON AuditLog(shareHandoffIdDigest)
+            WHERE eventType = 'creationSharePresented' AND shareHandoffIdDigest IS NOT NULL
+            """)
         try execute(sql: "CREATE INDEX IF NOT EXISTS idx_auditlog_subject_hash ON AuditLog(subjectHash)")
         // WP3 steps 3i-3t2 (photo-text-search): D-005 resumable deletion journal
         try execute(sql: """

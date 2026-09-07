@@ -4,7 +4,7 @@
 //       docs/decisions/ADR-020-grounded-citation-share-audit.md
 // Task: 4.0i - Verifiable citations, stable navigation, and system-share audit
 // AC coverage: current-policy revalidation, truthful unavailable sources, controller-backed
-//              share audit, and content-free idempotent L2 retry records
+//              share audit, exact hash-only handoff idempotency, and content-free L2 retry records
 // Architecture: AGENTS.md §4.2, §4.4, §7; ADR-020 decisions 5-8
 // Generated: 2026-09-07
 // ==========================================
@@ -26,6 +26,7 @@ public nonisolated enum CreationExportFormat: String, Sendable, Codable, Equatab
 public nonisolated enum CreationExportError: Error, LocalizedError, Sendable, Equatable {
     case privacyDenied
     case sourceUnavailable
+    case invalidPeriodType
     case auditPersistenceFailed
 
     public nonisolated var errorDescription: String? {
@@ -34,6 +35,8 @@ public nonisolated enum CreationExportError: Error, LocalizedError, Sendable, Eq
             "The current privacy policy no longer permits this creation action."
         case .sourceUnavailable:
             "The source memory is currently unavailable."
+        case .invalidPeriodType:
+            "The report period is invalid."
         case .auditPersistenceFailed:
             "The share handoff occurred, but its audit record is pending retry."
         }
@@ -51,6 +54,7 @@ private nonisolated struct CreationShareAuditRetry: Codable, Sendable {
 
 /// Composition-owned action boundary for citation navigation and user-mediated exports.
 public actor CreationExportCoordinator {
+    private static let validPeriodTypes: Set<String> = ["month", "year"]
     private let privacyActor: PrivacyActor
     private let sourceResolver: any CreationSourceResolving
     private let pendingOps: PendingOpsActor
@@ -162,8 +166,16 @@ public actor CreationExportCoordinator {
         traceID: String,
         presented: Bool
     ) async throws {
+        guard periodType.map(Self.validPeriodTypes.contains) ?? true else {
+            throw CreationExportError.invalidPeriodType
+        }
+        let handoffDigest = Self.handoffDigest(payloadID)
         let policy = await privacyActor.getPolicy()
         do {
+            let alreadyRecorded = try await privacyActor.hasCreationShareAudit(
+                shareHandoffIdDigest: handoffDigest
+            )
+            guard !alreadyRecorded else { return }
             try await privacyActor.writeAuditLog(
                 eventType: .creationSharePresented,
                 traceID: traceID,
@@ -171,9 +183,15 @@ public actor CreationExportCoordinator {
                 success: presented,
                 exportFormat: format.rawValue,
                 sharePresented: presented,
-                periodType: periodType
+                periodType: periodType,
+                shareHandoffIdDigest: handoffDigest
             )
         } catch {
+            if (try? await privacyActor.hasCreationShareAudit(
+                shareHandoffIdDigest: handoffDigest
+            )) == true {
+                return
+            }
             let retry = CreationShareAuditRetry(
                 schemaVersion: 1,
                 payloadID: payloadID,
@@ -208,28 +226,41 @@ public actor CreationExportCoordinator {
               ) else {
             return false
         }
-
-        let existing = try await privacyActor.fetchAuditLogs(
-            limit: 100,
-            eventType: .creationSharePresented
-        ).contains {
-            $0.traceID == retry.traceID
-                && $0.exportFormat == retry.exportFormat.rawValue
-                && $0.sharePresented == retry.sharePresented
+        guard retry.schemaVersion == 1,
+              retry.periodType.map(Self.validPeriodTypes.contains) ?? true else {
+            throw CreationExportError.invalidPeriodType
         }
+
+        let handoffDigest = Self.handoffDigest(retry.payloadID)
+        let existing = try await privacyActor.hasCreationShareAudit(
+            shareHandoffIdDigest: handoffDigest
+        )
         if !existing {
             let policy = await privacyActor.getPolicy()
-            try await privacyActor.writeAuditLog(
-                eventType: .creationSharePresented,
-                traceID: retry.traceID,
-                policyVersion: policy.policyVersion,
-                success: retry.sharePresented,
-                exportFormat: retry.exportFormat.rawValue,
-                sharePresented: retry.sharePresented,
-                periodType: retry.periodType
-            )
+            do {
+                try await privacyActor.writeAuditLog(
+                    eventType: .creationSharePresented,
+                    traceID: retry.traceID,
+                    policyVersion: policy.policyVersion,
+                    success: retry.sharePresented,
+                    exportFormat: retry.exportFormat.rawValue,
+                    sharePresented: retry.sharePresented,
+                    periodType: retry.periodType,
+                    shareHandoffIdDigest: handoffDigest
+                )
+            } catch {
+                guard (try? await privacyActor.hasCreationShareAudit(
+                    shareHandoffIdDigest: handoffDigest
+                )) == true else {
+                    throw CreationExportError.auditPersistenceFailed
+                }
+            }
         }
         _ = try await pendingOps.remove(operationId: operationID)
         return !existing
+    }
+
+    private nonisolated static func handoffDigest(_ payloadID: UUID) -> String {
+        AuditContentHasher.sha256Hex(payloadID.uuidString.lowercased())
     }
 }

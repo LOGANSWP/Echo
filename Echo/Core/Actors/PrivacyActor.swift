@@ -15,6 +15,7 @@
 //          AC-7 (search is an operation, not an authorized source type),
 //          US-AWK-005 AC-5 (结构化卡片交互字段写入与公开读取),
 //          4.0h AC-2/3/5 (structured source deletion and cascade cleanup audit),
+//          4.0i AC-5/6 (typed creation audit and exact hash-only share handoff identity),
 //          PR review 修复: 同意闸门仅 .denied 短路，.allowed 落入 per-source 授权检查 (US-PRV-001)
 // 架构约束: 遵循 AGENTS.md §4.2 (Actor 隔离契约), §7.1 (PrivacyCheckpoint 强制注入),
 //           §7.3 (审计日志), §5.4 (30天保留), R-006 (审计强制覆盖),
@@ -403,16 +404,23 @@ public actor PrivacyActor {
         noSourceCount: Int? = nil,
         exportFormat: String? = nil,
         sharePresented: Bool? = nil,
-        periodType: String? = nil
+        periodType: String? = nil,
+        shareHandoffIdDigest: String? = nil
     ) async throws {
         let validExportFormats: Set<String> = ["plainText", "markdown", "pdf"]
         let validPeriodTypes: Set<String> = ["month", "year"]
+        let hasValidShareDigest = shareHandoffIdDigest.map {
+            $0.count == 64 && $0.allSatisfy(\.isHexDigit)
+        } ?? false
         guard exportFormat.map(validExportFormats.contains) ?? true,
               periodType.map(validPeriodTypes.contains) ?? true,
               sourceMemoryCount.map({ $0 >= 0 }) ?? true,
               citationCount.map({ $0 >= 0 }) ?? true,
               noSourceCount.map({ $0 >= 0 }) ?? true,
-              eventType != .creationSharePresented || (exportFormat != nil && sharePresented != nil) else {
+              eventType == .creationSharePresented || shareHandoffIdDigest == nil,
+              eventType != .creationSharePresented || (
+                exportFormat != nil && sharePresented != nil && hasValidShareDigest
+              ) else {
             throw AuditValidationError.invalidCreationFields
         }
         let write = Self.makeAuditWrite(
@@ -453,7 +461,8 @@ public actor PrivacyActor {
             noSourceCount: noSourceCount,
             exportFormat: exportFormat,
             sharePresented: sharePresented,
-            periodType: periodType
+            periodType: periodType,
+            shareHandoffIdDigest: shareHandoffIdDigest
         )
         try await db.executeWrite(sql: write.sql, bindings: write.bindings)
     }
@@ -497,14 +506,15 @@ public actor PrivacyActor {
         exportFormat: String? = nil,
         sharePresented: Bool? = nil,
         periodType: String? = nil,
+        shareHandoffIdDigest: String? = nil,
         timestamp: Date = Date()
     ) -> DatabaseManager.DBWrite {
         // Hash content fields before persistence (AGENTS.md §5.4).
         let contentHash = content.map { AuditContentHasher.sha256Hex($0) }
         return DatabaseManager.DBWrite(
             sql: """
-                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
             bindings: [
                 .text(eventType.rawValue),
@@ -546,6 +556,7 @@ public actor PrivacyActor {
                 exportFormat.map { .text($0) } ?? .null,
                 sharePresented.map { .int($0 ? 1 : 0) } ?? .null,
                 periodType.map { .text($0) } ?? .null,
+                shareHandoffIdDigest.map { .text($0) } ?? .null,
             ]
         )
     }
@@ -597,7 +608,7 @@ public actor PrivacyActor {
                        preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted,
                        sourceDeletionOutcome, excludedAutoCleaned, userNotified,
                        templateType, sourceMemoryCount, citationCount, noSourceCount,
-                       exportFormat, sharePresented, periodType
+                       exportFormat, sharePresented, periodType, shareHandoffIdDigest
                 FROM AuditLog WHERE eventType = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.text(eventType.rawValue), .int(Int64(limit)), .int(Int64(offset))]
@@ -612,13 +623,28 @@ public actor PrivacyActor {
                        preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted,
                        sourceDeletionOutcome, excludedAutoCleaned, userNotified,
                        templateType, sourceMemoryCount, citationCount, noSourceCount,
-                       exportFormat, sharePresented, periodType
+                       exportFormat, sharePresented, periodType, shareHandoffIdDigest
                 FROM AuditLog ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.int(Int64(limit)), .int(Int64(offset))]
         }
         let rows = try await db.executeQuery(sql: sql, bindings: bindings)
         return rows.compactMap { AuditLogEntry.fromRow($0) }
+    }
+
+    /// Exact hash-only lookup for durable system-share audit idempotency.
+    public func hasCreationShareAudit(shareHandoffIdDigest: String) async throws -> Bool {
+        let rows = try await db.executeQuery(
+            sql: """
+                SELECT 1 AS present FROM AuditLog
+                WHERE eventType = ? AND shareHandoffIdDigest = ? LIMIT 1
+                """,
+            bindings: [
+                .text(AuditEvent.creationSharePresented.rawValue),
+                .text(shareHandoffIdDigest),
+            ]
+        )
+        return rows.first?["present"]?.intValue == 1
     }
 
     /// 审计日志总数

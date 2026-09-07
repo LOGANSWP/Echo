@@ -175,6 +175,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
         get { sharePayload != nil }
         set {
             if !newValue {
+                activeSharePayload = nil
+                presentedPayloadIDs.removeAll()
                 sharePayload = nil
             }
         }
@@ -530,14 +532,26 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     private func completeCopy(_ output: CreativeOutput) {
         UIPasteboard.general.string = CreationExportService.plainText(from: output)
-        UIAccessibility.post(notification: .announcement, argument: "Creation copied to clipboard")
+        UIAccessibility.post(
+            notification: .announcement,
+            argument: EchoStrings.tr("Creation copied to clipboard")
+        )
     }
 
     private func showHandoffError() {
+        activeSharePayload = nil
+        presentedPayloadIDs.removeAll()
         sharePayload = nil
         viewState = .error(.l2Recoverable(
-            message: "Unable to prepare this creation for sharing. Please try again."
+            message: EchoStrings.tr("Unable to prepare this creation for sharing. Please try again.")
         ))
+    }
+
+    private func showCitationError(_ error: CreationExportError) {
+        let message = error == .privacyDenied
+            ? EchoStrings.tr("The current privacy policy no longer permits opening this source.")
+            : EchoStrings.tr("This source memory is currently unavailable.")
+        viewState = .error(.l2Recoverable(message: message))
     }
 
     func openCitation(_ citation: CreationCitation) {
@@ -552,7 +566,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
         }
         Task { [weak self] in
             guard let self, let coordinator = self.exportCoordinator else {
-                self?.showHandoffError()
+                self?.showCitationError(.sourceUnavailable)
                 return
             }
             do {
@@ -560,8 +574,10 @@ final class CreationViewModel: CreationSharePresentationReporting {
                     anchor: anchor,
                     traceID: UUID().uuidString
                 )
+            } catch let error as CreationExportError {
+                self.showCitationError(error)
             } catch {
-                self.showHandoffError()
+                self.showCitationError(.sourceUnavailable)
             }
         }
     }
@@ -744,6 +760,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
         generateTask = nil
         exportTask?.cancel()
         exportTask = nil
+        activeSharePayload = nil
+        presentedPayloadIDs.removeAll()
         sharePayload = nil
     }
 }

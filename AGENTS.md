@@ -1,6 +1,6 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v5.48
+**版本**：v5.49
 **生效日期**：2026-09-07
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（Codex / OpenCode / Cursor / Claude）及人类开发者
 **优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
@@ -462,7 +462,7 @@ ExcludedAssets 禁止写入条件:
 ```yaml
 审计日志契约:
   - 强制字段: eventType, timestamp, traceID, policyVersion, success
-  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType
+  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest
   - 隐私保护: 标识符和内容仅记录哈希摘要，禁止原文；枚举/布尔/进度整数可作为结构化字段
   - 保留期: 30 天，超期自动清理
   - 加密: NSFileProtectionComplete
@@ -562,7 +562,7 @@ let checkpoint = await PrivacyActor.shared.validate(
 | `.memoryEdited`                   | 手动编辑记忆             | editedFields, reindexed, conflictResolvedWith             |
 | `.synthesis`                      | 来源锚点解析与校验       | citationCount, noSourceCount；MemoryID 仅 hash digest     |
 | `.creativeGeneration`             | 创作生成完成             | templateType, sourceMemoryCount, citationCount, noSourceCount；不记录正文 |
-| `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat=`plainText/markdown/pdf`, sharePresented, periodType=`month/year`（可选）；不记录 activityType、目标 App、完成状态、原文或 source locator |
+| `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat=`plainText/markdown/pdf`, sharePresented, periodType=`month/year`（可选）, shareHandoffIdDigest；不记录 activityType、目标 App、完成状态、原文或 source locator |
 | `.narrativeReportGenerated`       | 月度/年度报告生成         | periodType, dataSourcesUsed, periodKeyDigest               |
 | `.cardInteraction`               | 交互式唤醒卡动作       | action=next/record/jump, cardIdDigest, memoryIdDigest, feelingAssociatedToSource（hash-only，禁止感受原文） |
 | `.feedbackReceived`               | 反馈收集                 | sentiment, decayFactor                                    |
@@ -1418,7 +1418,7 @@ Echo 固定采用用户已批准的 **`echo-memory-canvas`** 设计配置，扩�
 
 **4.0d 交互式唤醒卡边界（2026-09-02 规格审查）**：音乐建议默认且始终可从随 App 打包的离线年份曲库产生；仅当用户在卡片中显式选择“匹配此设备音乐”后，才可请求媒体库权限并通过 `MPMediaQuery` 读取 `isCloudItem == false` 的本地曲目元数据。禁止 `MusicCatalog*`、personal recommendations、recently played 和任意 MusicKit Web Service，禁止上传记忆派生数据。领域 API 可暴露 `userFeelings` 集合，但物理存储必须为以 `memoryId` 为外键的 `MemoryFeeling` 关系表；感受不创建 Memory/Representation，不进入搜索或翻译索引。`next` 按稳定唤醒顺序前进，`record` 仅在事务成功后成立；`.cardInteraction` 仅记录 action、hash-only card/memory digest 与布尔 `feelingAssociatedToSource`。`4.0d` 只负责 card→typed Focus 路由，Focus 内真实来源解析/删除由 `4.0h` 交付，可验证 source anchor 与分享审计由 `4.0i` 交付。详见 ADR-016/017。
 
-**4.0e~4.0j Focus 生产边界（2026-09-07 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 使用版本化、有大小/数量上限的结构化生成 envelope；每段显式返回 `sourceMemoryIDs[]`，仅接受当前策略过滤后实际提交模型的 opaque MemoryID allow-list，禁止暴露 source locator 或 round-robin 伪绑定。allow-list 只验证 provenance 身份，不自动证明事实语义；多引用、`NoSource` 与 `partialNoSource` 必须类型化表达。锚点导航及复制、Markdown/PDF/plain-text 分享准备前均重新执行当前 UserPolicy/PrivacyCheckpoint；所有格式保留可理解引用。`.synthesis`、`.creativeGeneration` 与 `.creationSharePresented` 使用专用结构化审计列；只有系统面板实际呈现回调后才写 `sharePresented=true`，准备/呈现失败写 false，呈现后取消不算失败，呈现后的审计写入失败不得改写呈现事实。`4.0j` 以持久周期键和 TaskQueueActor earliest-eligible 生成月报/年报，不承诺精确后台时刻或伪造不可用分区。详见 ADR-017/019/020。
+**4.0e~4.0j Focus 生产边界（2026-09-07 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 使用版本化、有大小/数量上限的结构化生成 envelope；每段显式返回 `sourceMemoryIDs[]`，仅接受当前策略过滤后实际提交模型的 opaque MemoryID allow-list，禁止暴露 source locator 或 round-robin 伪绑定。allow-list 只验证 provenance 身份，不自动证明事实语义；多引用、`NoSource` 与 `partialNoSource` 必须类型化表达。锚点导航及复制、Markdown/PDF/plain-text 分享准备前均重新执行当前 UserPolicy/PrivacyCheckpoint；所有格式保留可理解引用。`.synthesis`、`.creativeGeneration` 与 `.creationSharePresented` 使用专用结构化审计列；每个 share handoff 以 hash-only `shareHandoffIdDigest` 和唯一索引提供无窗口幂等性。只有系统面板实际呈现回调后才写 `sharePresented=true`，准备/呈现失败写 false，呈现后取消不算失败，呈现后的审计写入失败不得改写呈现事实；无效 `periodType` 在入队前 fail-closed，不得伪装成持久化故障。`4.0j` 以持久周期键和 TaskQueueActor earliest-eligible 生成月报/年报，不承诺精确后台时刻或伪造不可用分区。详见 ADR-017/019/020。
 
 ### 17.3 双状态模型
 
@@ -1555,3 +1555,4 @@ $init-session-echo → $next-task-echo → $ui-bootstrap-build-echo <task-id>
 | v5.46 | 2026-09-05 | 4.0h 规格合理性复审（ADR-019）：来源内容可用性与删除能力分面建模；PhotoKit 删除要求 `canPerform(.delete)`；扩展同一删除 journal 的外部结果门禁，只有 confirmedDeleted 才能推进 D-005；limited-hidden/撤权不可见不作为删除证据；Share Extension 不猜测 host App，非持久化音频只展示转写；`userNotified` 仅在提示实际展示后为 true。 | Codex |
 | v5.47 | 2026-09-06 | 4.0h PR 预审修订：统一删除审计字段为生产 schema 的 `excludedWritten`；补齐 observer 注册前基线、全量 PhotoKit 前台补偿、活跃删除竞态隔离、逐 journal 容错、通知确认事务与非阻断 UI 结果；同步修复 Share Extension 备忘录 AC 和 Phase 3F 基线状态一致性。 | Codex |
 | v5.48 | 2026-09-07 | 4.0i 规格合理性复审（ADR-020）：明确 allow-list 只验证来源身份、不自动证明事实；采用版本化有界 JSON、多引用与 partialNoSource；复制/导出前重验当前授权；以真实系统呈现回调区分准备/呈现/取消/审计失败；新增专用结构化生成与分享审计字段，并澄清用户主动复制或系统 share/export 是 R-001 允许的受控外部交接。 | Codex |
+| v5.49 | 2026-09-07 | 4.0i PR 预审修订：为每次系统分享增加 hash-only `shareHandoffIdDigest` 与唯一索引，移除 100 条扫描窗口和复用 traceID 误判；无效 periodType 不进入持久化重试；清理陈旧 handoff ownership，并补齐来源可用性无障碍语义、导航专用错误与 Notes 合约措辞。 | Codex |
