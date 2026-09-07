@@ -3,18 +3,18 @@
   "designProfileId": "echo-memory-canvas",
   "surfaceId": "creation",
   "surfaceFamily": "focus",
-  "responsibility": "Render grounded creation whose paragraph source IDs were explicitly emitted and validated against the current input allow-list, with stable Detail anchors, NoSource fallback, local copy/export and a user-mediated system share handoff. Never infer sources by paragraph position or claim a saved Note.",
+  "responsibility": "Render provenance-grounded creation from a versioned bounded JSON envelope whose opaque paragraph source IDs were explicitly emitted and validated against the exact currently authorized submitted-input allow-list. Express multiple anchors plus cited/noSource/partialNoSource, route through current-policy revalidation, and preserve citation semantics across copy/export/share. Never infer sources by position, claim automatic fact verification, or claim a saved Note.",
   "inputs": {
     "templateType": "Preset creation template: letter | report | poem | timeline (US-SYN-003 AC-1)",
-    "sourceMemories": "Retrieved memory summaries with citation anchors (US-SYN-002/003 AC-2)",
-    "generatedContent": "Structured CreativePipeline output with per-paragraph explicit source MemoryIDs validated against sourceMemories; unknown/missing IDs become NoSource. Fixture output is Preview/test-only.",
+    "sourceMemories": "Current-policy-filtered retrieved memory summaries with opaque MemoryIDs; assetID/sourceLocator/source App identity never enters the model envelope",
+    "generatedContent": "Versioned JSON CreativePipeline output bounded by raw bytes, paragraph count, paragraph characters and references per paragraph. Each paragraph has text + sourceMemoryIDs[]. Unknown version, malformed root or any limit breach fails the whole generation as L2. Validated output carries [SourceAnchor] plus cited/noSource/partialNoSource; fixture output is Preview/test-only.",
     "preferredLanguage": "UserPolicy.preferredLanguage (zh-Hans | en-US) — output language",
     "promptDraft": "Personalized System Prompt draft (US-SYN-005) — editable, confirm/reset"
   },
   "outputs": {
-    "visibleContent": "Template picker, generation progress, validated source anchors, NoSource, copy/export/share/Save to Notes handoff actions and honest error states. Successful share-sheet presentation writes creationSharePresented with structured sharePresented=true; Echo does not record activityType, target App, completion or content.",
+    "visibleContent": "Template picker, generation progress, provenance-labelled source anchors, NoSource/partial-NoSource warnings, copy/export/share/Save to Notes handoff actions and honest error states. Allow-list membership is labelled Source memory, never Verified fact. Copy and export preparation revalidate current UserPolicy + PrivacyCheckpoint; revoked sources block derived-body handoff. Successful share-controller presentation callback writes creationSharePresented with structured sharePresented=true; Echo does not record activityType, target App, completion, content or source locators.",
     "interactionTargets": "creation-generate, creation-copy, creation-export, creation-save-to-notes, creation-retry, creation-edit-prompt, creation-confirm-prompt, creation-reset-prompt, creation-citation-anchor-*",
-    "accessibilityTree": "Generated content with source citation semantics; system share handoff is announced without claiming a final save result; prompt editor is editable text with confirm/reset actions"
+    "accessibilityTree": "Generated content exposes cited/noSource/partialNoSource and each valid source anchor without claiming factual verification; system share handoff is announced only after actual presentation and without claiming a final save result; prompt editor is editable text with confirm/reset actions"
   },
   "systemContainer": "NavigationStack (pushed from MemoryDetailView creation entry) + ScrollView + Form sheet (prompt editor) + confirmationDialog (export format) + item-driven system share handoff",
   "layoutMode": "single_column",
@@ -30,5 +30,5 @@
     "error",
     "share-handoff"
   ],
-  "version": "1.2.0"
+  "version": "1.3.0"
 }

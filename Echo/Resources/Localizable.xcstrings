@@ -6338,6 +6338,30 @@
         "en-US": { "stringUnit": { "state": "translated", "value": "Unable to delete the original source. Your Echo memory was kept." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法删除原始来源，Echo 记忆已保留。" } }
       }
+    },
+    "MemoryID: %@": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "MemoryID: %@" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "记忆 ID：%@" } }
+      }
+    },
+    "No source for part or all of this paragraph": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "No source for part or all of this paragraph" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "此段落的部分或全部内容没有来源" } }
+      }
+    },
+    "The share was presented, but its audit record is pending retry.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "The share was presented, but its audit record is pending retry." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "分享面板已显示，但审计记录仍待重试。" } }
+      }
+    },
+    "Unable to present the system share sheet. Please try again.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to present the system share sheet. Please try again." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法显示系统分享面板，请重试。" } }
+      }
     }
   },
   "version": "1.0"

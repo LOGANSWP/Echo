@@ -46,17 +46,17 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 
 该 saga 复用现有 `MemoryDeletionJournal` 与后续 D-005 phase，不建立第二套本地清理状态机；但必须增加正交的外部结果门禁，不能让 `.planned` 同时承担两种语义。`4.0h` 补充 PhotoKit 请求前后的编排、能力解析、schema 演进和恢复判定，完整规则以 ADR-019 为准。
 
-### 5. 引用必须由模型输出绑定并经过校验
+### 5. 引用必须由模型输出绑定并经过校验（由 ADR-020 收紧）
 
-生成协议要求每个段落返回显式 source memory IDs。解析器只接受本次输入集合中的稳定 MemoryID；未知、缺失或无法解析的 ID 不得轮询替换，相关段落标记 `NoSource`。有来源锚点点击后重新按当前 UserPolicy 和 source resolver 校验，再进入对应 Detail；失败显示诚实不可用状态。
+生成协议要求每个段落返回显式 source memory IDs。ADR-020 进一步要求版本化、有字节/段落/字符/引用数上限的 JSON envelope，只向模型暴露 opaque MemoryID。解析器只接受当前策略过滤后实际提交模型的稳定 MemoryID；未知、缺失或无法解析的 ID 不得轮询替换。每段以 `[SourceAnchor]` 和 `cited/noSource/partialNoSource` 表达 provenance；allow-list 命中不声称自动证明事实。有来源锚点点击后重新按当前 UserPolicy 和 source resolver 校验，再进入对应 Detail；失败显示诚实不可用状态。
 
-### 6. 分享与生成审计分离
+### 6. 分享与生成审计分离（由 ADR-020 收紧）
 
 - `.creativeGeneration`：生成完成时记录 `templateType`、`sourceMemoryCount`、`citationCount`、`noSourceCount`。
 - `.creationSharePresented`：本地导出准备完成且系统 share sheet 成功呈现后记录 `exportFormat`、`sharePresented=true`，报告可附 `periodType`。
 - `.narrativeReportGenerated`：报告生成后记录 `periodType`、实际使用的数据源类别和幂等周期键摘要。
 
-`sharePresented` 使用结构化布尔字段，不哈希；MemoryID、周期幂等键和自由文本只保存摘要。Echo 不持久化 `activityType`、目标 App、用户完成状态或导出原文。用户关闭已呈现的 share sheet 不算失败；导出准备或面板呈现失败按 L2 处理，并写 `sharePresented=false`。
+`sharePresented` 使用结构化布尔字段，不哈希；MemoryID、周期幂等键和自由文本只保存摘要。Echo 不持久化 `activityType`、目标 App、用户完成状态或导出原文。复制与所有导出准备前重新执行当前 UserPolicy + PrivacyCheckpoint，所有格式保留引用。只有系统控制器实际呈现回调后才写 true；用户关闭已呈现的 share sheet 不算失败，准备或未进入呈现回调即失败按 L2 并写 false。真实呈现后的审计写入失败不得改写事实，须进入不含原文/目标的幂等 L2 重试。审计字段必须使用专用 typed columns，不得编码进 `sourceLanguage`；完整规则见 ADR-020。
 
 ### 7. 叙事报告采用持久的 earliest-eligible 调度
 
@@ -87,4 +87,5 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 - `docs/decisions/ADR-010-canonical-generation-lifecycle.md`
 - `docs/decisions/ADR-013-creation-export-boundary.md`
 - `docs/decisions/ADR-019-photokit-source-deletion-recovery.md`
+- `docs/decisions/ADR-020-grounded-citation-share-audit.md`
 - Apple Developer Documentation: `PHAssetChangeRequest.deleteAssets(_:)`, `UIActivityViewController.completionWithItemsHandler`

@@ -22,7 +22,7 @@
 | **Phase 3F 执行计划**  | `05-planning/phase3f-execution-plan.md`           | Phase 3F 开发 Agent 执行指令与任务账本迁移契约    |
 | **Phase 3F 故事矩阵**  | `05-planning/phase3f-story-matrix.md`             | 66 个用户故事的 Phase 3F 归属矩阵                 |
 | **Phase 3F 证据索引**  | `05-planning/phase3f-evidence-index.md`           | Phase 3F 预合并证据索引                           |
-| **决策记录 (ADR)**     | `decisions/ADR-001~019`                            | SQLite/并发、Phase 3F、检索、唤醒卡、Focus 写入/来源/创作、渐进式权限与 PhotoKit 删除恢复边界等决策 |
+| **决策记录 (ADR)**     | `decisions/ADR-001~020`                            | SQLite/并发、Phase 3F、检索、唤醒卡、Focus 写入/来源/创作、渐进式权限、PhotoKit 删除恢复与来源锚点/分享审计边界等决策 |
 | **疑难杂症问题**       | `06-troubleshooting/`                              | 架构性限制/难解问题的定位与根因分析（如照片文本搜索跨模态限制） |
 | **UI 文档路由**        | `ui/README.md`                                     | Phase 3 UI 设计配置、自动化工作流、架构边界、测试 |
 | **UI 设计风格**        | `ui/echo-memory-canvas-style.md`                   | 全 App 方案 B「平衡画布」、共享 profile/token/component、Discovery masonry 与 Focus/Task 同源表达 |

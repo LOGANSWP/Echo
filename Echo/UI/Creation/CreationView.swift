@@ -6,7 +6,7 @@
 //            docs/ui/echo-memory-canvas-style.md §3.2 (Focus surfaces — 单列 + grouped metadata),
 //            §4 (共享 Token), §7.1 (Focus 共享表达), §10.1.2 (数据加载失败空态),
 //            docs/ui/architecture.md §3 (Surface View), §8 (Focus family)
-// Task: 4.0b - Balanced Canvas Focus surfaces for Detail, Creation, and Translation
+// Task: 4.0b + 4.0i - Balanced Focus surface and verifiable citation/share lifecycle
 // AC coverage: US-SYN-003 AC-1 ✅ (template selection), AC-2 ✅ (stable source routing),
 //              AC-3 ✅ (preview/copy/export), AC-4 ✅ (system share handoff),
 //              AC-5 ✅ (no fabricated Notes result),
@@ -15,7 +15,7 @@
 //          PR #44 review: W-1 ✅ (移除 example.com 外链回退), W-2 ✅ (Toast accessibility .contain)
 // 架构约束: AGENTS.md §8.1 (ViewModel 驱动), §17.3 (Focus 禁止 masonry),
 //           echo-memory-canvas apple-native 基础; 系统容器 + semantic colors + Dynamic Type
-// 生成时间: 2026-08-02
+// 生成时间: 2026-08-02 | Updated: 2026-09-07 (4.0i, ADR-020)
 // ==========================================
 
 import SwiftUI
@@ -48,8 +48,10 @@ struct CreationView: View {
     @State private var viewModel: CreationViewModel
     @Environment(\.echoDesignProfile) private var designProfile
 
-    init(viewModel: CreationViewModel = CreationViewModel()) {
-        _viewModel = State(initialValue: viewModel)
+    init(viewModel: CreationViewModel? = nil) {
+        _viewModel = State(initialValue: viewModel ?? CreationViewModel(
+            exportCoordinator: LiveAppAdapters.makeCreationExportCoordinator()
+        ))
     }
 
     // MARK: - Body
@@ -96,10 +98,12 @@ struct CreationView: View {
             Text("Choose a format for this creation.")
         }
         // 分享/导出/打印 Sheet (US-SYN-003 AC-3, US-SYN-004 AC-4)
-        .sheet(item: $viewModel.sharePayload) { payload in
-            SystemShareSheet(payload: payload)
+        .sheet(item: $viewModel.sharePayload, onDismiss: {
+            viewModel.shareSheetDidDismiss()
+        }) { payload in
+            SystemShareSheet(payload: payload, reporter: viewModel)
         }
-        .navigationDestination(for: UUID.self) { memoryID in
+        .navigationDestination(item: $viewModel.navigationMemoryID) { memoryID in
             MemoryDetailView(memoryId: memoryID)
         }
         .onAppear {
@@ -295,8 +299,18 @@ struct CreationView: View {
                                     .foregroundStyle(EchoColorToken.primaryText.color)
                                     .textSelection(.enabled)
 
-                                if let citation = paragraph.citation {
+                                ForEach(paragraph.citations, id: \.memoryId) { citation in
                                     citationAnchor(citation)
+                                }
+
+                                if paragraph.groundingStatus != .cited {
+                                    Label(
+                                        EchoStrings.tr("No source for part or all of this paragraph"),
+                                        systemImage: "exclamationmark.triangle"
+                                    )
+                                        .font(EchoTypographyToken.caption.font)
+                                        .foregroundStyle(EchoColorToken.secondaryText.color)
+                                        .accessibilityIdentifier("creation-citation-no-source")
                                 }
                             }
                         }
@@ -314,25 +328,27 @@ struct CreationView: View {
 
     /// 溯源锚点 — [🔗 MemoryID:xxx] (US-SYN-002 AC-1, US-SYN-003 AC-2)。
     private func citationAnchor(_ citation: CreationCitation) -> some View {
-        NavigationLink(value: citation.memoryId) {
+        Button {
+            viewModel.openCitation(citation)
+        } label: {
             HStack(spacing: 6) {
-                Image(systemName: citation.hasSource ? "link" : "exclamationmark.triangle")
+                Image(systemName: citation.availability == .available ? "link" : "link.badge.plus")
                     .font(EchoTypographyToken.caption.font)
-                Text(citation.hasSource
-                     ? "🔗 MemoryID:\(citation.memoryId.uuidString.prefix(8))…"
-                     : "⚠️ NoSource")
+                Text(String(
+                    format: EchoStrings.tr("MemoryID: %@"),
+                    String(citation.memoryId.uuidString.prefix(8)) + "…"
+                ))
                     .font(EchoTypographyToken.caption.font)
             }
             .foregroundStyle(
-                citation.hasSource
+                citation.availability == .available
                     ? EchoColorToken.warmAccent.color
                     : EchoColorToken.secondaryText.color
             )
         }
         .buttonStyle(.plain)
-        .disabled(!citation.hasSource)
         .accessibilityIdentifier("creation-citation-anchor-\(citation.memoryId.uuidString.prefix(8))")
-        .accessibilityLabel(citation.hasSource ? "Source memory citation" : "No source available")
+        .accessibilityLabel("Open source memory citation")
     }
 
     /// 操作按钮行 — 复制 / 导出 / 保存 / 分享。
@@ -521,6 +537,7 @@ struct PromptEditorSheet: View {
 /// - 系统分享面板，非 masonry
 struct SystemShareSheet: UIViewControllerRepresentable {
     let payload: CreationSharePayload
+    let reporter: any CreationSharePresentationReporting
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let item: Any
@@ -529,10 +546,43 @@ struct SystemShareSheet: UIViewControllerRepresentable {
         } else {
             item = payload.text
         }
-        return UIActivityViewController(activityItems: [item], applicationActivities: nil)
+        return ReportingActivityViewController(
+            activityItems: [item],
+            payloadID: payload.id,
+            reporter: reporter
+        )
     }
 
     func updateUIViewController(_ controller: UIActivityViewController, context: Context) {
+    }
+}
+
+@MainActor
+private final class ReportingActivityViewController: UIActivityViewController {
+    private let payloadID: UUID
+    private weak var presentationReporter: (any CreationSharePresentationReporting)?
+    private var didReportPresentation = false
+
+    init(
+        activityItems: [Any],
+        payloadID: UUID,
+        reporter: any CreationSharePresentationReporting
+    ) {
+        self.payloadID = payloadID
+        self.presentationReporter = reporter
+        super.init(activityItems: activityItems, applicationActivities: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        return nil
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard !didReportPresentation else { return }
+        didReportPresentation = true
+        presentationReporter?.shareControllerDidAppear(payloadID: payloadID)
     }
 }
 

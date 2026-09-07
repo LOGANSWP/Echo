@@ -75,7 +75,7 @@ struct CreationViewModelTests {
         vm.loadPreloaded(CreationFixtureLoader.load("creation-generated-letter")!)
         #expect(vm.viewState == .generated)
         #expect(vm.creation?.paragraphs.count == 2)
-        #expect(vm.creation?.paragraphs.allSatisfy { $0.citation?.hasSource == true } == true)
+        #expect(vm.creation?.paragraphs.allSatisfy { !$0.citations.isEmpty } == true)
     }
 
     @Test("Explicit fixture journey generates the selected deterministic template")
@@ -89,19 +89,19 @@ struct CreationViewModelTests {
 
         #expect(settled == .generated)
         #expect(vm.creation?.selectedTemplate == .letter)
-        #expect(vm.creation?.paragraphs.allSatisfy { $0.citation?.hasSource == true } == true)
+        #expect(vm.creation?.paragraphs.allSatisfy { !$0.citations.isEmpty } == true)
     }
 
     // MARK: - US-SYN-003 AC-3: Preview / Copy / Export
 
-    @Test("US-SYN-003 AC-3: copy writes plain text to pasteboard")
+    @Test("US-SYN-003 AC-3: copy preserves citation semantics in plain text")
     func copyWritesToPasteboard() {
         let vm = CreationViewModel()
         vm.loadPreloaded(CreationFixtureLoader.load("creation-generated-letter")!)
         vm.copyToClipboard()
         let pasted = UIPasteboard.general.string
         #expect(pasted?.contains("small orange cat") == true)
-        #expect(pasted?.contains("🔗") == false)
+        #expect(pasted?.contains("🔗") == true)
     }
 
     @Test("US-SYN-003 AC-3: export picker only presents in generated state")

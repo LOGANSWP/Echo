@@ -3,7 +3,7 @@
   "actionId": "creation.saveToNotes",
   "source": "user",
   "targetIntent": "CreationViewModel.saveToNotes()",
-  "expectedOutcome": "Prepare a local export and present the system share sheet. On successful presentation write creationSharePresented with structured sharePresented=true; dismissal/cancel is not failure. Preparation/presentation failure maps to L2 with sharePresented=false. Never record activityType, target App, completion or content (US-SYN-003, ADR-017).",
+  "expectedOutcome": "Revalidate current UserPolicy + PrivacyCheckpoint, prepare a citation-preserving local export, and present the system share controller. On its actual presentation callback write creationSharePresented with typed exportFormat and sharePresented=true; payload readiness is not presentation. Preparation or pre-callback presentation failure maps to L2 with sharePresented=false. Dismissal after presentation is not failure. If audit persistence fails after presentation, retain the true presentation fact and enqueue an idempotent content-free L2 retry. Never record activityType, target App, completion, content, assetID or sourceLocator (US-SYN-003, ADR-020).",
   "requiresConfirmation": false,
-  "version": "1.2.0"
+  "version": "1.3.0"
 }

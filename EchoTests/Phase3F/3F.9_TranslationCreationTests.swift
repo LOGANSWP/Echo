@@ -283,16 +283,16 @@ struct TranslationCreationTests {
 
         @Test("US-SYN-003 AC-2: grounded generation attaches source anchors to output")
         func groundedOutputHasAnchors() async throws {
-            let pipeline = try await makePipeline(output: "You loved walking in the park with a small cat.\n\nYou also enjoyed quiet mornings.")
+            let pipeline = try await makePipeline(output: #"{"schemaVersion":1,"paragraphs":[{"text":"You loved walking in the park with a small cat.","sourceMemoryIDs":["22222222-2222-2222-2222-222222222222"]},{"text":"You also enjoyed quiet mornings.","sourceMemoryIDs":["33333333-3333-3333-3333-333333333333"]}]}"#)
             let output = try await pipeline.generate(
                 template: .letter,
                 sources: sampleSources(),
                 traceID: "test-trace"
             )
             #expect(output.paragraphs.count == 2)
-            #expect(output.paragraphs.allSatisfy { $0.anchor != nil } == true)
+            #expect(output.paragraphs.allSatisfy { !$0.anchors.isEmpty } == true)
             #expect(output.sourceMemoryCount == 2)
-            #expect(output.paragraphs[0].anchor?.memoryID == UUID(uuidString: "22222222-2222-2222-2222-222222222222"))
+            #expect(output.paragraphs[0].anchors.first?.memoryID == UUID(uuidString: "22222222-2222-2222-2222-222222222222"))
         }
 
         @Test("US-SYN-003: empty sources produce empty output with reason")
@@ -345,12 +345,16 @@ struct TranslationCreationTests {
                     GroundedParagraph(
                         id: UUID(uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")!,
                         text: "You loved walking in the park.",
-                        anchor: SourceAnchor(memoryID: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!)
+                        anchors: [
+                            SourceAnchor(memoryID: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!),
+                        ],
+                        groundingStatus: .cited
                     ),
                     GroundedParagraph(
                         id: UUID(uuidString: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")!,
                         text: "You enjoyed quiet mornings.",
-                        anchor: nil
+                        anchors: [],
+                        groundingStatus: .noSource
                     ),
                 ],
                 sourceMemoryCount: 2,
@@ -366,11 +370,11 @@ struct TranslationCreationTests {
             #expect(md.contains("NoSource") == true)
         }
 
-        @Test("US-SYN-003 AC-3: share text is plain text without anchor markers")
+        @Test("US-SYN-003 AC-3: share text preserves source markers")
         func shareTextPlain() {
             let share = CreationExportService.shareText(from: sampleOutput())
             #expect(share.contains("You loved walking in the park."))
-            #expect(share.contains("[🔗") == false)
+            #expect(share.contains("[🔗") == true)
         }
 
         @Test("US-SYN-003 AC-3 ADR-013: PDF data is non-empty")

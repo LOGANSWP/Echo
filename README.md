@@ -2,7 +2,7 @@
 
 **你的手机里藏着太多记忆——照片、视频、备忘录、语音……Echo 让这一切可以被「搜索」和「唤醒」。**
 
-Echo 是一款**完全离线**的端侧 AI 记忆助手。它自动索引你的 **相册图片与视频**，并通过 **Share Sheet 显式分享**摄入备忘录与语音备忘录，通过 AI 理解内容后建立向量索引，让你能像谷歌搜索一样用自然语言检索自己的记忆——**所有数据永不离开设备**，所有 AI 推理在端侧完成，所有操作可追溯、可删除。
+Echo 是一款**本地优先、离线可用**的端侧 AI 记忆助手。它自动索引你的 **相册图片与视频**，并通过 **Share Sheet 显式分享**摄入备忘录与语音备忘录，通过 AI 理解内容后建立向量索引，让你能像谷歌搜索一样用自然语言检索自己的记忆——Echo 不主动上传内容，所有 AI 推理在端侧完成，所有操作可追溯、可删除；只有用户明确发起复制或系统 share/export 时，内容才交由系统选择的目标处理。
 
 > 📌 **数据源接入方式（R-5.2 决策 2026-08-01）**：受 iOS 公开 API 限制，Echo 无法自动/后台读取系统备忘录、语音备忘录或 iMessage。已批准路径：**Photos 授权范围内读取（PhotoKit）+ Share Extension 用户主动分享**。备忘录/语音备忘录需用户通过分享按钮显式摄入。
 
@@ -21,10 +21,10 @@ Echo 是一款**完全离线**的端侧 AI 记忆助手。它自动索引你的 
 | 📝 **备忘录** | Share Sheet 显式分享（需用户操作） | E5 文本向量化，支持中英文语义检索 | 🔶 |
 | 🎙️ **语音备忘录** | Share Sheet 显式分享（需用户操作） | Whisper ASR 真实转写（whisper.cpp v1.9.2，3F.3b）+ 文本向量索引 | 🔶 |
 
-> ⚠️ **Echo 不会主动上传任何内容。** 所有数据在设备本地处理。
+> ⚠️ **Echo 不会主动上传任何内容。** 所有处理均在设备本地完成；复制与系统 share/export 只在用户明确触发时发生，Echo 不选择或观察后续接收目标。
 > 📌 **目标态**：AI 模型随 App 安装包分发、运行时无网络请求（R-005 红线）。**3F.3 已交付（2026-08-06）**：E5 真实 384d 文本推理（Unigram tokenizer + Core ML）、SigLIP2 视觉预处理与转换源工件、Whisper tiny GGUF 工件与 fail-closed 桥接、LanguageAligner（R-004 单次重试）、模型溯源登记（model-provenance-register）。SigLIP2 Core ML 转换仍追踪于 3F.3 后续任务与 model-provenance-register §3。**3F.3b 已交付（2026-08-09）**：whisper.cpp v1.9.2 运行时接入（vendored SPM 本地包 + GGML_CPU_GENERIC 构建），`WhisperASREngine` 真实转写经 `WhisperRuntimeBridge` → `NativeWhisperCInterop`，GGUF SHA-256 校验（818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7）+ `reportModelLoaded(.whisperTiny)` 上报。
 >
-> 📌 **当前状态（2026-09-02）**：Phase 3F 已完成并由 `3F.finalize` 解锁 Phase 4；当前 `current_phase="4"`。平衡画布 Foundation/AppShell（4.0）、Discovery（4.0a）与 Focus（4.0b）已完成，Task 页面族 4.0c 为首个 ready 任务。4.0c 规格评审将启动时渐进式权限与跨进程任务重建分别拆为 4.0f/4.0g，避免视觉任务或 fixture 冒充生产闭环。
+> 📌 **当前状态（2026-09-07）**：Phase 3F 已完成并由 `3F.finalize` 解锁 Phase 4；当前 `current_phase="4"`。平衡画布基础及 Discovery/Focus/Task 页面族（4.0~4.0c）、交互式唤醒卡（4.0d）、编辑冲突（4.0e）、渐进式权限（4.0f）、真实断点恢复（4.0g）与来源删除闭环（4.0h）已完成。首个 ready 任务为 4.0i；其规格已由 ADR-020 收紧为受限结构化来源协议、当前授权下的复制/导出/分享、真实分享呈现审计与专用审计字段。
 >
 > 📌 **3F.2 已交付（2026-08-05）**：真实来源边界——`PhotoKitSourceAdapter`（授权状态机 + 撤回即停 + 本地仅下载策略 + `.dataSourceConnected` 审计）、`PhotoKitChangeObserver`（变更去重）、`EchoShareExtension` target（Share 预览确认 → App Group 信封原子入队）、`SharedImportQueueActor`（去重 + 恰好一次消费，App 重启恢复）、`IngestPipeline.ingestShared`/`drainSharedImports`（R-006 + ExcludedAssets fail-closed + hash-only `.shareExtensionImported` 审计）。App/Extension 共享 `group.com.echo.Echo` App Group。真实模型工件推理（E5/SigLIP2/Whisper）由 3F.3 接入；真实来源 E2E 证据于 3F.11 no-fixture 门禁验证。
 >
@@ -36,7 +36,7 @@ Echo 是一款**完全离线**的端侧 AI 记忆助手。它自动索引你的 
 
 | 特性             | 说明                                                      | 状态 |
 | ---------------- | --------------------------------------------------------- | :---: |
-| **全离线**       | 所有数据端侧处理，永不离开设备                            | ✅ |
+| **本地优先**     | 端侧处理且不主动上传；仅用户明确复制或系统分享/导出时交接内容 | ✅ |
 | **隐私可审计**   | 隐私校验 (`PrivacyCheckpoint`) 全覆盖，审计日志保留 30 天 | ✅ |
 | **零网络依赖**   | 所有模型随 App 打包，无网络下载                           | ✅ |
 | **反馈学习**     | 纯本地反馈驱动重排（余弦阈值 ≥0.80，权重截断 ±0.5）       | ✅ |

@@ -4,15 +4,17 @@
   "surfaceId": "creation",
   "dataConditions": {
     "generationPhase": "generated",
-    "exportPrepared": "local Markdown/PDF/text export prepared without network access",
-    "systemShareSheet": "presented"
+    "authorizationRevalidated": "current UserPolicy + PrivacyCheckpoint passed immediately before payload preparation",
+    "exportPrepared": "local citation-preserving Markdown/PDF/plain-text export prepared without network access or source locators",
+    "systemShareSheet": "actual system share-controller presentation callback observed"
   },
   "allowedActions": [],
   "expectedSemantics": {
     "handoff": "System share sheet is visible with user-mediated destinations",
-    "cancellation": "Dismissal returns to generated without an L2 error",
+    "cancellation": "Dismissal after actual presentation returns to generated without an L2 error or cancellation audit",
+    "audit": "creationSharePresented uses typed exportFormat and sharePresented=true only after the actual presentation callback; a later audit persistence failure retains the true fact and enters idempotent content-free L2 retry",
     "privacy": "Echo does not infer or audit the selected target app or final save result",
     "prohibited": "No Saved to Notes Toast, private NoteStore call, notes:// deep link or fabricated note URL"
   },
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

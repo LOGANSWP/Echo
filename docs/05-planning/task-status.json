@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-06T16:40:42Z",
+  "last_updated": "2026-09-07T14:14:07Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2775,13 +2775,23 @@
             "docs/03-implementation/开发避坑与关键注意点手册.md",
             "docs/decisions/ADR-013-creation-export-boundary.md",
             "docs/decisions/ADR-017-focus-production-boundaries.md",
+            "docs/decisions/ADR-020-grounded-citation-share-audit.md",
+            "docs/ui/README.md",
             "docs/ui/architecture.md",
+            "docs/ui/testing-and-artifacts.md",
             "UIAutomation/Contracts/instances/memory-detail-surface.json",
             "UIAutomation/Contracts/instances/creation-surface.json",
+            "UIAutomation/Contracts/instances/creation-state-generated.json",
+            "UIAutomation/Contracts/instances/creation-state-share-handoff.json",
+            "UIAutomation/Contracts/instances/creation-journey-generate-save-basic.json",
+            "UIAutomation/Contracts/instances/creation-action-copy.json",
+            "UIAutomation/Contracts/instances/creation-action-export.json",
+            "UIAutomation/Contracts/instances/creation-action-share.json",
             "UIAutomation/Contracts/instances/creation-action-save-to-notes.json",
+            "UIAutomation/Policies/acceptance-policy.json",
             "docs/05-planning/task-status.json"
           ],
-          "status": "ready",
+          "status": "review",
           "dependencies": [
             "4.0h"
           ],
@@ -2792,21 +2802,23 @@
             "Creation"
           ],
           "implementation_constraints": [
-            "CreativePipeline 输出每段显式 source MemoryID；解析器只接受本次输入 allow-list，禁止按位置或轮询猜测来源",
-            "未知、缺失、撤权或不可解析来源标记 NoSource 并禁用跳转；有效锚点经当前 UserPolicy 与 FocusSourceResolver 复验后进入稳定 Detail",
-            "Markdown/PDF/系统分享保留可理解的引用语义；Notes 仅为系统 share/export 交接，不调用私有 API 或伪造保存结果",
-            "creativeGeneration 与 creationSharePresented 分离；sharePresented 为结构化 Bool，不哈希且不记录 activityType、目标 App、用户完成状态或原文",
-            "导出准备或面板呈现失败为 L2；已成功呈现后的用户取消不是失败"
+            "CreativePipeline 仅向模型暴露 opaque MemoryID，并解析有字节/段落/字符/引用数上限的版本化 JSON envelope；未知版本、畸形或超限整体 L2 fail-closed",
+            "parser 只接受当前策略过滤后实际提交模型的精确 allow-list，禁止位置/轮询 fallback；领域与 UI 使用 [SourceAnchor] 和 cited/noSource/partialNoSource，多引用可表达且 provenance 不冒充事实证明",
+            "锚点导航、复制、Markdown/PDF/plain-text 分享准备均重新执行当前 UserPolicy + PrivacyCheckpoint；撤权阻止派生正文交接，仍授权但离线的来源保留诚实不可用标记",
+            "所有导出格式保留可理解引用，PDF 支持多页且不截断；不得暴露 assetID、sourceLocator 或猜测来源 App；Notes 仅为系统 share/export 交接",
+            "creativeGeneration 与 creationSharePresented 分离；只有系统控制器真实呈现回调写 sharePresented=true，payload 就绪不是证据，呈现后关闭不是失败，呈现后审计写入失败不得反写 false",
+            "AuditLog 通过幂等 migration 使用 templateType/sourceMemoryCount/citationCount/noSourceCount/exportFormat/sharePresented/periodType 专用 typed columns，禁止塞入 sourceLanguage"
           ],
           "acceptance_evidence": [
-            "多来源、缺失 ID、未知 ID、输入集合外 ID 与模型伪造 ID 的 allow-list 解析证据，无 round-robin fallback",
-            "有效 citation 到真实 Detail、撤权/资产消失转 NoSource/诚实不可用、NoSource 禁用",
-            "Markdown/PDF/share payload 引用语义与系统 share sheet 呈现证据",
-            "呈现成功/准备失败/呈现失败/已呈现后取消的状态与 L2 行为",
-            "creativeGeneration 与 creationSharePresented 审计字段、结构化 sharePresented 及零目标 App/原文证明"
+            "版本化 envelope 的正常、未知版本、畸形、字节/段落/字符/引用超限测试；未校验输出不展示且无 round-robin fallback",
+            "多引用、缺失 ID、未知/输入外/伪造 ID 的 exact allow-list 与 cited/noSource/partialNoSource 测试；UI 不声称 Verified fact",
+            "有效 citation 经当前策略复验进入真实 Detail；导航或导出前撤权被阻止，资产离线/消失但仍授权时保持诚实不可用",
+            "plainText/Markdown/PDF/share payload 均保留引用，PDF 多页无截断，且零 assetID/sourceLocator/来源 App 身份",
+            "payload 就绪但未呈现、准备失败、呈现失败、真实呈现、呈现后关闭及呈现后审计失败的状态与 L2 行为",
+            "专用 typed audit columns、固定计数语义、sourceLanguage 无 metadata、幂等 audit retry 及零目标 App/原文证明"
           ],
-          "last_updated": "2026-09-06T16:40:42Z",
-          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed."
+          "last_updated": "2026-09-07T14:14:07Z",
+          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed. The 2026-09-07 reasonableness review (ADR-020) corrected the overclaim that provenance proves factual accuracy, added a versioned bounded JSON envelope and multi-anchor partialNoSource semantics, required current-policy revalidation for copy/export/share, made actual controller presentation the only true sharePresented=true trigger, required citation-preserving multipage exports, and assigned dedicated typed audit columns with failure-truth and idempotent-retry behavior. Task moved from ready to in_progress at 2026-09-07T13:14:25Z after dependency, entry-gate and deferred-item checks passed. Implementation completed with grounded multi-source parsing, fail-closed protocol limits, stable source navigation, current-policy action authorization, citation-preserving text/Markdown/multipage PDF export, actual share-controller presentation reporting, typed audit persistence, and content-free idempotent audit retry. Focused and affected regression suites passed 65 tests with zero failures; the mandatory pre-commit 4.0i suite was rerun on iPhone 17 Pro and passed 10 tests with zero failures. SwiftLint, accessibility contracts, localization parity, production static bans, JSON validation, and diff checks passed. Task remains in review at 2026-09-07T14:14:07Z; PR remains unset until creation."
         },
         {
           "id": "4.0j",
@@ -4049,6 +4061,45 @@
         "docs/05-planning/phase3f-story-matrix.md",
         "docs/05-planning/phase3f-evidence-index.md",
         "docs/05-planning/deferred-items.json",
+        "docs/05-planning/task-status.json"
+      ]
+    },
+    {
+      "id": "DOC-20260907-4-0I-REASONABLENESS",
+      "status": "resolved",
+      "detected_at": "2026-09-07T13:02:46Z",
+      "resolved_at": "2026-09-07T13:02:46Z",
+      "decision_maker": "Codex spec review under human instruction",
+      "selected_option": "bounded-provenance-contract-current-policy-share-structured-audit",
+      "decision": "Retain task 4.0i while replacing factual-verification overclaims with provenance semantics; require a versioned bounded JSON generation envelope, exact currently authorized submitted-input allow-list validation, multiple source anchors with cited/noSource/partialNoSource states, current-policy revalidation for navigation/copy/export/share, citation-preserving plain text/Markdown/multipage PDF, actual share-controller presentation evidence, and dedicated typed audit columns with truthful post-presentation failure handling.",
+      "reason": "The previous contract treated allow-list membership as if it proved factual support, left structured output unversioned and unbounded, could not represent partial validity, omitted export-time authorization changes, allowed payload readiness to masquerade as share presentation, left citation counts ambiguous, dropped citation semantics from some exports, and specified audit fields that the production schema could not represent without abusing sourceLanguage.",
+      "affected_documents": [
+        "AGENTS.md",
+        "README.md",
+        "docs/INDEX.md",
+        "docs/01-spec/用户故事与验收标准规格书.md",
+        "docs/02-architecture/架构设计文档.md",
+        "docs/02-architecture/数据流全链路技术说明文档.md",
+        "docs/03-implementation/开发避坑与关键注意点手册.md",
+        "docs/decisions/ADR-013-creation-export-boundary.md",
+        "docs/decisions/ADR-017-focus-production-boundaries.md",
+        "docs/decisions/ADR-020-grounded-citation-share-audit.md",
+        "docs/ui/README.md",
+        "docs/ui/architecture.md",
+        "docs/ui/testing-and-artifacts.md",
+        "UIAutomation/Contracts/instances/memory-detail-surface.json",
+        "UIAutomation/Contracts/instances/creation-surface.json",
+        "UIAutomation/Contracts/instances/creation-state-generated.json",
+        "UIAutomation/Contracts/instances/creation-state-share-handoff.json",
+        "UIAutomation/Contracts/instances/creation-journey-generate-save-basic.json",
+        "UIAutomation/Contracts/instances/creation-action-copy.json",
+        "UIAutomation/Contracts/instances/creation-action-export.json",
+        "UIAutomation/Contracts/instances/creation-action-share.json",
+        "UIAutomation/Contracts/instances/creation-action-save-to-notes.json",
+        "UIAutomation/Policies/acceptance-policy.json",
+        "docs/05-planning/开发计划安排文档.md",
+        "docs/05-planning/phase3f-evidence-index.md",
+        "docs/05-planning/phase3f-story-matrix.md",
         "docs/05-planning/task-status.json"
       ]
     }

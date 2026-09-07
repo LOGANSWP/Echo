@@ -5,17 +5,17 @@
   "dataConditions": {
     "templateType": "letter",
     "generationPhase": "generated",
-    "generatedContent": "non-empty AI text with citation anchors",
+    "generatedContent": "non-empty validated structured output with [SourceAnchor] and typed cited/noSource/partialNoSource provenance",
     "sourceMemoryCount": ">= 1"
   },
   "allowedActions": ["creation.copy", "creation.export", "creation.saveToNotes", "creation.share", "creation.regenerate"],
   "expectedSemantics": {
     "generatedBody": "AI-generated content rendered",
-    "citationAnchors": "per-paragraph [🔗 MemoryID:xxx] anchors present (US-SYN-002/003 AC-2)",
-    "copyButton": "Copy content to clipboard",
-    "exportButton": "Export as PDF/Markdown (US-SYN-003 AC-3)",
+    "citationAnchors": "zero or more valid Source memory anchors per paragraph plus explicit noSource/partialNoSource status; no Verified fact claim",
+    "copyButton": "Revalidate current policy, then copy citation-preserving content or show a recoverable authorization error",
+    "exportButton": "Revalidate current policy, then export citation-preserving PDF/Markdown; PDF supports multiple pages without truncation",
     "saveToNotesButton": "Save to Apple Notes (US-SYN-003 AC-4)",
     "shareButton": "Share/export/print narrative report (US-SYN-004 AC-4)"
   },
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

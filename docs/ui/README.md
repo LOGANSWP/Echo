@@ -33,7 +33,7 @@
 | Phase 4 交互式唤醒卡（4.0d） | style + architecture + testing + US-AWK-005 AC 原文 + ADR-016 + Home/Detail contracts；Bundle 离线音乐、MemoryFeeling 关系、card→Focus intent 属于生产功能闭环，不是第四种 surface family |
 | Phase 4 记忆编辑与冲突（4.0e） | architecture + testing + US-AWK-007 AC 原文 + ADR-010/017 + Memory Detail contracts |
 | Phase 4 来源解析与删除（4.0h） | architecture + testing + US-PRV-004/007 AC 原文 + ADR-008/017/019 + Memory Detail delete contracts；重点核对 `canPerform(.delete)`、prepared/confirmed 外部门禁、limited-hidden 非删除、transcript-only Share audio 与真实通知审计 |
-| Phase 4 引用与分享（4.0i） | architecture + testing + US-SYN-002/003/004 AC 原文 + ADR-013/017 + Detail/Creation contracts |
+| Phase 4 引用与分享（4.0i） | architecture + testing + US-SYN-002/003/004 AC 原文 + ADR-013/017/020 + Detail/Creation contracts + acceptance policy；重点核对版本化有界 JSON、多引用/partialNoSource、provenance 非事实证明、当前授权复验、三格式引用保留、真实呈现回调与 typed audit columns |
 | Phase 4 叙事调度（4.0j） | architecture + testing + US-SYN-004 AC 原文 + ADR-011/017 |
 | UI 测试 | `testing-and-artifacts.md` |
 | UI 交付 | `automation-workflow.md`（§批准点 — 含 UI 审查指南：页面清单/导航路径/未实现说明） |

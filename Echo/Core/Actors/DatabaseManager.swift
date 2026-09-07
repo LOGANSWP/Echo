@@ -6,12 +6,13 @@
 //      4.0d - MemoryFeeling relationship and card interaction audit migration
 //      4.0f - Persisted awakening preferences and HealthKit request lifecycle
 //      4.0h - Source deletion saga, structured audit fields, and cleanup notices
+//      4.0i - Typed grounded-generation and system-share audit fields
 // 架构约束: 遵循 AGENTS.md §4.2 (Actor 隔离契约), R-007 (禁止 @unchecked Sendable)
 // AC 覆盖: D-005 deletion journal persists phase, vector plan, and exclusion intent;
 //          US-AWK-005 AC-4/5 (feeling cascade and structured interaction audit);
 //          4.0f AC-3/6 (awakening preferences and honest HealthKit request state);
 //          4.0h AC-2/3/5 (source deletion recovery and structured audit state)
-// Generated: 2026-07-04; Updated: 2026-09-05 (4.0h)
+// Generated: 2026-07-04; Updated: 2026-09-07 (4.0i)
 // ==========================================
 
 import Foundation
@@ -239,6 +240,28 @@ public actor DatabaseManager {
         }
         if !auditColumns.contains("userNotified") {
             try execute(sql: "ALTER TABLE AuditLog ADD COLUMN userNotified INTEGER")
+        }
+        // 4.0i / ADR-020: creation/share semantics use typed columns, never sourceLanguage JSON.
+        if !auditColumns.contains("templateType") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN templateType TEXT")
+        }
+        if !auditColumns.contains("sourceMemoryCount") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN sourceMemoryCount INTEGER")
+        }
+        if !auditColumns.contains("citationCount") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN citationCount INTEGER")
+        }
+        if !auditColumns.contains("noSourceCount") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN noSourceCount INTEGER")
+        }
+        if !auditColumns.contains("exportFormat") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN exportFormat TEXT")
+        }
+        if !auditColumns.contains("sharePresented") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN sharePresented INTEGER")
+        }
+        if !auditColumns.contains("periodType") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN periodType TEXT")
         }
         try execute(sql: "CREATE INDEX IF NOT EXISTS idx_auditlog_subject_hash ON AuditLog(subjectHash)")
         // WP3 steps 3i-3t2 (photo-text-search): D-005 resumable deletion journal

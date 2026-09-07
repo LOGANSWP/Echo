@@ -3,6 +3,6 @@
   "actionId": "creation.export",
   "source": "user",
   "targetIntent": "CreationViewModel.export(format:)",
-  "expectedOutcome": "Export sheet presented with PDF/Markdown options (US-SYN-003 AC-3)",
-  "version": "1.0.0"
+  "expectedOutcome": "After current UserPolicy + PrivacyCheckpoint revalidation, present citation-preserving Markdown/PDF options. Revoked sources block derived-body handoff; still-authorized but unavailable sources retain honest markers. PDF is multipage and cannot truncate body or citations; payload excludes assetID/sourceLocator/source App identity.",
+  "version": "1.1.0"
 }

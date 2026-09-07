@@ -1,7 +1,7 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v5.47
-**生效日期**：2026-09-05
+**版本**：v5.48
+**生效日期**：2026-09-07
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（Codex / OpenCode / Cursor / Claude）及人类开发者
 **优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
 **加载方式**：Agent 启动时自动加载根目录 `AGENTS.md`；子目录 `AGENTS.md` 叠加补充。  
@@ -76,13 +76,13 @@
 
 ### 1.1 一句话定义
 
-Echo 是一个 **本地优先、隐私可审计、完全离线可用** 的端侧 AI 记忆助手。用户的所有数据永不离开设备，所有 AI 推理在端侧完成，所有操作可追溯、可删除。
+Echo 是一个 **本地优先、隐私可审计、完全离线可用** 的端侧 AI 记忆助手。Echo 不主动上传用户数据或调用云端 AI；仅在用户明确触发复制或系统 share/export 时把用户选择的内容交给系统剪贴板/分享面板，Echo 不选择、观察或推断后续接收目标。所有 AI 推理在端侧完成，所有操作可追溯、可删除。
 
 ### 1.2 绝对红线（违反即阻断）
 
 | 红线编号  | 规则                                                         | 验证方式                              | 后果    |
 | --------- | ------------------------------------------------------------ | ------------------------------------- | ------- |
-| **R-001** | **禁止任何数据上传云端**：所有处理必须在端侧完成             | CI 扫描网络请求 API                   | PR 阻断 |
+| **R-001** | **禁止 Echo 主动上传数据**：所有处理与 AI 推理必须在端侧完成；仅允许用户明确触发复制或系统 share/export，Echo 不选择、观察或推断后续接收目标，不调用上传 API | CI 扫描网络请求 API + 用户动作/系统分享边界测试 | PR 阻断 |
 | **R-002** | **禁止用户主动输入文本记忆**：所有文本记忆仅来自系统备忘录和语音备忘录转写 | UI 检查 + 单元测试                    | PR 阻断 |
 | **R-003** | **原始文件级联删除不写入 ExcludedAssets**：仅用户主动“仅从 Echo 移除”才写入 | 单元测试 + 审计检查                   | PR 阻断 |
 | **R-004** | **AI 输出语言仅限 zh-Hans/en-US**：响应语言必须匹配 UserPolicy.preferredLanguage | Language Aligner 运行时校验           | PR 阻断 |
@@ -462,7 +462,7 @@ ExcludedAssets 禁止写入条件:
 ```yaml
 审计日志契约:
   - 强制字段: eventType, timestamp, traceID, policyVersion, success
-  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified
+  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType
   - 隐私保护: 标识符和内容仅记录哈希摘要，禁止原文；枚举/布尔/进度整数可作为结构化字段
   - 保留期: 30 天，超期自动清理
   - 加密: NSFileProtectionComplete
@@ -560,7 +560,9 @@ let checkpoint = await PrivacyActor.shared.validate(
 | `.memoryDeleted`                  | 记忆删除或原始删除尝试   | preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedWritten, success |
 | `.cascadeDeleteFromOriginal`      | PhotoKit 原始文件级联清除 | assetIdDigest, memoryIdDigest, excludedAutoCleaned, userNotified=false, excludedWritten=false, success |
 | `.memoryEdited`                   | 手动编辑记忆             | editedFields, reindexed, conflictResolvedWith             |
-| `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat, sharePresented, periodType（可选）；不记录目标 App/完成状态 |
+| `.synthesis`                      | 来源锚点解析与校验       | citationCount, noSourceCount；MemoryID 仅 hash digest     |
+| `.creativeGeneration`             | 创作生成完成             | templateType, sourceMemoryCount, citationCount, noSourceCount；不记录正文 |
+| `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat=`plainText/markdown/pdf`, sharePresented, periodType=`month/year`（可选）；不记录 activityType、目标 App、完成状态、原文或 source locator |
 | `.narrativeReportGenerated`       | 月度/年度报告生成         | periodType, dataSourcesUsed, periodKeyDigest               |
 | `.cardInteraction`               | 交互式唤醒卡动作       | action=next/record/jump, cardIdDigest, memoryIdDigest, feelingAssociatedToSource（hash-only，禁止感受原文） |
 | `.feedbackReceived`               | 反馈收集                 | sentiment, decayFactor                                    |
@@ -1416,7 +1418,7 @@ Echo 固定采用用户已批准的 **`echo-memory-canvas`** 设计配置，扩�
 
 **4.0d 交互式唤醒卡边界（2026-09-02 规格审查）**：音乐建议默认且始终可从随 App 打包的离线年份曲库产生；仅当用户在卡片中显式选择“匹配此设备音乐”后，才可请求媒体库权限并通过 `MPMediaQuery` 读取 `isCloudItem == false` 的本地曲目元数据。禁止 `MusicCatalog*`、personal recommendations、recently played 和任意 MusicKit Web Service，禁止上传记忆派生数据。领域 API 可暴露 `userFeelings` 集合，但物理存储必须为以 `memoryId` 为外键的 `MemoryFeeling` 关系表；感受不创建 Memory/Representation，不进入搜索或翻译索引。`next` 按稳定唤醒顺序前进，`record` 仅在事务成功后成立；`.cardInteraction` 仅记录 action、hash-only card/memory digest 与布尔 `feelingAssociatedToSource`。`4.0d` 只负责 card→typed Focus 路由，Focus 内真实来源解析/删除由 `4.0h` 交付，可验证 source anchor 与分享审计由 `4.0i` 交付。详见 ADR-016/017。
 
-**4.0e~4.0j Focus 生产边界（2026-09-03 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 要求模型显式返回且 allow-list 校验 source MemoryID，禁止 round-robin 伪绑定，并把 `.creativeGeneration` 与结构化布尔 `.creationSharePresented` 审计分离；`4.0j` 以持久周期键和 TaskQueueActor earliest-eligible 生成月报/年报，不承诺精确后台时刻或伪造不可用分区。详见 ADR-017/019。
+**4.0e~4.0j Focus 生产边界（2026-09-07 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 使用版本化、有大小/数量上限的结构化生成 envelope；每段显式返回 `sourceMemoryIDs[]`，仅接受当前策略过滤后实际提交模型的 opaque MemoryID allow-list，禁止暴露 source locator 或 round-robin 伪绑定。allow-list 只验证 provenance 身份，不自动证明事实语义；多引用、`NoSource` 与 `partialNoSource` 必须类型化表达。锚点导航及复制、Markdown/PDF/plain-text 分享准备前均重新执行当前 UserPolicy/PrivacyCheckpoint；所有格式保留可理解引用。`.synthesis`、`.creativeGeneration` 与 `.creationSharePresented` 使用专用结构化审计列；只有系统面板实际呈现回调后才写 `sharePresented=true`，准备/呈现失败写 false，呈现后取消不算失败，呈现后的审计写入失败不得改写呈现事实。`4.0j` 以持久周期键和 TaskQueueActor earliest-eligible 生成月报/年报，不承诺精确后台时刻或伪造不可用分区。详见 ADR-017/019/020。
 
 ### 17.3 双状态模型
 
@@ -1552,3 +1554,4 @@ $init-session-echo → $next-task-echo → $ui-bootstrap-build-echo <task-id>
 | v5.45 | 2026-09-04 | 4.0g PR 预审修订：用队列 taskId reservation 封闭 Restart 替换与普通入队竞态；区分活动队列所有权和 orphan checkpoint；清理排队取消后的 pause 所有权；未知任务类型 fail-closed 且不可执行；Pause/Resume/Cancel 仅在真实成功后更新 UI，Pause/Cancel 审计带 outcome。同步全部 Echo skills 使用 GitHub 双阶段认证判断，避免非 commit 流程继续误报需重认证。 | Codex |
 | v5.46 | 2026-09-05 | 4.0h 规格合理性复审（ADR-019）：来源内容可用性与删除能力分面建模；PhotoKit 删除要求 `canPerform(.delete)`；扩展同一删除 journal 的外部结果门禁，只有 confirmedDeleted 才能推进 D-005；limited-hidden/撤权不可见不作为删除证据；Share Extension 不猜测 host App，非持久化音频只展示转写；`userNotified` 仅在提示实际展示后为 true。 | Codex |
 | v5.47 | 2026-09-06 | 4.0h PR 预审修订：统一删除审计字段为生产 schema 的 `excludedWritten`；补齐 observer 注册前基线、全量 PhotoKit 前台补偿、活跃删除竞态隔离、逐 journal 容错、通知确认事务与非阻断 UI 结果；同步修复 Share Extension 备忘录 AC 和 Phase 3F 基线状态一致性。 | Codex |
+| v5.48 | 2026-09-07 | 4.0i 规格合理性复审（ADR-020）：明确 allow-list 只验证来源身份、不自动证明事实；采用版本化有界 JSON、多引用与 partialNoSource；复制/导出前重验当前授权；以真实系统呈现回调区分准备/呈现/取消/审计失败；新增专用结构化生成与分享审计字段，并澄清用户主动复制或系统 share/export 是 R-001 允许的受控外部交接。 | Codex |

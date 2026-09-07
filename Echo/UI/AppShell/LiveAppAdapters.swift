@@ -126,6 +126,12 @@ public enum LiveAppAdapters {
         )
     }
 
+    static func makeCreationExportCoordinator(
+        composition: AppComposition = .shared
+    ) -> CreationExportCoordinator {
+        composition.creationExportCoordinator
+    }
+
     /// 解析离线 LLM 推理来源 (ADR-009 决策 4)。
     ///
     /// 当前未获批捆绑 LLM 运行时（model-provenance-register 无 LLM 工件）→ 返回 nil。

@@ -58,16 +58,49 @@ struct CreationParagraph: Sendable, Equatable, Identifiable {
     let id: UUID
     /// 段落文本
     let text: String
-    /// 溯源锚点 — 关联的源记忆 (US-SYN-002 AC-1)
-    let citation: CreationCitation?
+    /// All validated source identities declared for this paragraph.
+    let citations: [CreationCitation]
+    /// Honest provenance state; it does not claim factual verification.
+    let groundingStatus: GroundingStatus
+
+    init(
+        id: UUID,
+        text: String,
+        citations: [CreationCitation],
+        groundingStatus: GroundingStatus
+    ) {
+        self.id = id
+        self.text = text
+        self.citations = citations
+        self.groundingStatus = groundingStatus
+    }
+
+    init(id: UUID, text: String, citation: CreationCitation?) {
+        self.init(
+            id: id,
+            text: text,
+            citations: citation.map { [$0] } ?? [],
+            groundingStatus: citation == nil ? .noSource : .cited
+        )
+    }
 }
 
 /// 溯源锚点 — [🔗 MemoryID:xxx] 指向原始数据 (US-SYN-002 AC-1/AC-2)。
 struct CreationCitation: Sendable, Equatable {
     /// 源记忆 ID
     let memoryId: UUID
-    /// 是否存在可跳转来源（无来源 → [⚠️ NoSource] 置灰, US-SYN-002 AC-3）
-    let hasSource: Bool
+    let sourceType: String?
+    let availability: CitationSourceAvailability
+
+    init(
+        memoryId: UUID,
+        sourceType: String? = nil,
+        availability: CitationSourceAvailability = .available
+    ) {
+        self.memoryId = memoryId
+        self.sourceType = sourceType
+        self.availability = availability
+    }
 }
 
 /// 创作结果展示模型 — 薄适配器 (docs/ui/architecture.md §7.1)。
@@ -82,8 +115,28 @@ struct CreationModel: Sendable, Equatable {
     var paragraphs: [CreationParagraph]
     /// 引用的源记忆数
     var sourceMemoryCount: Int
+    /// Source types submitted during production generation, retained for action-time revalidation.
+    var sourceTypes: [String]
     /// 空态原因（无匹配源记忆时非 nil → empty state）
     var emptyReason: String?
+
+    init(
+        selectedTemplate: CreationTemplate,
+        title: String?,
+        periodType: String?,
+        paragraphs: [CreationParagraph],
+        sourceMemoryCount: Int,
+        sourceTypes: [String] = [],
+        emptyReason: String?
+    ) {
+        self.selectedTemplate = selectedTemplate
+        self.title = title
+        self.periodType = periodType
+        self.paragraphs = paragraphs
+        self.sourceMemoryCount = sourceMemoryCount
+        self.sourceTypes = sourceTypes
+        self.emptyReason = emptyReason
+    }
 }
 
 /// 确定性创作 Fixture Loader — Preview / 单元测试 / Live Sim Review 注入。
@@ -170,16 +223,14 @@ enum CreationFixtureLoader {
                     id: uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                     text: "In the summer of 2025 you spent many evenings walking in the park, and a small orange cat often followed you home.",
                     citation: CreationCitation(
-                        memoryId: uuid("22222222-2222-2222-2222-222222222222"),
-                        hasSource: true
+                        memoryId: uuid("22222222-2222-2222-2222-222222222222")
                     )
                 ),
                 CreationParagraph(
                     id: uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                     text: "You wrote down how peaceful those evenings felt, even on hard days.",
                     citation: CreationCitation(
-                        memoryId: uuid("33333333-3333-3333-3333-333333333333"),
-                        hasSource: true
+                        memoryId: uuid("33333333-3333-3333-3333-333333333333")
                     )
                 ),
             ],
@@ -201,16 +252,14 @@ enum CreationFixtureLoader {
                     id: uuid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                     text: "This year had three clear chapters: a quiet winter, an active spring in the park, and a reflective autumn.",
                     citation: CreationCitation(
-                        memoryId: uuid("44444444-4444-4444-4444-444444444444"),
-                        hasSource: true
+                        memoryId: uuid("44444444-4444-4444-4444-444444444444")
                     )
                 ),
                 CreationParagraph(
                     id: uuid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
                     text: "Your top recurring theme was time outdoors with people close to you.",
                     citation: CreationCitation(
-                        memoryId: uuid("55555555-5555-5555-5555-555555555555"),
-                        hasSource: true
+                        memoryId: uuid("55555555-5555-5555-5555-555555555555")
                     )
                 ),
             ],
@@ -260,8 +309,7 @@ enum CreationFixtureLoader {
                     id: uuid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
                     text: "A small orange cat at my feet,\nturning ordinary evenings into a quiet kind of warmth.",
                     citation: CreationCitation(
-                        memoryId: uuid("22222222-2222-2222-2222-222222222222"),
-                        hasSource: true
+                        memoryId: uuid("22222222-2222-2222-2222-222222222222")
                     )
                 ),
             ],
@@ -283,8 +331,7 @@ enum CreationFixtureLoader {
                     id: uuid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
                     text: "Spring 2025 — long evening walks in the park.",
                     citation: CreationCitation(
-                        memoryId: uuid("22222222-2222-2222-2222-222222222222"),
-                        hasSource: true
+                        memoryId: uuid("22222222-2222-2222-2222-222222222222")
                     )
                 ),
             ],
