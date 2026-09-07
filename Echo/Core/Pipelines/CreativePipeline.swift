@@ -4,16 +4,15 @@
 //            docs/decisions/ADR-013-creation-export-boundary.md → 决策 3 (grounded 生成 + source anchors),
 //            docs/01-spec/用户故事与验收标准规格书.md → US-SYN-002 (溯源锚点), US-SYN-003 (grounded 生成),
 //            US-SYN-007 (术语表注入), US-SYN-008 (合成失败模板降级)
-// 任务: 3F.9 - Apple Translation 与 grounded creation
-//       4.0a - Search operation/source authorization separation
-// AC 覆盖: US-SYN-002 AC-1/3 ✅ (锚点渲染/NoSource), AC-5 ✅ (.synthesis 审计),
-//          US-SYN-003 AC-2 ✅ (严格引用检索结果, 每段附溯源锚点), AC-6 ✅ (.creativeGeneration 审计),
+// 任务: 3F.9 + 4.0a + 4.0i - Grounded creation and verifiable citations
+// AC 覆盖: US-SYN-002 AC-1/3 ✅ (多锚点/NoSource/partialNoSource), AC-5 ✅ (.synthesis 审计),
+//          US-SYN-003 AC-2 ✅ (版本化 JSON + exact allow-list), AC-6 ✅ (.creativeGeneration typed 审计),
 //          US-SYN-007 AC-1 ✅ (Prompt 注入术语表子集), US-SYN-008 AC-1/5 ✅ (失败模板降级 + .synthesisFallback 审计),
 //          US-PRV-001 AC-7 ✅ (按真实 sourceType 授权，不使用 search 伪来源),
 //          R-004 ✅ (LanguageAligner 语言对齐)
 // 架构约束: AGENTS.md §4.1 (Pipeline 契约: 审计强制 / 错误分级 / 纯函数), R-006 (PrivacyCheckpoint 入口),
 //           §4.2 (仅持有不可变引用); actor 声明合法 (v5.12)
-// 生成时间: 2026-08-11
+// 生成时间: 2026-08-11 | Updated: 2026-09-07 (4.0i, ADR-020)
 // ==========================================
 
 import Foundation
@@ -29,7 +28,7 @@ public enum CreativeTemplate: String, Sendable, Equatable {
 }
 
 /// grounded 创作源记忆 — 检索结果输入 (US-SYN-003 AC-2 严格引用检索结果)。
-public struct CreativeSource: Sendable, Equatable {
+public nonisolated struct CreativeSource: Sendable, Equatable {
     /// 源记忆 ID
     public nonisolated let memoryID: UUID
     /// 数据源引用 (PHAsset.localIdentifier / note 定位符)
@@ -57,36 +56,67 @@ public struct CreativeSource: Sendable, Equatable {
 }
 
 /// 溯源锚点 — `[🔗 MemoryID:xxx]` (US-SYN-002 AC-1)。
-public struct SourceAnchor: Sendable, Equatable {
+public nonisolated struct SourceAnchor: Sendable, Equatable {
     /// 源记忆 ID
     public nonisolated let memoryID: UUID
-    /// 是否存在可跳转来源（无来源 → `[⚠️ NoSource]` 置灰, US-SYN-002 AC-3）
-    public nonisolated let hasSource: Bool
+    /// Canonical source type is carried internally for current-policy revalidation.
+    public nonisolated let sourceType: String?
+    /// Refreshed at the copy/export/navigation boundary; never inferred from model output.
+    public nonisolated let availability: CitationSourceAvailability
 
-    public nonisolated init(memoryID: UUID, hasSource: Bool = true) {
+    public nonisolated init(
+        memoryID: UUID,
+        sourceType: String? = nil,
+        availability: CitationSourceAvailability = .available
+    ) {
         self.memoryID = memoryID
-        self.hasSource = hasSource
+        self.sourceType = sourceType
+        self.availability = availability
     }
+
+}
+
+public nonisolated enum CitationSourceAvailability: String, Sendable, Codable, Equatable {
+    case available
+    case offlineUnavailable
+    case missing
+    case unsupported
+}
+
+/// Provenance state for one generated paragraph. This proves source identity, not factual accuracy.
+public nonisolated enum GroundingStatus: String, Sendable, Codable, Equatable {
+    case cited
+    case noSource
+    case partialNoSource
 }
 
 /// grounded 生成段落 — AI 生成文本 + 溯源锚点 (US-SYN-002/003 AC-2)。
-public struct GroundedParagraph: Sendable, Equatable, Identifiable {
+public nonisolated struct GroundedParagraph: Sendable, Equatable, Identifiable {
     /// 段落唯一标识（确定性）
     public nonisolated let id: UUID
     /// 段落文本
     public nonisolated let text: String
-    /// 溯源锚点 — 无来源段落锚点为 nil (US-SYN-002 AC-3)
-    public nonisolated let anchor: SourceAnchor?
+    /// All validated source anchors in model-declared order, deduplicated within the paragraph.
+    public nonisolated let anchors: [SourceAnchor]
+    /// Whether every, none, or only part of the model-declared references passed the allow-list.
+    public nonisolated let groundingStatus: GroundingStatus
 
-    public nonisolated init(id: UUID, text: String, anchor: SourceAnchor?) {
+    public nonisolated init(
+        id: UUID,
+        text: String,
+        anchors: [SourceAnchor],
+        groundingStatus: GroundingStatus
+    ) {
         self.id = id
         self.text = text
-        self.anchor = anchor
+        self.anchors = anchors
+        self.groundingStatus = groundingStatus
     }
+
 }
 
 /// grounded 创作输出 — 含 source anchors (ADR-013 决策 3)。
-public struct CreativeOutput: Sendable, Equatable {
+public nonisolated struct CreativeOutput: Sendable, Equatable {
     /// 选中的创作模板
     public nonisolated let template: CreativeTemplate
     /// 结果标题（叙事报告含周期, US-SYN-004 AC-5）
@@ -97,10 +127,20 @@ public struct CreativeOutput: Sendable, Equatable {
     public nonisolated let paragraphs: [GroundedParagraph]
     /// 引用的源记忆数
     public nonisolated let sourceMemoryCount: Int
+    /// Canonical source types actually submitted to the model, retained for action-time policy checks.
+    public nonisolated let sourceTypes: [String]
     /// 空态原因（无匹配源记忆时非 nil → empty state）
     public nonisolated let emptyReason: String?
     /// 合成是否走了失败降级模板 (US-SYN-008)
     public nonisolated let didFallback: Bool
+    /// Count of validated anchor occurrences; duplicate IDs within one paragraph count once.
+    public nonisolated var citationCount: Int {
+        paragraphs.reduce(0) { $0 + $1.anchors.count }
+    }
+    /// Paragraphs carrying either noSource or partialNoSource.
+    public nonisolated var noSourceCount: Int {
+        paragraphs.count { $0.groundingStatus != .cited }
+    }
 
     public nonisolated init(
         template: CreativeTemplate,
@@ -108,6 +148,7 @@ public struct CreativeOutput: Sendable, Equatable {
         periodType: String? = nil,
         paragraphs: [GroundedParagraph],
         sourceMemoryCount: Int,
+        sourceTypes: [String] = [],
         emptyReason: String? = nil,
         didFallback: Bool = false
     ) {
@@ -116,6 +157,7 @@ public struct CreativeOutput: Sendable, Equatable {
         self.periodType = periodType
         self.paragraphs = paragraphs
         self.sourceMemoryCount = sourceMemoryCount
+        self.sourceTypes = Array(Set(sourceTypes)).sorted()
         self.emptyReason = emptyReason
         self.didFallback = didFallback
     }
@@ -133,6 +175,8 @@ public enum CreativeError: Error, LocalizedError, Sendable, Equatable {
     case alignmentFailed
     /// 无匹配源记忆 (空态, 非错误 — 业务空结果)
     case noSources
+    /// The model output did not satisfy ADR-020's bounded, versioned envelope contract (L2).
+    case invalidStructuredOutput(CreativeProtocolFailure)
 
     public nonisolated var errorDescription: String? {
         switch self {
@@ -144,8 +188,38 @@ public enum CreativeError: Error, LocalizedError, Sendable, Equatable {
             return "Language alignment failed after the maximum retry count."
         case .noSources:
             return "No source memories matched this template."
+        case .invalidStructuredOutput(let failure):
+            return "The generated response did not satisfy the grounded-output contract: \(failure.rawValue)."
         }
     }
+}
+
+public nonisolated enum CreativeProtocolFailure: String, Sendable, Equatable {
+    case oversizedPayload
+    case malformedEnvelope
+    case unsupportedSchemaVersion
+    case tooManyParagraphs
+    case emptyParagraph
+    case paragraphTooLong
+    case tooManyReferences
+}
+
+/// Named limits make the local generation boundary deterministic and reviewable.
+public nonisolated enum CreativeGenerationLimits {
+    public nonisolated static let maximumPayloadBytes = 262_144
+    public nonisolated static let maximumParagraphs = 64
+    public nonisolated static let maximumParagraphCharacters = 8_000
+    public nonisolated static let maximumReferencesPerParagraph = 16
+}
+
+private nonisolated struct CreativeGenerationEnvelope: Decodable {
+    let schemaVersion: Int
+    let paragraphs: [CreativeGenerationParagraph]
+}
+
+private nonisolated struct CreativeGenerationParagraph: Decodable {
+    let text: String
+    let sourceMemoryIDs: [UUID]
 }
 
 // MARK: - Creative Pipeline
@@ -223,7 +297,7 @@ public actor CreativePipeline {
                 success: false,
                 sourceType: "creation",
                 affectedCount: 0,
-                sourceLanguage: encodeFailureMetadata(failureReason: "runtime-unavailable")
+                outcome: "runtime-unavailable"
             )
             throw CreativeError.runtimeUnavailable
         }
@@ -234,6 +308,7 @@ public actor CreativePipeline {
                 template: template,
                 paragraphs: [],
                 sourceMemoryCount: 0,
+                sourceTypes: [],
                 emptyReason: "No source memories matched this template",
                 didFallback: false
             )
@@ -244,22 +319,36 @@ public actor CreativePipeline {
                 success: true,
                 sourceType: "creation",
                 affectedCount: 0,
-                sourceLanguage: encodeSynthesisMetadata(citationCount: 0, noSourceCount: 0)
+                citationCount: 0,
+                noSourceCount: 0
             )
             return output
         }
 
-        // 构建 grounded prompt — 源文本 + 术语表子集 + R-004 语言指令 (经 aligner 注入)
-        let groundedPrompt = buildGroundedPrompt(template: template, sources: sources)
+        // Exact allow-list and unique submitted sources define the only legal citation identities.
+        var submittedIDs: Set<UUID> = []
+        let submittedSources = sources.filter { submittedIDs.insert($0.memoryID).inserted }
+        let submittedSourceTypes = Dictionary(
+            uniqueKeysWithValues: submittedSources.map {
+                ($0.memoryID, SearchPipeline.normalizeSourceType($0.sourceType))
+            }
+        )
+        let groundedPrompt = buildGroundedPrompt(template: template, sources: submittedSources)
 
         do {
             let generated = try await aligner.align(prompt: groundedPrompt, traceID: traceID)
-
-            // 解析段落 + 附加溯源锚点（逐段循环映射源记忆）
-            let paragraphs = buildParagraphs(from: generated, sources: sources)
-
-            let citationCount = paragraphs.filter { $0.anchor?.hasSource == true }.count
-            let noSourceCount = paragraphs.count - citationCount
+            let paragraphs = try parseParagraphs(
+                from: generated,
+                allowedMemoryIDs: submittedIDs,
+                sourceTypes: submittedSourceTypes
+            )
+            let output = CreativeOutput(
+                template: template,
+                paragraphs: paragraphs,
+                sourceMemoryCount: submittedSources.count,
+                sourceTypes: Array(Set(submittedSourceTypes.values)).sorted(),
+                didFallback: false
+            )
 
             try? await privacyActor.writeAuditLog(
                 eventType: .synthesis,
@@ -267,8 +356,9 @@ public actor CreativePipeline {
                 policyVersion: checkpoint.policyVersion,
                 success: true,
                 sourceType: "creation",
-                affectedCount: sources.count,
-                sourceLanguage: encodeSynthesisMetadata(citationCount: citationCount, noSourceCount: noSourceCount)
+                affectedCount: submittedSources.count,
+                citationCount: output.citationCount,
+                noSourceCount: output.noSourceCount
             )
             try? await privacyActor.writeAuditLog(
                 eventType: .creativeGeneration,
@@ -276,20 +366,25 @@ public actor CreativePipeline {
                 policyVersion: checkpoint.policyVersion,
                 success: true,
                 sourceType: "creation",
-                affectedCount: sources.count,
-                sourceLanguage: encodeCreationMetadata(
-                    templateType: template.rawValue,
-                    sourceMemoryCount: sources.count,
-                    savedToNotes: false
-                )
+                affectedCount: submittedSources.count,
+                templateType: template.rawValue,
+                sourceMemoryCount: submittedSources.count,
+                citationCount: output.citationCount,
+                noSourceCount: output.noSourceCount
             )
-
-            return CreativeOutput(
-                template: template,
-                paragraphs: paragraphs,
-                sourceMemoryCount: sources.count,
-                didFallback: false
+            return output
+        } catch let error as CreativeError {
+            // Invalid/unknown/oversized structured output must never be displayed or fabricated.
+            try? await privacyActor.writeAuditLog(
+                eventType: .synthesisFallback,
+                traceID: traceID,
+                policyVersion: checkpoint.policyVersion,
+                success: false,
+                sourceType: "creation",
+                affectedCount: submittedSources.count,
+                outcome: error.errorDescription
             )
+            throw error
         } catch {
             // 对齐失败 → 失败降级模板 (US-SYN-008) — 模板内容固定，不含 LLM 生成成分
             try? await privacyActor.writeAuditLog(
@@ -298,8 +393,8 @@ public actor CreativePipeline {
                 policyVersion: checkpoint.policyVersion,
                 success: false,
                 sourceType: "creation",
-                affectedCount: sources.count,
-                sourceLanguage: encodeFailureMetadata(failureReason: String(describing: error))
+                affectedCount: submittedSources.count,
+                outcome: "generation-or-language-alignment-failed"
             )
             let fallbackOutput = CreativeOutput(
                 template: template,
@@ -307,10 +402,12 @@ public actor CreativePipeline {
                     GroundedParagraph(
                         id: UUID(),
                         text: alignerFallbackText(),
-                        anchor: nil
+                        anchors: [],
+                        groundingStatus: .noSource
                     ),
                 ],
-                sourceMemoryCount: sources.count,
+                sourceMemoryCount: submittedSources.count,
+                sourceTypes: Array(Set(submittedSourceTypes.values)).sorted(),
                 didFallback: true
             )
             return fallbackOutput
@@ -335,34 +432,78 @@ public actor CreativePipeline {
             lines.append(contentsOf: termLines)
         }
 
-        for (index, source) in sources.enumerated() {
+        for source in sources {
             let text = source.text ?? "[no text — \(source.sourceType)]"
-            lines.append("[\(index)] \(source.assetID): \(text)")
+            lines.append("MemoryID \(source.memoryID.uuidString): \(text)")
         }
 
-        lines.append("Output plain text paragraphs separated by blank lines.")
+        lines.append("Return JSON only using this exact shape:")
+        lines.append(#"{"schemaVersion":1,"paragraphs":[{"text":"...","sourceMemoryIDs":["opaque-memory-uuid"]}]}"#)
+        lines.append("Use only MemoryIDs listed above. Use an empty sourceMemoryIDs array when no source supports a paragraph.")
         return lines.joined(separator: "\n")
     }
 
-    /// 解析生成文本为段落并附加溯源锚点（逐段循环映射源记忆）。
-    private func buildParagraphs(from generated: String, sources: [CreativeSource]) -> [GroundedParagraph] {
-        let rawParagraphs = generated
-            .split(separator: "\n\n")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-
-        guard !rawParagraphs.isEmpty else {
-            return []
+    private func parseParagraphs(
+        from generated: String,
+        allowedMemoryIDs: Set<UUID>,
+        sourceTypes: [UUID: String]
+    ) throws -> [GroundedParagraph] {
+        let data = Data(generated.utf8)
+        guard data.count <= CreativeGenerationLimits.maximumPayloadBytes else {
+            throw CreativeError.invalidStructuredOutput(.oversizedPayload)
+        }
+        let envelope: CreativeGenerationEnvelope
+        do {
+            envelope = try JSONDecoder().decode(CreativeGenerationEnvelope.self, from: data)
+        } catch {
+            throw CreativeError.invalidStructuredOutput(.malformedEnvelope)
+        }
+        guard envelope.schemaVersion == 1 else {
+            throw CreativeError.invalidStructuredOutput(.unsupportedSchemaVersion)
+        }
+        guard envelope.paragraphs.count <= CreativeGenerationLimits.maximumParagraphs else {
+            throw CreativeError.invalidStructuredOutput(.tooManyParagraphs)
         }
 
-        return rawParagraphs.enumerated().map { index, text in
-            let source = sources[index % sources.count]
+        return try envelope.paragraphs.enumerated().map { index, paragraph in
+            let text = paragraph.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty else {
+                throw CreativeError.invalidStructuredOutput(.emptyParagraph)
+            }
+            guard text.count <= CreativeGenerationLimits.maximumParagraphCharacters else {
+                throw CreativeError.invalidStructuredOutput(.paragraphTooLong)
+            }
+            guard paragraph.sourceMemoryIDs.count <= CreativeGenerationLimits.maximumReferencesPerParagraph else {
+                throw CreativeError.invalidStructuredOutput(.tooManyReferences)
+            }
+
+            var seen: Set<UUID> = []
+            let declaredIDs = paragraph.sourceMemoryIDs.filter { seen.insert($0).inserted }
+            let validIDs = declaredIDs.filter(allowedMemoryIDs.contains)
+            let status: GroundingStatus
+            if declaredIDs.isEmpty || validIDs.isEmpty {
+                status = .noSource
+            } else if validIDs.count == declaredIDs.count {
+                status = .cited
+            } else {
+                status = .partialNoSource
+            }
             return GroundedParagraph(
-                id: UUID(),
-                text: String(text),
-                anchor: SourceAnchor(memoryID: source.memoryID, hasSource: true)
+                id: Self.stableParagraphID(index: index, text: text),
+                text: text,
+                anchors: validIDs.map {
+                    SourceAnchor(memoryID: $0, sourceType: sourceTypes[$0])
+                },
+                groundingStatus: status
             )
         }
+    }
+
+    private nonisolated static func stableParagraphID(index: Int, text: String) -> UUID {
+        let bytes = Array(AuditContentHasher.sha256Hex("\(index):\(text)").utf8.prefix(32))
+        let string = String(decoding: bytes, as: UTF8.self)
+        let formatted = "\(string.prefix(8))-\(string.dropFirst(8).prefix(4))-\(string.dropFirst(12).prefix(4))-\(string.dropFirst(16).prefix(4))-\(string.dropFirst(20).prefix(12))"
+        return UUID(uuidString: formatted) ?? UUID()
     }
 
     /// 对齐失败降级模板文本 (US-SYN-008 AC-3: 模板内容固定，不含 LLM 生成成分)。
@@ -370,41 +511,4 @@ public actor CreativePipeline {
         "Unable to generate this creation right now. Please try again later."
     }
 
-    /// 审计 metadata — .synthesis (US-SYN-002 AC-5)
-    private nonisolated func encodeSynthesisMetadata(citationCount: Int, noSourceCount: Int) -> String {
-        let payload: [String: Any] = ["citationCount": citationCount, "noSourceCount": noSourceCount]
-        guard let data = try? JSONSerialization.data(withJSONObject: payload),
-              let str = String(data: data, encoding: .utf8) else {
-            return "{}"
-        }
-        return str
-    }
-
-    /// 审计 metadata — .creativeGeneration (US-SYN-003 AC-6)
-    private nonisolated func encodeCreationMetadata(
-        templateType: String,
-        sourceMemoryCount: Int,
-        savedToNotes: Bool
-    ) -> String {
-        let payload: [String: Any] = [
-            "templateType": templateType,
-            "sourceMemoryCount": sourceMemoryCount,
-            "savedToNotes": savedToNotes,
-        ]
-        guard let data = try? JSONSerialization.data(withJSONObject: payload),
-              let str = String(data: data, encoding: .utf8) else {
-            return "{}"
-        }
-        return str
-    }
-
-    /// 审计 metadata — .synthesisFallback (US-SYN-008 AC-5)
-    private nonisolated func encodeFailureMetadata(failureReason: String) -> String {
-        let payload: [String: Any] = ["failureReason": failureReason]
-        guard let data = try? JSONSerialization.data(withJSONObject: payload),
-              let str = String(data: data, encoding: .utf8) else {
-            return "{}"
-        }
-        return str
-    }
 }

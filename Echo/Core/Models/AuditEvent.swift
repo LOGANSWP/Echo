@@ -7,12 +7,14 @@
 //       3F.6 - 跟进查询审计事件（US-RET-005 AC-4）
 //       4.0d - 交互式唤醒卡 hash-only action audit
 //       4.0h - Structured audit for PhotoKit deletion results and exclusion cleanup notices
+//       4.0i - Typed grounded-generation and system-share audit
 // AC 覆盖: AGENTS.md §5.4 (必填字段 eventType/timestamp/traceID/policyVersion/success, hash-only, 30天, 加密),
 //          US-PRV-006 AC-6 (retentionPolicyEvaluated), ADR-007 §决策-3 (purgeFailed 审计),
-//          US-RET-005 AC-4 ✅ (followUpQuery, 2026-08-11 3F.6), US-SRC-010 AC-5 ✅ (crossAppSearch)
+//          US-RET-005 AC-4 ✅ (followUpQuery, 2026-08-11 3F.6), US-SRC-010 AC-5 ✅ (crossAppSearch),
+//          4.0i AC-5/6 (typed creation audit and exact hash-only share handoff identity)
 // 架构约束: AGENTS.md R-007 (禁止 unchecked Sendable), 仅记录哈希摘要禁止原文
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
-// Generated: 2026-08-04 | Updated: 2026-09-05 (4.0h source lifecycle)
+// Generated: 2026-08-04 | Updated: 2026-09-07 (4.0i typed creation/share audit)
 // ==========================================
 
 import Foundation
@@ -97,10 +99,18 @@ public enum AuditEvent: String, Sendable, Codable {
     case synthesis
     /// 创作生成 (US-SYN-003 AC-6: 含 templateType, sourceMemoryCount, exportFormat, savedToNotes)
     case creativeGeneration
+    /// User-mediated system share/export presentation (US-SYN-003/004, ADR-020).
+    case creationSharePresented
+    /// Persisted monthly/yearly report generation (US-SYN-004, delivered by 4.0j).
+    case narrativeReportGenerated
     /// 合成失败模板降级 (US-SYN-008 AC-5: 含 failureReason)
     case synthesisFallback
     /// 交互式唤醒卡动作（US-AWK-005 AC-5: next/record/jump + hash-only identity）
     case cardInteraction
+}
+
+public nonisolated enum AuditValidationError: Error, Sendable, Equatable {
+    case invalidCreationFields
 }
 
 // MARK: - Audit Log Entry
@@ -146,6 +156,15 @@ public struct AuditLogEntry: Sendable, Codable {
     public nonisolated let sourceDeletionOutcome: String?
     public nonisolated let excludedAutoCleaned: Bool?
     public nonisolated let userNotified: Bool?
+    public nonisolated let templateType: String?
+    public nonisolated let sourceMemoryCount: Int?
+    public nonisolated let citationCount: Int?
+    public nonisolated let noSourceCount: Int?
+    public nonisolated let exportFormat: String?
+    public nonisolated let sharePresented: Bool?
+    public nonisolated let periodType: String?
+    /// Hash-only identity for one system-share handoff; used for durable idempotency.
+    public nonisolated let shareHandoffIdDigest: String?
 
     public nonisolated init(
         id: Int64 = 0,
@@ -178,7 +197,15 @@ public struct AuditLogEntry: Sendable, Codable {
         sourceDeletionCompleted: Bool? = nil,
         sourceDeletionOutcome: String? = nil,
         excludedAutoCleaned: Bool? = nil,
-        userNotified: Bool? = nil
+        userNotified: Bool? = nil,
+        templateType: String? = nil,
+        sourceMemoryCount: Int? = nil,
+        citationCount: Int? = nil,
+        noSourceCount: Int? = nil,
+        exportFormat: String? = nil,
+        sharePresented: Bool? = nil,
+        periodType: String? = nil,
+        shareHandoffIdDigest: String? = nil
     ) {
         self.id = id
         self.eventType = eventType
@@ -211,6 +238,14 @@ public struct AuditLogEntry: Sendable, Codable {
         self.sourceDeletionOutcome = sourceDeletionOutcome
         self.excludedAutoCleaned = excludedAutoCleaned
         self.userNotified = userNotified
+        self.templateType = templateType
+        self.sourceMemoryCount = sourceMemoryCount
+        self.citationCount = citationCount
+        self.noSourceCount = noSourceCount
+        self.exportFormat = exportFormat
+        self.sharePresented = sharePresented
+        self.periodType = periodType
+        self.shareHandoffIdDigest = shareHandoffIdDigest
     }
 
     /// 从数据库查询结果行构造 AuditLogEntry（用于 fetchAuditLogs）
@@ -252,7 +287,15 @@ public struct AuditLogEntry: Sendable, Codable {
             sourceDeletionCompleted: row["sourceDeletionCompleted"]?.intValue.map { $0 != 0 },
             sourceDeletionOutcome: row["sourceDeletionOutcome"]?.stringValue,
             excludedAutoCleaned: row["excludedAutoCleaned"]?.intValue.map { $0 != 0 },
-            userNotified: row["userNotified"]?.intValue.map { $0 != 0 }
+            userNotified: row["userNotified"]?.intValue.map { $0 != 0 },
+            templateType: row["templateType"]?.stringValue,
+            sourceMemoryCount: row["sourceMemoryCount"]?.intValue.map(Int.init),
+            citationCount: row["citationCount"]?.intValue.map(Int.init),
+            noSourceCount: row["noSourceCount"]?.intValue.map(Int.init),
+            exportFormat: row["exportFormat"]?.stringValue,
+            sharePresented: row["sharePresented"]?.intValue.map { $0 != 0 },
+            periodType: row["periodType"]?.stringValue,
+            shareHandoffIdDigest: row["shareHandoffIdDigest"]?.stringValue
         )
     }
 }

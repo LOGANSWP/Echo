@@ -5,17 +5,17 @@
 //            US-SYN-004 (月度/年度叙事报告), US-SYN-005 (私有 Prompt 草稿编辑确认)
 //            docs/ui/echo-memory-canvas-style.md §3.2 (Focus surfaces — 单列 + grouped metadata),
 //            docs/ui/architecture.md §6 (ViewModel 契约), §7 (适配器契约)
-// 任务: 3.9 - 整合所有 ViewModel 与 Pipeline + 创作保存 UI
+// 任务: 3.9 + 4.0i - Grounded creation, stable citation navigation, and truthful share audit
 // AC coverage: US-SYN-003 AC-1 ✅ (template selection), AC-2 ✅ (grounded citations),
 //              AC-3 ✅ (preview/copy/export), AC-4 ✅ (system share handoff),
 //              AC-5 ✅ (visible L2 recovery when payload preparation fails),
 //          US-SYN-004 AC-4 ✅ (分享/导出/打印), AC-5 ✅ (保存逻辑与 SYN-003 一致, 标题含报告周期),
 //          US-SYN-005 AC-4 ✅ (Prompt 草稿可编辑确认), AC-6 ✅ (重置为默认 Prompt)
-//              Task 4.0b ✅ (truthful NoSource export, native share UI, real PDF attachment)
+//              Task 4.0b ✅ (native Focus presentation), Task 4.0i ✅ (multi-anchor/current-policy handoff)
 // 架构约束: AGENTS.md §8.1 (@MainActor + @Observable + state enum: idle/loading/completed/error/cancelled),
 //           §8.2 (状态流转), docs/ui/architecture.md §6~7 (适配器契约),
 //           §2.5 (Adapter 不保存第二份领域真相 — 仅转换展示字段)
-// 生成时间: 2026-08-02
+// 生成时间: 2026-08-02 | Updated: 2026-09-07 (4.0i, ADR-020)
 // ==========================================
 
 import Foundation
@@ -34,20 +34,44 @@ struct CreationSharePayload: Identifiable, Equatable, Sendable {
     let text: String
     let previewTitle: String
     let attachmentURL: URL?
+    let exportFormat: CreationExportFormat
+    let traceID: String
+    let periodType: String?
 
     init(
         id: UUID = UUID(),
         kind: Kind,
         text: String,
         previewTitle: String,
-        attachmentURL: URL? = nil
+        attachmentURL: URL? = nil,
+        exportFormat: CreationExportFormat,
+        traceID: String,
+        periodType: String? = nil
     ) {
         self.id = id
         self.kind = kind
         self.text = text
         self.previewTitle = previewTitle
         self.attachmentURL = attachmentURL
+        self.exportFormat = exportFormat
+        self.traceID = traceID
+        self.periodType = periodType
     }
+}
+
+private extension CreationSharePayload.Kind {
+    var exportFormat: CreationExportFormat {
+        switch self {
+        case .markdown: .markdown
+        case .pdf: .pdf
+        case .text, .notesHandoff: .plainText
+        }
+    }
+}
+
+@MainActor
+protocol CreationSharePresentationReporting: AnyObject {
+    func shareControllerDidAppear(payloadID: UUID)
 }
 
 // MARK: - CreationViewModel
@@ -75,7 +99,7 @@ struct CreationSharePayload: Identifiable, Equatable, Sendable {
 /// ```
 @MainActor
 @Observable
-final class CreationViewModel {
+final class CreationViewModel: CreationSharePresentationReporting {
     // MARK: - State Enum
 
     /// ViewModel 统一状态枚举 (AGENTS.md §8.1)
@@ -135,6 +159,8 @@ final class CreationViewModel {
 
     /// 导出格式确认弹窗是否呈现
     var isExportPickerPresented: Bool = false
+    /// Set only after current-policy/source resolution succeeds.
+    var navigationMemoryID: UUID?
     /// Prepared local payload for the user-mediated system share handoff.
     var sharePayload: CreationSharePayload? {
         didSet {
@@ -149,6 +175,8 @@ final class CreationViewModel {
         get { sharePayload != nil }
         set {
             if !newValue {
+                activeSharePayload = nil
+                presentedPayloadIDs.removeAll()
                 sharePayload = nil
             }
         }
@@ -160,17 +188,23 @@ final class CreationViewModel {
     private var generateTask: Task<Void, Never>?
     /// Currently active PDF generation task.
     private var exportTask: Task<Void, Never>?
+    private var activeSharePayload: CreationSharePayload?
+    private var presentedPayloadIDs: Set<UUID> = []
     /// UI 切片模式模拟创作源 — fixture 注入
     private var stubCreation: CreationModel?
     /// Production creation pipeline. A missing runtime must fail closed and never load fixture output.
     private let creativePipeline: CreativePipeline?
+    /// Production action boundary. Fixtures may bypass it but cannot serve as production evidence.
+    private let exportCoordinator: CreationExportCoordinator?
     /// 创作源记忆（grounded 输入，经检索结果映射）— 3F.9 生产路径
     private var sourceMemories: [CreativeSource] = []
 
     init(
-        creativePipeline: CreativePipeline? = nil
+        creativePipeline: CreativePipeline? = nil,
+        exportCoordinator: CreationExportCoordinator? = nil
     ) {
         self.creativePipeline = creativePipeline
+        self.exportCoordinator = exportCoordinator
     }
 
     // MARK: - Actions
@@ -293,9 +327,14 @@ final class CreationViewModel {
             CreationParagraph(
                 id: paragraph.id,
                 text: paragraph.text,
-                citation: paragraph.anchor.map {
-                    CreationCitation(memoryId: $0.memoryID, hasSource: $0.hasSource)
-                }
+                citations: paragraph.anchors.map {
+                    CreationCitation(
+                        memoryId: $0.memoryID,
+                        sourceType: $0.sourceType,
+                        availability: $0.availability
+                    )
+                },
+                groundingStatus: paragraph.groundingStatus
             )
         }
 
@@ -305,6 +344,7 @@ final class CreationViewModel {
             periodType: output.periodType,
             paragraphs: paragraphs,
             sourceMemoryCount: output.sourceMemoryCount,
+            sourceTypes: output.sourceTypes,
             emptyReason: output.emptyReason
         )
     }
@@ -316,15 +356,30 @@ final class CreationViewModel {
         generate()
     }
 
-    /// 复制生成内容到剪贴板 (US-SYN-003 AC-3)。
-    ///
-    /// 复制纯文本（段落拼接，不含锚点标记）。
+    /// Copies citation-preserving plain text after current-policy revalidation.
     func copyToClipboard() {
         guard let creation else { return }
-        let text = creation.paragraphs.map(\.text).joined(separator: "\n\n")
-        UIPasteboard.general.string = text
-        // accessibility: 复制后触发朗读确认
-        UIAccessibility.post(notification: .announcement, argument: "Creation copied to clipboard")
+        let output = Self.creativeOutput(from: creation)
+        if isFixtureBacked {
+            completeCopy(output)
+            return
+        }
+        exportTask?.cancel()
+        exportTask = Task { [weak self] in
+            guard let self, let coordinator = self.exportCoordinator else {
+                self?.showHandoffError()
+                return
+            }
+            do {
+                let authorized = try await coordinator.authorize(
+                    output: output,
+                    traceID: UUID().uuidString
+                )
+                self.completeCopy(authorized)
+            } catch {
+                self.showHandoffError()
+            }
+        }
     }
 
     /// 呈现导出格式选择 (US-SYN-003 AC-3)。
@@ -338,15 +393,7 @@ final class CreationViewModel {
     /// 3F.9 (ADR-013 决策 4): 经 `CreationExportService` 生成导出内容后呈现系统 share sheet。
     func export(format: ExportFormat) {
         isExportPickerPresented = false
-        exportTask?.cancel()
-        switch format {
-        case .pdf:
-            exportTask = Task { [weak self] in
-                await self?.preparePDFSharePayload()
-            }
-        case .markdown:
-            prepareSharePayload(kind: .markdown)
-        }
+        prepareSharePayload(kind: format == .pdf ? .pdf : .markdown)
     }
 
     /// 呈现分享/打印 Sheet (US-SYN-004 AC-4)。
@@ -366,73 +413,230 @@ final class CreationViewModel {
 
     private func prepareSharePayload(kind: CreationSharePayload.Kind) {
         guard viewState == .generated, let creation else {
-            sharePayload = nil
-            viewState = .error(.l2Recoverable(
-                message: "Unable to prepare this creation for sharing. Please try again."
-            ))
+            showHandoffError()
             return
         }
-
         let output = Self.creativeOutput(from: creation)
-        let text: String
-        switch kind {
-        case .markdown:
-            text = CreationExportService.markdown(from: output)
-        case .text, .notesHandoff:
-            text = CreationExportService.shareText(from: output)
-        case .pdf:
-            assertionFailure("PDF payloads must be prepared by preparePDFSharePayload()")
+        let payloadID = UUID()
+        let traceID = UUID().uuidString
+        if isFixtureBacked, kind != .pdf {
+            finishTextPayload(
+                output: output,
+                creation: creation,
+                kind: kind,
+                payloadID: payloadID,
+                traceID: traceID
+            )
             return
         }
-        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            sharePayload = nil
-            viewState = .error(.l2Recoverable(
-                message: "Unable to prepare this creation for sharing. Please try again."
-            ))
-            return
+        exportTask?.cancel()
+        exportTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let authorized: CreativeOutput
+                if self.isFixtureBacked {
+                    authorized = output
+                } else if let coordinator = self.exportCoordinator {
+                    authorized = try await coordinator.authorize(output: output, traceID: traceID)
+                } else {
+                    throw CreationExportError.privacyDenied
+                }
+                try Task.checkCancellation()
+                if kind == .pdf {
+                    try await self.finishPDFPayload(
+                        output: authorized,
+                        creation: creation,
+                        payloadID: payloadID,
+                        traceID: traceID
+                    )
+                } else {
+                    self.finishTextPayload(
+                        output: authorized,
+                        creation: creation,
+                        kind: kind,
+                        payloadID: payloadID,
+                        traceID: traceID
+                    )
+                }
+            } catch is CancellationError {
+                return
+            } catch {
+                await self.recordFailedPresentation(
+                    payloadID: payloadID,
+                    kind: kind,
+                    periodType: creation.periodType,
+                    traceID: traceID
+                )
+                self.showHandoffError()
+            }
         }
+    }
 
-        sharePayload = CreationSharePayload(
+    private func finishTextPayload(
+        output: CreativeOutput,
+        creation: CreationModel,
+        kind: CreationSharePayload.Kind,
+        payloadID: UUID,
+        traceID: String
+    ) {
+        let text = kind == .markdown
+            ? CreationExportService.markdown(from: output)
+            : CreationExportService.plainText(from: output)
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            showHandoffError()
+            return
+        }
+        publishPayload(CreationSharePayload(
+            id: payloadID,
             kind: kind,
             text: text,
-            previewTitle: creation.title ?? "Echo Creation"
+            previewTitle: creation.title ?? "Echo Creation",
+            exportFormat: kind.exportFormat,
+            traceID: traceID,
+            periodType: creation.periodType
+        ))
+    }
+
+    private func finishPDFPayload(
+        output: CreativeOutput,
+        creation: CreationModel,
+        payloadID: UUID,
+        traceID: String
+    ) async throws {
+        let data = try await CreationExportService.pdf(from: output)
+        try Task.checkCancellation()
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("Echo-Creation-\(payloadID.uuidString)")
+            .appendingPathExtension("pdf")
+        try data.write(to: fileURL, options: .atomic)
+        if Task.isCancelled {
+            try? FileManager.default.removeItem(at: fileURL)
+            throw CancellationError()
+        }
+        publishPayload(CreationSharePayload(
+            id: payloadID,
+            kind: .pdf,
+            text: "",
+            previewTitle: creation.title ?? "Echo Creation",
+            attachmentURL: fileURL,
+            exportFormat: .pdf,
+            traceID: traceID,
+            periodType: creation.periodType
+        ))
+    }
+
+    private func publishPayload(_ payload: CreationSharePayload) {
+        activeSharePayload = payload
+        sharePayload = payload
+    }
+
+    private func completeCopy(_ output: CreativeOutput) {
+        UIPasteboard.general.string = CreationExportService.plainText(from: output)
+        UIAccessibility.post(
+            notification: .announcement,
+            argument: EchoStrings.tr("Creation copied to clipboard")
         )
     }
 
-    private func preparePDFSharePayload() async {
-        guard viewState == .generated, let creation else {
-            sharePayload = nil
-            viewState = .error(.l2Recoverable(
-                message: "Unable to prepare this creation for sharing. Please try again."
-            ))
+    private func showHandoffError() {
+        activeSharePayload = nil
+        presentedPayloadIDs.removeAll()
+        sharePayload = nil
+        viewState = .error(.l2Recoverable(
+            message: EchoStrings.tr("Unable to prepare this creation for sharing. Please try again.")
+        ))
+    }
+
+    private func showCitationError(_ error: CreationExportError) {
+        let message = error == .privacyDenied
+            ? EchoStrings.tr("The current privacy policy no longer permits opening this source.")
+            : EchoStrings.tr("This source memory is currently unavailable.")
+        viewState = .error(.l2Recoverable(message: message))
+    }
+
+    func openCitation(_ citation: CreationCitation) {
+        let anchor = SourceAnchor(
+            memoryID: citation.memoryId,
+            sourceType: citation.sourceType,
+            availability: citation.availability
+        )
+        if isFixtureBacked {
+            navigationMemoryID = citation.memoryId
             return
         }
-
-        do {
-            let data = try await CreationExportService.pdf(from: Self.creativeOutput(from: creation))
-            try Task.checkCancellation()
-            let fileURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("Echo-Creation-\(UUID().uuidString)")
-                .appendingPathExtension("pdf")
-            try data.write(to: fileURL, options: .atomic)
-            if Task.isCancelled {
-                try? FileManager.default.removeItem(at: fileURL)
+        Task { [weak self] in
+            guard let self, let coordinator = self.exportCoordinator else {
+                self?.showCitationError(.sourceUnavailable)
                 return
             }
-            sharePayload = CreationSharePayload(
-                kind: .pdf,
-                text: "",
-                previewTitle: creation.title ?? "Echo Creation",
-                attachmentURL: fileURL
+            do {
+                self.navigationMemoryID = try await coordinator.authorizeNavigation(
+                    anchor: anchor,
+                    traceID: UUID().uuidString
+                )
+            } catch let error as CreationExportError {
+                self.showCitationError(error)
+            } catch {
+                self.showCitationError(.sourceUnavailable)
+            }
+        }
+    }
+
+    func shareControllerDidAppear(payloadID: UUID) {
+        guard let payload = activeSharePayload,
+              payload.id == payloadID,
+              presentedPayloadIDs.insert(payloadID).inserted,
+              let coordinator = exportCoordinator else { return }
+        Task { [weak self] in
+            do {
+                try await coordinator.recordSharePresentation(
+                    payloadID: payload.id,
+                    format: payload.exportFormat,
+                    periodType: payload.periodType,
+                    traceID: payload.traceID,
+                    presented: true
+                )
+            } catch {
+                // The true presentation already happened; never rewrite it as false.
+                self?.viewState = .error(.l2Recoverable(
+                    message: EchoStrings.tr("The share was presented, but its audit record is pending retry.")
+                ))
+            }
+        }
+    }
+
+    func shareSheetDidDismiss() {
+        guard let payload = activeSharePayload else { return }
+        activeSharePayload = nil
+        sharePayload = nil
+        let wasPresented = presentedPayloadIDs.remove(payload.id) != nil
+        guard !wasPresented else { return }
+        Task { [weak self] in
+            await self?.recordFailedPresentation(
+                payloadID: payload.id,
+                kind: payload.kind,
+                periodType: payload.periodType,
+                traceID: payload.traceID
             )
-        } catch is CancellationError {
-            return
-        } catch {
-            sharePayload = nil
-            viewState = .error(.l2Recoverable(
-                message: "Unable to prepare this creation for sharing. Please try again."
+            self?.viewState = .error(.l2Recoverable(
+                message: EchoStrings.tr("Unable to present the system share sheet. Please try again.")
             ))
         }
+    }
+
+    private func recordFailedPresentation(
+        payloadID: UUID,
+        kind: CreationSharePayload.Kind,
+        periodType: String?,
+        traceID: String
+    ) async {
+        try? await exportCoordinator?.recordSharePresentation(
+            payloadID: payloadID,
+            format: kind.exportFormat,
+            periodType: periodType,
+            traceID: traceID,
+            presented: false
+        )
     }
 
     private static func creativeOutput(from creation: CreationModel) -> CreativeOutput {
@@ -445,12 +649,18 @@ final class CreationViewModel {
                 GroundedParagraph(
                     id: paragraph.id,
                     text: paragraph.text,
-                    anchor: paragraph.citation.map {
-                        SourceAnchor(memoryID: $0.memoryId, hasSource: $0.hasSource)
-                    }
+                    anchors: paragraph.citations.map {
+                        SourceAnchor(
+                            memoryID: $0.memoryId,
+                            sourceType: $0.sourceType,
+                            availability: $0.availability
+                        )
+                    },
+                    groundingStatus: paragraph.groundingStatus
                 )
             },
             sourceMemoryCount: creation.sourceMemoryCount,
+            sourceTypes: creation.sourceTypes,
             emptyReason: creation.emptyReason
         )
     }
@@ -550,6 +760,8 @@ final class CreationViewModel {
         generateTask = nil
         exportTask?.cancel()
         exportTask = nil
+        activeSharePayload = nil
+        presentedPayloadIDs.removeAll()
         sharePayload = nil
     }
 }

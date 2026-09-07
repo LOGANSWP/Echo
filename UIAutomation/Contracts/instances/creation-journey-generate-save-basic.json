@@ -10,9 +10,9 @@
   ],
   "preconditionFixtures": ["creation-generated-letter"],
   "assertions": [
-    { "type": "generate_flow", "expected": "idle -> generating -> generated with citation anchors" },
-    { "type": "copy", "expected": "Content copied to pasteboard" },
-    { "type": "save_to_notes", "expected": "Local export prepares and presents the system share sheet; cancellation is not an error; no saved-note Toast or link is asserted (ADR-013)" }
+    { "type": "generate_flow", "expected": "idle -> generating -> generated only after bounded versioned output validates; paragraphs expose Source memory anchors plus cited/noSource/partialNoSource without factual-verification claims" },
+    { "type": "copy", "expected": "Current policy is revalidated before citation-preserving content reaches the pasteboard; revoked source content is blocked" },
+    { "type": "save_to_notes", "expected": "Current policy is revalidated, local citation-preserving export prepares, and only the actual system share-controller presentation callback proves sharePresented=true; cancellation after presentation is not an error; no saved-note Toast or link is asserted (ADR-020)" }
   ],
-  "version": "1.1.0"
+  "version": "1.2.0"
 }

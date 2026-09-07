@@ -739,7 +739,7 @@ Production awakening system adapters per ADR-012: real `CoreLocationProvider` (C
 ## Related Specs
 - Task ID: 3F.8 — Awakening 与 system adapters
 - Stories: US-AWK-001, US-AWK-002, US-AWK-003, US-AWK-005, US-SRC-010
-- Phase 4 closure note (updated 2026-09-03, ADR-016/017): this evidence proves only the US-AWK-005 AC-1/3 subset listed below. Task 4.0d owns card media/music/feelings and card→typed-Focus routing; 4.0h owns Focus source resolution and PhotoKit deletion capability; 4.0i owns allow-list validated source anchors and stable Detail navigation. 4.2/RC must verify the joined production loop and zero MusicKit web-service paths.
+- Phase 4 closure note (updated 2026-09-07, ADR-016/017/020): this evidence proves only the US-AWK-005 AC-1/3 subset listed below. Task 4.0d owns card media/music/feelings and card→typed-Focus routing; 4.0h owns Focus source resolution and PhotoKit deletion capability; 4.0i owns bounded structured provenance anchors and current-policy-revalidated stable Detail navigation. Allow-list membership is not automatic fact verification. 4.2/RC must verify the joined production loop and zero MusicKit web-service paths.
 - Documents: docs/decisions/ADR-012-awakening-system-boundary.md (governing), docs/01-spec/用户故事与验收标准规格书.md, docs/02-architecture/架构设计文档.md, docs/02-architecture/数据流全链路技术说明文档.md, docs/ui/testing-and-artifacts.md, docs/ui/echo-readiness.md, docs/05-planning/phase3f-execution-plan.md §4.6.8, docs/05-planning/phase3f-evidence-index.md, docs/05-planning/task-status.json, docs/05-planning/deferred-items.json
 
 ## AC Coverage

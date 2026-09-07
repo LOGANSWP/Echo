@@ -3,6 +3,6 @@
   "actionId": "creation.share",
   "source": "user",
   "targetIntent": "CreationViewModel.presentShare()",
-  "expectedOutcome": "Share/export/print sheet presented for narrative report (US-SYN-004 AC-4)",
-  "version": "1.0.0"
+  "expectedOutcome": "After current UserPolicy + PrivacyCheckpoint revalidation, prepare a citation-preserving report payload and present the system share controller. Only its actual presentation callback proves sharePresented=true; payload readiness does not. Revoked sources block derived-body handoff; dismissal after presentation is not failure.",
+  "version": "1.1.0"
 }

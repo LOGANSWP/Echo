@@ -3,6 +3,6 @@
   "actionId": "creation.copy",
   "source": "user",
   "targetIntent": "CreationViewModel.copyToClipboard()",
-  "expectedOutcome": "Generated content copied to UIPasteboard; confirmation announced",
-  "version": "1.0.0"
+  "expectedOutcome": "A composition-owned export coordinator revalidates current UserPolicy + PrivacyCheckpoint before reading/preparing content. If authorized, citation-preserving plain text is copied to UIPasteboard and confirmation is announced; a revoked source blocks derived-body handoff with a recoverable authorization error. No assetID/sourceLocator/source App identity is copied.",
+  "version": "1.1.0"
 }
