@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-07T14:14:07Z",
+  "last_updated": "2026-09-07T14:17:55Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2817,8 +2817,15 @@
             "payload 就绪但未呈现、准备失败、呈现失败、真实呈现、呈现后关闭及呈现后审计失败的状态与 L2 行为",
             "专用 typed audit columns、固定计数语义、sourceLanguage 无 metadata、幂等 audit retry 及零目标 App/原文证明"
           ],
-          "last_updated": "2026-09-07T14:14:07Z",
-          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed. The 2026-09-07 reasonableness review (ADR-020) corrected the overclaim that provenance proves factual accuracy, added a versioned bounded JSON envelope and multi-anchor partialNoSource semantics, required current-policy revalidation for copy/export/share, made actual controller presentation the only true sharePresented=true trigger, required citation-preserving multipage exports, and assigned dedicated typed audit columns with failure-truth and idempotent-retry behavior. Task moved from ready to in_progress at 2026-09-07T13:14:25Z after dependency, entry-gate and deferred-item checks passed. Implementation completed with grounded multi-source parsing, fail-closed protocol limits, stable source navigation, current-policy action authorization, citation-preserving text/Markdown/multipage PDF export, actual share-controller presentation reporting, typed audit persistence, and content-free idempotent audit retry. Focused and affected regression suites passed 65 tests with zero failures; the mandatory pre-commit 4.0i suite was rerun on iPhone 17 Pro and passed 10 tests with zero failures. SwiftLint, accessibility contracts, localization parity, production static bans, JSON validation, and diff checks passed. Task remains in review at 2026-09-07T14:14:07Z; PR remains unset until creation."
+          "pr": {
+            "number": 77,
+            "url": "https://github.com/logan-suu/Echo/pull/77",
+            "head": "feature/grounded-citation-share-US-SYN-002",
+            "base": "dev-1.0",
+            "created_at": "2026-09-07T14:17:35Z"
+          },
+          "last_updated": "2026-09-07T14:17:55Z",
+          "notes": "Created by ADR-017 because the existing paragraph-index round-robin source assignment cannot prove grounding, and sharePresented cannot be truthfully recorded during generation or hidden in a hash. Automatically promoted from backlog to ready after dependency 4.0h completed. The 2026-09-07 reasonableness review (ADR-020) corrected the overclaim that provenance proves factual accuracy, added a versioned bounded JSON envelope and multi-anchor partialNoSource semantics, required current-policy revalidation for copy/export/share, made actual controller presentation the only true sharePresented=true trigger, required citation-preserving multipage exports, and assigned dedicated typed audit columns with failure-truth and idempotent-retry behavior. Task moved from ready to in_progress at 2026-09-07T13:14:25Z after dependency, entry-gate and deferred-item checks passed. Implementation completed with grounded multi-source parsing, fail-closed protocol limits, stable source navigation, current-policy action authorization, citation-preserving text/Markdown/multipage PDF export, actual share-controller presentation reporting, typed audit persistence, and content-free idempotent audit retry. Focused and affected regression suites passed 65 tests with zero failures; the mandatory pre-commit 4.0i suite was rerun on iPhone 17 Pro and passed 10 tests with zero failures. SwiftLint, accessibility contracts, localization parity, production static bans, JSON validation, and diff checks passed. Pull request #77 was created against dev-1.0 at 2026-09-07T14:17:35Z. CI and CodeRabbit are pending; merge remains human-only."
         },
         {
           "id": "4.0j",
