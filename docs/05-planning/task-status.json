@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-07T21:52:24Z",
+  "last_updated": "2026-09-07T21:55:19Z",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -2873,6 +2873,16 @@
             "docs/05-planning/task-status.json"
           ],
           "status": "review",
+          "pr": {
+            "number": 78,
+            "url": "https://github.com/logan-suu/Echo/pull/78",
+            "head": "feature/narrative-report-scheduling-US-SYN-004",
+            "base": "dev-1.0",
+            "created_at": "2026-09-07T21:55:19Z",
+            "merged_at": null,
+            "merge_commit": null,
+            "merged_by": null
+          },
           "dependencies": [
             "4.0i"
           ],
@@ -2904,8 +2914,8 @@
             "BGProcessingTask 注册/permitted identifier/expiration/completion/resubmission 静态与行为证据，不包含精确时刻断言",
             "narrativeReportGenerated typed 字段、periodKeyDigest 唯一与报告正文/标题/MemoryID/locator 零审计落库证明"
           ],
-          "last_updated": "2026-09-07T21:52:24Z",
-          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77. Specification reasonableness review completed at 2026-09-07T19:46:11Z under user instruction; ADR-021 now defines new-install-default-on persisted switches and independent per-period-type eligibleFrom baselines, completed-calendar periods, frozen timezone bounds, one-period CAS claims, persistent report/source relations, atomic publication, bounded aggregation, noData/manual-L2/resource-defer states, opportunistic BGProcessingTask behavior and D-005 invalidation. TDD review further clarified that re-enabling one period type must not mutate the other type's baseline. Task moved from ready to in_progress at 2026-09-07T20:21:41Z after dependency, entry-gate and deferred-item checks passed. Production implementation completed with NarrativeReportActor/model/schema, independent schedules, deterministic period planning, queue/recovery, atomic publication and typed audit, BGProcessingTask integration, D-005 invalidation, Creation report library UI, bilingual localization and UI contracts. Final verification: 4.0j focused suite 11/11 passed; full EchoTests 1403 tests in 162 suites passed with 5 pre-existing known issues; SwiftLint 0; accessibility contracts, localization, static bans, JSON/plist, release compliance and diff checks passed. Coverage gate passed at 76% excluding declarative Views against the repository-configured 65% threshold. Task moved to review at 2026-09-07T21:47:34Z; commit/PR intentionally left for $commit-pr-echo."
+          "last_updated": "2026-09-07T21:55:19Z",
+          "notes": "Created by ADR-017 because no production narrative report scheduler exists; fixture report titles and share UI cannot satisfy US-SYN-004 automatic generation. Automatically promoted from backlog to ready at 2026-09-07T17:35:29Z after task 4.0i completed via human merge of PR #77. Specification reasonableness review completed at 2026-09-07T19:46:11Z under user instruction; ADR-021 now defines new-install-default-on persisted switches and independent per-period-type eligibleFrom baselines, completed-calendar periods, frozen timezone bounds, one-period CAS claims, persistent report/source relations, atomic publication, bounded aggregation, noData/manual-L2/resource-defer states, opportunistic BGProcessingTask behavior and D-005 invalidation. TDD review further clarified that re-enabling one period type must not mutate the other type's baseline. Task moved from ready to in_progress at 2026-09-07T20:21:41Z after dependency, entry-gate and deferred-item checks passed. Production implementation completed with NarrativeReportActor/model/schema, independent schedules, deterministic period planning, queue/recovery, atomic publication and typed audit, BGProcessingTask integration, D-005 invalidation, Creation report library UI, bilingual localization and UI contracts. Final verification: 4.0j focused suite 11/11 passed; full EchoTests 1403 tests in 162 suites passed with 5 pre-existing known issues; SwiftLint 0; accessibility contracts, localization, static bans, JSON/plist, release compliance and diff checks passed. Coverage gate passed at 76% excluding declarative Views against the repository-configured 65% threshold. Task moved to review at 2026-09-07T21:47:34Z. Implementation commit d84ce58 was pushed and PR #78 was created against dev-1.0 at 2026-09-07T21:55:19Z; merge remains human-only."
         },
         {
           "id": "4.1",
