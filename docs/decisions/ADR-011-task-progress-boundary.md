@@ -6,6 +6,7 @@
 **实现验证（3F.10，2026-08-12）**: 决策 3/4 落地——`ErrorClassifier`（DatabaseError/ModelLoadError/SyncConflictError/CancellationError → L1~L4）+ `ErrorSeverity.userFacingMessage(locale:)` 本地化文案（DEF-39-1 resolved）；`SystemMonitor`（ProcessInfo low-power + ThermalState `.serious/.critical`）生产接线 HomeView 降级横幅，`DegradationBannerViewModel` 真实驱动横幅/自动暂停后台任务/恢复（US-RES-002/003），`.degradationWarning` hash-only 审计。证据：`EchoTests/Phase3F/3F.10_LocalizationAccessibilityErrorTests.swift`（SystemMonitorTests/DegradationRuntimeTests/ErrorLocalizationTests）+ `Echo/Core/Utils/SystemMonitor.swift`。
 **修订（4.0c 规格评审，2026-09-02）**: 3F 已完成 ProgressActor/TaskQueue/面板接线，但 `TaskProgress` 不足以在进程重启后重建可执行 job。新增决策 2A，由 Phase 4 `4.0g` 交付生产 task reconstruction boundary；在此之前 ResumeProgress 必须显示诚实不可用/L2，不得以 fixture 成功态声称 AC-3/AC-4 完成。
 **修订（4.0g 规格合理性复审，2026-09-04）**: 重启语义改为“SQLite 事务内替换为 index 0 可重试 checkpoint，再单独入队”，不再声称 SQLite 与 `TaskQueueActor` 可跨 Actor 原子提交。Continue 必须保留原 checkpoint；恢复按精确 taskId、保留未知 raw taskType、排除当前会话仍被队列拥有的记录，并在重建时重新执行当前隐私/来源授权校验。同时明确 pause/cancel 终态、幂等与多记录边界。
+**修订（4.0j 规格合理性复审，2026-09-07）**: `TaskProgress` 不得替代报告周期状态。叙事报告生命周期扫描只自动 claim `eligible`；一旦进入 L2 `retryRequired`/`PendingOperations`，继续遵守本 ADR 的“仅手动重试”。系统 `BGProcessingTask` expiration、低电量或 serious/critical thermal 属于资源延后，可在安全 checkpoint 释放领域 claim 后等待下一机会，不得伪装成 L2。详见 ADR-021。
 
 ## 背景
 
@@ -52,3 +53,4 @@
 - `docs/05-planning/phase3f-execution-plan.md` §4.6.5（3F.5 文档合同）、§4.6.10（3F.10 文档合同）
 - `docs/05-planning/deferred-items.json` DEF-37-001、DEF-38-003、DEF-39-1
 - `docs/05-planning/task-status.json` 4.0g；`docs/05-planning/deferred-items.json` DEF-42-001
+- `docs/decisions/ADR-021-narrative-report-scheduling-persistence.md`

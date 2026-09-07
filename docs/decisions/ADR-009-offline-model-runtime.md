@@ -17,6 +17,8 @@
 5. **Loader 状态回报**：embedder→ModelLoaderActor 状态回报机制（关闭 DEF-34-003）；损坏/缺失工件进入 L3 阻断 + 手动重试（US-RES-004）。
 6. **参考输出**：`e5-reference-vectors.json`、`siglip2-reference-vectors.json`、`whisper-reference-transcripts.json` 提供确定性参考（US-SRC-011 model semantics），Golden 验证在 Phase 4 4.1。
 
+> **实施状态校正（2026-09-07，ADR-022）**：本 ADR 批准的是约束与方向，不等于生成式 LLM 工件已经登记或生产接线完成。当前 `LiveAppAdapters.resolveLLMProvider()` 返回 `nil`，model provenance register 也没有批准的生成式工件。`4.0j` 只能交付调度/存储基础；`4.0k` 必须完成不可变工件审批、真实 `LLMProvider`、`LanguageAligner` 和 no-fixture 生成证据后，SYN 自动生成能力才能声明生产完成。Stub/fixture 不得作为该证据。
+
 ## 备选方案
 
 | 方案 | 描述 | 结论 |
@@ -47,4 +49,4 @@
 - AGENTS.md R-004/R-005
 - `docs/02-architecture/技术选型文档.md`、`docs/03-implementation/双语言实现说明文档.md`
 - `docs/05-planning/model-provenance-register.md`（3F.3 创建）
-- ADR-006（范围契约）、ADR-013（创作/导出边界）
+- ADR-006（范围契约）、ADR-013（创作/导出边界）、ADR-022（生成运行时门禁）

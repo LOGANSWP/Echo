@@ -6,7 +6,7 @@
 //            docs/ui/echo-memory-canvas-style.md §3.2 (Focus surfaces — 单列 + grouped metadata),
 //            §4 (共享 Token), §7.1 (Focus 共享表达), §10.1.2 (数据加载失败空态),
 //            docs/ui/architecture.md §3 (Surface View), §8 (Focus family)
-// Task: 4.0b + 4.0i - Balanced Focus surface and verifiable citation/share lifecycle
+// Task: 4.0b + 4.0i + 4.0j - Balanced Focus surface and persistent report library
 // AC coverage: US-SYN-003 AC-1 ✅ (template selection), AC-2 ✅ (stable source routing),
 //              AC-3 ✅ (preview/copy/export), AC-4 ✅ (system share handoff),
 //              AC-5 ✅ (no fabricated Notes result),
@@ -15,7 +15,7 @@
 //          PR #44 review: W-1 ✅ (移除 example.com 外链回退), W-2 ✅ (Toast accessibility .contain)
 // 架构约束: AGENTS.md §8.1 (ViewModel 驱动), §17.3 (Focus 禁止 masonry),
 //           echo-memory-canvas apple-native 基础; 系统容器 + semantic colors + Dynamic Type
-// 生成时间: 2026-08-02 | Updated: 2026-09-07 (4.0i, ADR-020)
+// 生成时间: 2026-08-02 | Updated: 2026-09-07 (4.0j report library)
 // ==========================================
 
 import SwiftUI
@@ -46,11 +46,13 @@ struct CreationView: View {
     // MARK: - ViewModel
 
     @State private var viewModel: CreationViewModel
+    @State private var reportPendingDeletion: UUID?
     @Environment(\.echoDesignProfile) private var designProfile
 
     init(viewModel: CreationViewModel? = nil) {
         _viewModel = State(initialValue: viewModel ?? CreationViewModel(
-            exportCoordinator: LiveAppAdapters.makeCreationExportCoordinator()
+            exportCoordinator: LiveAppAdapters.makeCreationExportCoordinator(),
+            narrativeReportActor: AppComposition.shared.narrativeReportActor
         ))
     }
 
@@ -97,6 +99,25 @@ struct CreationView: View {
         } message: {
             Text("Choose a format for this creation.")
         }
+        .confirmationDialog(
+            EchoStrings.tr("Delete narrative report?"),
+            isPresented: Binding(
+                get: { reportPendingDeletion != nil },
+                set: { if !$0 { reportPendingDeletion = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(EchoStrings.tr("Delete report"), role: .destructive) {
+                guard let reportID = reportPendingDeletion else { return }
+                reportPendingDeletion = nil
+                viewModel.deleteReport(reportID)
+            }
+            Button(EchoStrings.tr("Cancel"), role: .cancel) {
+                reportPendingDeletion = nil
+            }
+        } message: {
+            Text(EchoStrings.tr("This report cannot be regenerated in this version."))
+        }
         // 分享/导出/打印 Sheet (US-SYN-003 AC-3, US-SYN-004 AC-4)
         .sheet(item: $viewModel.sharePayload, onDismiss: {
             viewModel.shareSheetDidDismiss()
@@ -107,6 +128,7 @@ struct CreationView: View {
             MemoryDetailView(memoryId: memoryID)
         }
         .onAppear {
+            viewModel.loadReportLibrary()
             #if DEBUG
             handleLaunchArguments()
             #endif
@@ -169,6 +191,8 @@ struct CreationView: View {
     private var idleState: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: EchoSpacingToken.section.points) {
+                reportLibrarySection
+
                 EchoSectionHeader(
                     title: "Choose a template",
                     subtitle: "Ground the creation in memories already stored on this device."
@@ -185,6 +209,122 @@ struct CreationView: View {
             .padding(EchoSpacingToken.grouped.points)
         }
         .scrollContentBackground(.hidden)
+    }
+
+    @ViewBuilder
+    private var reportLibrarySection: some View {
+        VStack(alignment: .leading, spacing: EchoSpacingToken.grouped.points) {
+            EchoSectionHeader(
+                title: "Narrative reports",
+                subtitle: "Monthly and yearly reports are generated on device after a period ends."
+            )
+
+            if let schedule = viewModel.reportSchedule {
+                EchoContainer(level: .section) {
+                    VStack(spacing: EchoSpacingToken.normal.points) {
+                        Toggle(
+                            EchoStrings.tr("Monthly reports"),
+                            isOn: Binding(
+                                get: { schedule.monthlyEnabled },
+                                set: { viewModel.setReportSchedule($0, for: .month) }
+                            )
+                        )
+                        .accessibilityIdentifier("creation-report-monthly-toggle")
+                        Toggle(
+                            EchoStrings.tr("Yearly reports"),
+                            isOn: Binding(
+                                get: { schedule.yearlyEnabled },
+                                set: { viewModel.setReportSchedule($0, for: .year) }
+                            )
+                        )
+                        .accessibilityIdentifier("creation-report-yearly-toggle")
+                    }
+                }
+            }
+
+            Button {
+                viewModel.scanNarrativeReportsNow()
+            } label: {
+                Label(EchoStrings.tr("Check for completed periods"), systemImage: "calendar.badge.clock")
+            }
+            .buttonStyle(EchoActionButtonStyle(role: .secondary))
+            .accessibilityIdentifier("creation-report-scan")
+
+            switch viewModel.reportLibraryState {
+            case .loading:
+                ProgressView(EchoStrings.tr("Loading narrative reports…"))
+                    .accessibilityIdentifier("creation-report-library-loading")
+            case .error(let message):
+                EchoContainer(level: .emphasized) {
+                    VStack(alignment: .leading, spacing: EchoSpacingToken.normal.points) {
+                        EchoStatusPresentation(
+                            role: .warning,
+                            systemImage: "exclamationmark.arrow.triangle.2.circlepath",
+                            title: EchoStrings.tr("Reports unavailable"),
+                            message: message
+                        )
+                        Button(EchoStrings.tr("Retry")) {
+                            viewModel.loadReportLibrary()
+                        }
+                        .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                        .accessibilityIdentifier("creation-report-library-retry")
+                    }
+                }
+            case .idle, .loaded:
+                EmptyView()
+            }
+
+            ForEach(viewModel.recoverableReportPeriods) { period in
+                EchoContainer(level: .emphasized) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: EchoSpacingToken.compact.points) {
+                            Text(period.periodKey)
+                                .font(EchoTypographyToken.body.font)
+                            Text(EchoStrings.tr("Generation needs your retry."))
+                                .font(EchoTypographyToken.caption.font)
+                                .foregroundStyle(EchoColorToken.secondaryText.color)
+                        }
+                        Spacer()
+                        Button(EchoStrings.tr("Retry")) {
+                            viewModel.retryReport(period)
+                        }
+                        .buttonStyle(EchoActionButtonStyle(role: .secondary))
+                        .accessibilityIdentifier("creation-report-retry-\(period.periodKey)")
+                    }
+                }
+            }
+
+            ForEach(viewModel.narrativeReports) { report in
+                EchoContainer(level: .card) {
+                    HStack(spacing: EchoSpacingToken.normal.points) {
+                        Button {
+                            viewModel.openReport(report.id)
+                        } label: {
+                            VStack(alignment: .leading, spacing: EchoSpacingToken.compact.points) {
+                                Text(report.envelope.title)
+                                    .font(EchoTypographyToken.body.font)
+                                    .foregroundStyle(EchoColorToken.primaryText.color)
+                                Text(report.periodKey)
+                                    .font(EchoTypographyToken.caption.font)
+                                    .foregroundStyle(EchoColorToken.secondaryText.color)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("creation-report-open-\(report.id.uuidString)")
+
+                        Button(role: .destructive) {
+                            reportPendingDeletion = report.id
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .accessibilityLabel(EchoStrings.tr("Delete narrative report"))
+                        .accessibilityIdentifier("creation-report-delete-\(report.id.uuidString)")
+                    }
+                }
+            }
+        }
+        .accessibilityIdentifier("creation-report-library")
     }
 
     /// 单个模板行 — 选择 + 展示。

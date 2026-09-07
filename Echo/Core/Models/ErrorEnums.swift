@@ -154,6 +154,7 @@ public enum TaskType: String, Sendable, Codable {
     case fullIndex
     case dataSourceSync
     case modelLoad
+    case narrativeReport
     /// Persisted raw value is unknown to this app version. `TaskProgress.rawTaskType`
     /// retains the original identity for diagnostics and fail-closed recovery.
     case unknown

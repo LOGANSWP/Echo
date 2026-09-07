@@ -52,6 +52,7 @@ struct BackgroundTaskModel: Identifiable, Sendable, Equatable {
         case .dataSourceSync: return "Syncing photos"
         case .fullIndex:      return "Building vector index"
         case .modelLoad:      return "Loading AI model"
+        case .narrativeReport: return "Creating narrative report"
         case .unknown:        return "Unsupported saved task"
         }
     }
@@ -66,6 +67,7 @@ struct BackgroundTaskModel: Identifiable, Sendable, Equatable {
         case .dataSourceSync: return "arrow.triangle.2.circlepath"
         case .fullIndex:      return "cube.box.fill"
         case .modelLoad:      return "cpu"
+        case .narrativeReport:return "book.pages"
         case .unknown:        return "exclamationmark.triangle"
         }
     }

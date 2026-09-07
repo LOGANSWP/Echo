@@ -1,0 +1,17 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/journey/v1",
+  "journeyId": "creation-report-library-basic",
+  "steps": [
+    { "surfaceId": "creation", "stateId": "report-library", "actionId": "creation.toggleMonthlyReportSchedule" },
+    { "surfaceId": "creation", "stateId": "report-library", "actionId": "creation.toggleMonthlyReportSchedule" },
+    { "surfaceId": "creation", "stateId": "report-library", "actionId": "creation.openReport" },
+    { "surfaceId": "creation", "stateId": "generated", "actionId": null }
+  ],
+  "preconditionFixtures": ["creation-generated-report"],
+  "assertions": [
+    { "type": "schedule_persistence", "expected": "Monthly and yearly controls are independent; re-enabling monthly persists a fresh eligibleFrom and does not claim disabled-interval backfill" },
+    { "type": "report_library", "expected": "Only adapter-provided persisted reports count as production rows; each row exposes period, state and current source availability" },
+    { "type": "open_report", "expected": "The stable report ID opens versioned persisted content with typed provenance; no fixture fallback is allowed on the production path" }
+  ],
+  "version": "1.0.0"
+}

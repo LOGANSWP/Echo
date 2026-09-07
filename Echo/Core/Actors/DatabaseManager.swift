@@ -7,17 +7,26 @@
 //      4.0f - Persisted awakening preferences and HealthKit request lifecycle
 //      4.0h - Source deletion saga, structured audit fields, and cleanup notices
 //      4.0i - Typed grounded-generation and system-share audit fields
+//      4.0j - Persisted narrative report scheduling and atomic publication
 // 架构约束: 遵循 AGENTS.md §4.2 (Actor 隔离契约), R-007 (禁止 @unchecked Sendable)
 // AC 覆盖: D-005 deletion journal persists phase, vector plan, and exclusion intent;
 //          US-AWK-005 AC-4/5 (feeling cascade and structured interaction audit);
 //          4.0f AC-3/6 (awakening preferences and honest HealthKit request state);
 //          4.0h AC-2/3/5 (source deletion recovery and structured audit state);
 //          4.0i AC-6 (unique exact share handoff audit identity)
-// Generated: 2026-07-04; Updated: 2026-09-07 (4.0i)
+//          4.0j AC-1/2/3/7 (per-type baselines, frozen periods, reports and invalidation)
+// Generated: 2026-07-04; Updated: 2026-09-07 (4.0j)
 // ==========================================
 
 import Foundation
 import SQLite3
+
+internal nonisolated enum NarrativePublicationFailureStage: Sendable, Equatable, CaseIterable {
+    case afterReport
+    case afterSources
+    case afterAudit
+    case afterCompletion
+}
 
 // MARK: - Database Manager Actor
 
@@ -43,6 +52,7 @@ public actor DatabaseManager {
 
     private var db: OpaquePointer?
     private let dbURL: URL
+    internal var narrativePublicationFailureStageForTesting: NarrativePublicationFailureStage?
 
     /// SQLite 版本号（运行时诊断用）
     public nonisolated var sqliteVersion: String {
@@ -267,10 +277,21 @@ public actor DatabaseManager {
         if !auditColumns.contains("shareHandoffIdDigest") {
             try execute(sql: "ALTER TABLE AuditLog ADD COLUMN shareHandoffIdDigest TEXT")
         }
+        if !auditColumns.contains("dataSourcesUsed") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN dataSourcesUsed TEXT")
+        }
+        if !auditColumns.contains("periodKeyDigest") {
+            try execute(sql: "ALTER TABLE AuditLog ADD COLUMN periodKeyDigest TEXT")
+        }
         try execute(sql: """
             CREATE UNIQUE INDEX IF NOT EXISTS idx_auditlog_share_handoff
             ON AuditLog(shareHandoffIdDigest)
             WHERE eventType = 'creationSharePresented' AND shareHandoffIdDigest IS NOT NULL
+            """)
+        try execute(sql: """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_auditlog_narrative_period
+            ON AuditLog(periodKeyDigest)
+            WHERE eventType = 'narrativeReportGenerated' AND periodKeyDigest IS NOT NULL
             """)
         try execute(sql: "CREATE INDEX IF NOT EXISTS idx_auditlog_subject_hash ON AuditLog(subjectHash)")
         // WP3 steps 3i-3t2 (photo-text-search): D-005 resumable deletion journal
@@ -528,6 +549,100 @@ public actor DatabaseManager {
                 updatedAt REAL NOT NULL
             )
             """)
+        // 4.0j / ADR-021: monthly and yearly automation are independent persisted controls.
+        try execute(sql: """
+            CREATE TABLE IF NOT EXISTS NarrativeReportSchedule (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                monthlyEnabled INTEGER NOT NULL DEFAULT 1,
+                yearlyEnabled INTEGER NOT NULL DEFAULT 1,
+                monthlyEligibleFrom REAL,
+                yearlyEligibleFrom REAL,
+                revision INTEGER NOT NULL DEFAULT 0,
+                updatedAt REAL NOT NULL
+            )
+            """)
+        try execute(sql: """
+            INSERT OR IGNORE INTO NarrativeReportSchedule
+              (id, monthlyEnabled, yearlyEnabled, monthlyEligibleFrom, yearlyEligibleFrom, revision, updatedAt)
+            VALUES (1, 1, 1, NULL, NULL, 0, CAST(strftime('%s','now') AS REAL))
+            """)
+        // Existing-data migration establishes both baselines once, at successful migration.
+        try execute(sql: """
+            UPDATE NarrativeReportSchedule
+            SET monthlyEligibleFrom = COALESCE(monthlyEligibleFrom, CAST(strftime('%s','now') AS REAL)),
+                yearlyEligibleFrom = COALESCE(yearlyEligibleFrom, CAST(strftime('%s','now') AS REAL)),
+                revision = revision + 1,
+                updatedAt = CAST(strftime('%s','now') AS REAL)
+            WHERE (monthlyEligibleFrom IS NULL OR yearlyEligibleFrom IS NULL)
+              AND EXISTS (SELECT 1 FROM Memory LIMIT 1)
+              AND EXISTS (SELECT 1 FROM ConsentStore WHERE id = 1 AND hasConsented = 1)
+            """)
+        try execute(sql: """
+            CREATE TABLE IF NOT EXISTS NarrativeReportPeriod (
+                periodType TEXT NOT NULL,
+                periodKey TEXT NOT NULL,
+                calendarIdentifier TEXT NOT NULL,
+                timeZoneIdentifier TEXT NOT NULL,
+                startInstant REAL NOT NULL,
+                endInstant REAL NOT NULL,
+                coverageStart REAL NOT NULL,
+                partialBaseline INTEGER NOT NULL,
+                state TEXT NOT NULL,
+                revision INTEGER NOT NULL DEFAULT 0,
+                claimedAt REAL,
+                taskId TEXT,
+                updatedAt REAL NOT NULL,
+                PRIMARY KEY (periodType, periodKey)
+            )
+            """)
+        try execute(sql: """
+            CREATE TABLE IF NOT EXISTS NarrativeReport (
+                reportId TEXT PRIMARY KEY NOT NULL,
+                periodType TEXT NOT NULL,
+                periodKey TEXT NOT NULL,
+                schemaVersion INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                envelope BLOB NOT NULL,
+                coverageJSON TEXT NOT NULL,
+                createdAt REAL NOT NULL,
+                UNIQUE (periodType, periodKey),
+                FOREIGN KEY (periodType, periodKey)
+                    REFERENCES NarrativeReportPeriod(periodType, periodKey) ON DELETE CASCADE
+            )
+            """)
+        try execute(sql: """
+            CREATE TABLE IF NOT EXISTS NarrativeReportSource (
+                reportId TEXT NOT NULL REFERENCES NarrativeReport(reportId) ON DELETE CASCADE,
+                memoryId TEXT NOT NULL REFERENCES Memory(memoryId) ON DELETE CASCADE,
+                sourceType TEXT NOT NULL,
+                ordinal INTEGER NOT NULL,
+                PRIMARY KEY (reportId, memoryId)
+            )
+            """)
+        try execute(sql: "CREATE INDEX IF NOT EXISTS idx_narrative_period_state ON NarrativeReportPeriod(state, endInstant, periodType)")
+        try execute(sql: "CREATE INDEX IF NOT EXISTS idx_narrative_source_memory ON NarrativeReportSource(memoryId)")
+        // A source deletion invalidates the v1 period before cascades remove the report relations.
+        try execute(sql: """
+            CREATE TRIGGER IF NOT EXISTS trg_narrative_source_memory_delete
+            BEFORE DELETE ON Memory
+            BEGIN
+                UPDATE NarrativeReportPeriod
+                SET state = 'invalidated', revision = revision + 1,
+                    taskId = NULL, claimedAt = NULL,
+                    updatedAt = CAST(strftime('%s','now') AS REAL)
+                WHERE EXISTS (
+                    SELECT 1 FROM NarrativeReport r
+                    JOIN NarrativeReportSource s ON s.reportId = r.reportId
+                    WHERE s.memoryId = OLD.memoryId
+                      AND r.periodType = NarrativeReportPeriod.periodType
+                      AND r.periodKey = NarrativeReportPeriod.periodKey
+                );
+                DELETE FROM NarrativeReport
+                WHERE reportId IN (
+                    SELECT reportId FROM NarrativeReportSource WHERE memoryId = OLD.memoryId
+                );
+            END
+            """)
         // WP6 (4b): 完整路由快照 canonical bytes 持久化——原子发布校验基础
         try execute(sql: """
             CREATE TABLE IF NOT EXISTS RouteSnapshot (
@@ -620,6 +735,209 @@ public actor DatabaseManager {
             try? execute(sql: "ROLLBACK")
             throw error
         }
+    }
+
+    /// Claims exactly one earliest eligible narrative period inside one SQLite transaction.
+    func claimEarliestNarrativeReportPeriod(taskID: String, claimedAt: Date) throws -> [String: DBValue]? {
+        try execute(sql: "BEGIN IMMEDIATE TRANSACTION")
+        do {
+            let rows = try executeQuery(
+                sql: """
+                    SELECT period.*
+                    FROM NarrativeReportPeriod AS period
+                    JOIN NarrativeReportSchedule AS schedule ON schedule.id = 1
+                    WHERE period.state = 'eligible'
+                      AND (
+                        (period.periodType = 'month'
+                         AND schedule.monthlyEnabled = 1
+                         AND schedule.monthlyEligibleFrom IS NOT NULL
+                         AND period.endInstant > schedule.monthlyEligibleFrom)
+                        OR
+                        (period.periodType = 'year'
+                         AND schedule.yearlyEnabled = 1
+                         AND schedule.yearlyEligibleFrom IS NOT NULL
+                         AND period.endInstant > schedule.yearlyEligibleFrom)
+                      )
+                    ORDER BY period.endInstant ASC,
+                             CASE period.periodType WHEN 'month' THEN 0 ELSE 1 END ASC,
+                             period.periodKey ASC
+                    LIMIT 1
+                    """,
+                bindings: []
+            )
+            guard let candidate = rows.first,
+                  let periodType = candidate["periodType"]?.stringValue,
+                  let periodKey = candidate["periodKey"]?.stringValue,
+                  let revision = candidate["revision"]?.intValue else {
+                try execute(sql: "COMMIT")
+                return nil
+            }
+            let changes = try executeWrite(
+                sql: """
+                    UPDATE NarrativeReportPeriod
+                    SET state = 'claimed', revision = revision + 1,
+                        claimedAt = ?, taskId = ?, updatedAt = ?
+                    WHERE periodType = ? AND periodKey = ?
+                      AND state = 'eligible' AND revision = ?
+                    """,
+                bindings: [
+                    .double(claimedAt.timeIntervalSince1970),
+                    .text(taskID),
+                    .double(claimedAt.timeIntervalSince1970),
+                    .text(periodType),
+                    .text(periodKey),
+                    .int(revision),
+                ]
+            )
+            guard changes == 1 else {
+                try execute(sql: "ROLLBACK")
+                return nil
+            }
+            let claimed = try executeQuery(
+                sql: "SELECT * FROM NarrativeReportPeriod WHERE periodType = ? AND periodKey = ?",
+                bindings: [.text(periodType), .text(periodKey)]
+            ).first
+            try execute(sql: "COMMIT")
+            return claimed
+        } catch {
+            try? execute(sql: "ROLLBACK")
+            throw error
+        }
+    }
+
+    /// Publishes the report, source relations, terminal period state and typed audit record
+    /// in one non-suspending SQLite transaction.
+    public func publishNarrativeReport(_ publication: NarrativeReportPublication) throws {
+        let envelopeData = try publication.envelope.encoded()
+        let coverageData = try JSONEncoder().encode(publication.envelope.coverage)
+        let sourceIDs = publication.sources.map(\.memoryID)
+        let sourceTypes = Array(Set(publication.sources.map(\.sourceType))).sorted()
+        let referencedIDs = Set(publication.envelope.paragraphs.flatMap(\.sourceMemoryIDs))
+        let auditTypes = (try? JSONDecoder().decode(
+            [String].self,
+            from: Data(publication.audit.dataSourcesUsedJSON.utf8)
+        )) ?? []
+        guard let coverageJSON = String(data: coverageData, encoding: .utf8),
+              publication.envelope.periodType == publication.period.periodType,
+              publication.envelope.periodKey == publication.period.periodKey,
+              publication.audit.periodType == publication.period.periodType,
+              publication.audit.periodKeyDigest.count == 64,
+              publication.audit.periodKeyDigest.allSatisfy(\.isHexDigit),
+              publication.period.state == .claimed,
+              publication.period.taskID != nil,
+              Set(sourceIDs).count == sourceIDs.count,
+              publication.sources.map(\.ordinal) == Array(publication.sources.indices),
+              referencedIDs.isSubset(of: Set(sourceIDs)),
+              auditTypes == sourceTypes else {
+            throw NarrativeReportError.invalidReportEnvelope
+        }
+
+        try execute(sql: "BEGIN IMMEDIATE TRANSACTION")
+        do {
+            let ownsClaim = try !executeQuery(
+                sql: """
+                    SELECT 1 AS present FROM NarrativeReportPeriod
+                    WHERE periodType = ? AND periodKey = ? AND state = 'claimed'
+                      AND revision = ? AND taskId = ? LIMIT 1
+                    """,
+                bindings: [
+                    .text(publication.period.periodType.rawValue),
+                    .text(publication.period.periodKey),
+                    .int(Int64(publication.period.revision)),
+                    .text(publication.period.taskID ?? ""),
+                ]
+            ).isEmpty
+            guard ownsClaim else { throw NarrativeReportError.publicationConflict }
+
+            try executeWrite(
+                sql: """
+                    INSERT INTO NarrativeReport
+                      (reportId, periodType, periodKey, schemaVersion, title, envelope, coverageJSON, createdAt)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                bindings: [
+                    .text(publication.reportID.uuidString),
+                    .text(publication.period.periodType.rawValue),
+                    .text(publication.period.periodKey),
+                    .int(Int64(publication.envelope.schemaVersion)),
+                    .text(publication.envelope.title),
+                    .blob(envelopeData),
+                    .text(coverageJSON),
+                    .double(publication.createdAt.timeIntervalSince1970),
+                ]
+            )
+            try failNarrativePublicationIfRequested(.afterReport)
+
+            for source in publication.sources {
+                try executeWrite(
+                    sql: """
+                        INSERT INTO NarrativeReportSource (reportId, memoryId, sourceType, ordinal)
+                        VALUES (?, ?, ?, ?)
+                        """,
+                    bindings: [
+                        .text(publication.reportID.uuidString),
+                        .text(source.memoryID.uuidString),
+                        .text(source.sourceType),
+                        .int(Int64(source.ordinal)),
+                    ]
+                )
+            }
+            try failNarrativePublicationIfRequested(.afterSources)
+
+            try executeWrite(
+                sql: """
+                    INSERT INTO AuditLog
+                      (eventType, timestamp, traceID, policyVersion, success,
+                       periodType, dataSourcesUsed, periodKeyDigest)
+                    VALUES ('narrativeReportGenerated', ?, ?, ?, 1, ?, ?, ?)
+                    """,
+                bindings: [
+                    .double(publication.audit.timestamp.timeIntervalSince1970),
+                    .text(publication.audit.traceID),
+                    .int(Int64(publication.audit.policyVersion)),
+                    .text(publication.audit.periodType.rawValue),
+                    .text(publication.audit.dataSourcesUsedJSON),
+                    .text(publication.audit.periodKeyDigest),
+                ]
+            )
+            try failNarrativePublicationIfRequested(.afterAudit)
+
+            let completed = try executeWrite(
+                sql: """
+                    UPDATE NarrativeReportPeriod
+                    SET state = 'completed', revision = revision + 1,
+                        claimedAt = NULL, taskId = NULL, updatedAt = ?
+                    WHERE periodType = ? AND periodKey = ? AND state = 'claimed'
+                      AND revision = ? AND taskId = ?
+                    """,
+                bindings: [
+                    .double(publication.createdAt.timeIntervalSince1970),
+                    .text(publication.period.periodType.rawValue),
+                    .text(publication.period.periodKey),
+                    .int(Int64(publication.period.revision)),
+                    .text(publication.period.taskID ?? ""),
+                ]
+            )
+            guard completed == 1 else { throw NarrativeReportError.publicationConflict }
+            try failNarrativePublicationIfRequested(.afterCompletion)
+            try execute(sql: "COMMIT")
+        } catch {
+            try? execute(sql: "ROLLBACK")
+            throw error
+        }
+    }
+
+    internal func setNarrativePublicationFailureStageForTesting(
+        _ stage: NarrativePublicationFailureStage?
+    ) {
+        narrativePublicationFailureStageForTesting = stage
+    }
+
+    private func failNarrativePublicationIfRequested(
+        _ stage: NarrativePublicationFailureStage
+    ) throws {
+        guard narrativePublicationFailureStageForTesting == stage else { return }
+        throw NarrativeReportError.injectedPublicationFailure
     }
 
     // MARK: - Database URL

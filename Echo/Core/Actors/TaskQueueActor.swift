@@ -3,7 +3,8 @@
 // 对应规格: docs/decisions/ADR-011-task-progress-boundary.md 决策-1 (串行契约)
 //            docs/01-spec/用户故事与验收标准规格书.md → US-SYS-001 AC-3/4/6 (暂停/取消/断点续传)
 //            AGENTS.md §4.3 (TaskQueue 契约), §4.5 (断点续传契约)
-// 任务: 3F.5 - Production ingestion; 4.0g - Production task resume loop
+// 任务: 3F.5 - Production ingestion; 4.0g - Production task resume loop;
+//       4.0j - Resource-deferred narrative work cleanup
 // AC Coverage: serial execution, reserved unique taskId ownership,
 //              pause without releasing the job, cancellation checkpoint retention,
 //              pause-ownership cleanup, terminal progress cleanup, truthful active projection
@@ -230,6 +231,16 @@ public actor TaskQueueActor {
         }
         pausedJobIds.remove(taskId)
         return false
+    }
+
+    /// Cancels system-deferred work and removes its checkpoint after cooperative unwind.
+    /// User cancellation must continue to use `cancel(taskId:)` so resumability is preserved.
+    @discardableResult
+    public func cancelAndDiscard(taskId: String) async -> Bool {
+        let cancelled = await cancel(taskId: taskId)
+        _ = try? await progressActor.delete(taskId: taskId)
+        pausedJobIds.remove(taskId)
+        return cancelled
     }
 
     /// 暂停指定任务：运行中 → 经 PauseToken 协作式挂起；排队中 → 标记暂停（不启动）。

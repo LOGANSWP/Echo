@@ -1174,6 +1174,23 @@
         }
       }
     },
+    "Creating narrative report": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creating narrative report"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在生成叙事报告"
+          }
+        }
+      }
+    },
     "Custom Tags": {
       "extractionState": "manual",
       "localizations": {
@@ -6397,6 +6414,126 @@
       "localizations": {
         "en-US": { "stringUnit": { "state": "translated", "value": "This source memory is currently unavailable." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "此来源记忆当前不可用。" } }
+      }
+    },
+    "Narrative reports": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Narrative reports" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "叙事报告" } }
+      }
+    },
+    "Monthly and yearly reports are generated on device after a period ends.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Monthly and yearly reports are generated on device after a period ends." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "每个周期结束后，月报和年报会在设备端生成。" } }
+      }
+    },
+    "Monthly reports": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Monthly reports" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "月度报告" } }
+      }
+    },
+    "Yearly reports": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Yearly reports" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "年度报告" } }
+      }
+    },
+    "Loading narrative reports…": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Loading narrative reports…" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "正在载入叙事报告…" } }
+      }
+    },
+    "Reports unavailable": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Reports unavailable" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "报告不可用" } }
+      }
+    },
+    "Generation needs your retry.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Generation needs your retry." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "需要你手动重试生成。" } }
+      }
+    },
+    "Delete narrative report": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Delete narrative report" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "删除叙事报告" } }
+      }
+    },
+    "Unable to load narrative reports. Please try again.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to load narrative reports. Please try again." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法载入叙事报告，请重试。" } }
+      }
+    },
+    "Narrative report scheduling is unavailable.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Narrative report scheduling is unavailable." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "叙事报告调度当前不可用。" } }
+      }
+    },
+    "Unable to update narrative report scheduling.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to update narrative report scheduling." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法更新叙事报告调度。" } }
+      }
+    },
+    "Narrative report is unavailable.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Narrative report is unavailable." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "叙事报告当前不可用。" } }
+      }
+    },
+    "Unable to open this narrative report.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to open this narrative report." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法打开此叙事报告。" } }
+      }
+    },
+    "Unable to delete this narrative report.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to delete this narrative report." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法删除此叙事报告。" } }
+      }
+    },
+    "Unable to retry this narrative report.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to retry this narrative report." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法重试此叙事报告。" } }
+      }
+    },
+    "Check for completed periods": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Check for completed periods" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "检查已结束的周期" } }
+      }
+    },
+    "Unable to start narrative report generation.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Unable to start narrative report generation." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "无法启动叙事报告生成。" } }
+      }
+    },
+    "Delete narrative report?": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Delete narrative report?" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "删除叙事报告？" } }
+      }
+    },
+    "Delete report": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "Delete report" } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "删除报告" } }
+      }
+    },
+    "This report cannot be regenerated in this version.": {
+      "localizations": {
+        "en-US": { "stringUnit": { "state": "translated", "value": "This report cannot be regenerated in this version." } },
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "此版本无法重新生成该报告。" } }
       }
     }
   },

@@ -9,6 +9,7 @@
 //       4.0d - Structured hash-only awakening card interaction fields
 //       4.0h - Structured original-source deletion and cleanup-notice audit fields
 //       4.0i - Typed grounded-generation and system-share audit fields
+//       4.0j - Content-free narrative report audit payload preparation
 // AC 覆盖: US-PRV-001 AC-1 (策略即时生效), AC-2 (被拒数据不进 Retriever),
 //          AC-3 (Denial Response), AC-4 (缓存失效), AC-5 (重新授权不清除排除表),
 //          AC-6 (审计记录 .denied/.reauthorized),
@@ -16,12 +17,13 @@
 //          US-AWK-005 AC-5 (结构化卡片交互字段写入与公开读取),
 //          4.0h AC-2/3/5 (structured source deletion and cascade cleanup audit),
 //          4.0i AC-5/6 (typed creation audit and exact hash-only share handoff identity),
+//          4.0j AC-3/8 (content-free typed publication payload),
 //          PR review 修复: 同意闸门仅 .denied 短路，.allowed 落入 per-source 授权检查 (US-PRV-001)
 // 架构约束: 遵循 AGENTS.md §4.2 (Actor 隔离契约), §7.1 (PrivacyCheckpoint 强制注入),
 //           §7.3 (审计日志), §5.4 (30天保留), R-006 (审计强制覆盖),
 //           R-007 (禁止 unchecked Sendable), R-008 (跨 Actor 调用必须 await)
 // 重要: 所有 struct stored/computed properties 必须 nonisolated（项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor）
-// Generated: 2026-07-05 (Stub), 2026-07-07 (Task 2.1 Full Implementation); Updated: 2026-09-07 (4.0i)
+// Generated: 2026-07-05 (Stub), 2026-07-07 (Task 2.1 Full Implementation); Updated: 2026-09-07 (4.0j)
 // ==========================================
 
 import Foundation
@@ -405,11 +407,16 @@ public actor PrivacyActor {
         exportFormat: String? = nil,
         sharePresented: Bool? = nil,
         periodType: String? = nil,
-        shareHandoffIdDigest: String? = nil
+        shareHandoffIdDigest: String? = nil,
+        dataSourcesUsed: String? = nil,
+        periodKeyDigest: String? = nil
     ) async throws {
         let validExportFormats: Set<String> = ["plainText", "markdown", "pdf"]
         let validPeriodTypes: Set<String> = ["month", "year"]
         let hasValidShareDigest = shareHandoffIdDigest.map {
+            $0.count == 64 && $0.allSatisfy(\.isHexDigit)
+        } ?? false
+        let hasValidPeriodDigest = periodKeyDigest.map {
             $0.count == 64 && $0.allSatisfy(\.isHexDigit)
         } ?? false
         guard exportFormat.map(validExportFormats.contains) ?? true,
@@ -420,6 +427,12 @@ public actor PrivacyActor {
               eventType == .creationSharePresented || shareHandoffIdDigest == nil,
               eventType != .creationSharePresented || (
                 exportFormat != nil && sharePresented != nil && hasValidShareDigest
+              ),
+              eventType == .narrativeReportGenerated || (
+                dataSourcesUsed == nil && periodKeyDigest == nil
+              ),
+              eventType != .narrativeReportGenerated || (
+                periodType != nil && dataSourcesUsed != nil && hasValidPeriodDigest
               ) else {
             throw AuditValidationError.invalidCreationFields
         }
@@ -462,7 +475,9 @@ public actor PrivacyActor {
             exportFormat: exportFormat,
             sharePresented: sharePresented,
             periodType: periodType,
-            shareHandoffIdDigest: shareHandoffIdDigest
+            shareHandoffIdDigest: shareHandoffIdDigest,
+            dataSourcesUsed: dataSourcesUsed,
+            periodKeyDigest: periodKeyDigest
         )
         try await db.executeWrite(sql: write.sql, bindings: write.bindings)
     }
@@ -507,14 +522,16 @@ public actor PrivacyActor {
         sharePresented: Bool? = nil,
         periodType: String? = nil,
         shareHandoffIdDigest: String? = nil,
+        dataSourcesUsed: String? = nil,
+        periodKeyDigest: String? = nil,
         timestamp: Date = Date()
     ) -> DatabaseManager.DBWrite {
         // Hash content fields before persistence (AGENTS.md §5.4).
         let contentHash = content.map { AuditContentHasher.sha256Hex($0) }
         return DatabaseManager.DBWrite(
             sql: """
-                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest, dataSourcesUsed, periodKeyDigest)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
             bindings: [
                 .text(eventType.rawValue),
@@ -557,7 +574,39 @@ public actor PrivacyActor {
                 sharePresented.map { .int($0 ? 1 : 0) } ?? .null,
                 periodType.map { .text($0) } ?? .null,
                 shareHandoffIdDigest.map { .text($0) } ?? .null,
+                dataSourcesUsed.map { .text($0) } ?? .null,
+                periodKeyDigest.map { .text($0) } ?? .null,
             ]
+        )
+    }
+
+    /// Prepares validated values for DatabaseManager's all-or-nothing report publication.
+    /// This method never writes AuditLog and carries no report content or source identities.
+    public func prepareNarrativeReportAuditPayload(
+        checkpoint: PrivacyCheckpoint,
+        period: NarrativeReportPeriod,
+        sourceTypes: [String]
+    ) async throws -> NarrativeReportAuditPayload {
+        await ensurePolicyLoaded()
+        let canonicalTypes = Array(Set(sourceTypes.map(SearchPipeline.normalizeSourceType))).sorted()
+        guard checkpoint.isAllowed,
+              checkpoint.operation == .search,
+              checkpoint.policyVersion == policy.policyVersion,
+              checkpoint.sourceTypes == canonicalTypes,
+              canonicalTypes.allSatisfy({ policy.authorizedSourceTypes.contains($0) }),
+              period.periodKey.hasPrefix("\(period.periodType.rawValue):") else {
+            throw AuditValidationError.invalidNarrativeReportFields
+        }
+        let encodedTypes = try JSONEncoder().encode(canonicalTypes)
+        guard let json = String(data: encodedTypes, encoding: .utf8) else {
+            throw AuditValidationError.invalidNarrativeReportFields
+        }
+        return NarrativeReportAuditPayload(
+            traceID: checkpoint.traceID,
+            policyVersion: checkpoint.policyVersion,
+            periodType: period.periodType,
+            dataSourcesUsedJSON: json,
+            periodKeyDigest: AuditContentHasher.sha256Hex(period.periodKey)
         )
     }
 
@@ -608,7 +657,8 @@ public actor PrivacyActor {
                        preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted,
                        sourceDeletionOutcome, excludedAutoCleaned, userNotified,
                        templateType, sourceMemoryCount, citationCount, noSourceCount,
-                       exportFormat, sharePresented, periodType, shareHandoffIdDigest
+                       exportFormat, sharePresented, periodType, shareHandoffIdDigest,
+                       dataSourcesUsed, periodKeyDigest
                 FROM AuditLog WHERE eventType = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.text(eventType.rawValue), .int(Int64(limit)), .int(Int64(offset))]
@@ -623,7 +673,8 @@ public actor PrivacyActor {
                        preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted,
                        sourceDeletionOutcome, excludedAutoCleaned, userNotified,
                        templateType, sourceMemoryCount, citationCount, noSourceCount,
-                       exportFormat, sharePresented, periodType, shareHandoffIdDigest
+                       exportFormat, sharePresented, periodType, shareHandoffIdDigest,
+                       dataSourcesUsed, periodKeyDigest
                 FROM AuditLog ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.int(Int64(limit)), .int(Int64(offset))]

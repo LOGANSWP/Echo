@@ -22,6 +22,14 @@
 	<string>Echo never writes to your health data.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<false/>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.echo.narrative-report-processing</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIStatusBarStyle</key>

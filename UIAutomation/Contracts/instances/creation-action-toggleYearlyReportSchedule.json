@@ -1,0 +1,8 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/action/v1",
+  "actionId": "creation.toggleYearlyReportSchedule",
+  "source": "user",
+  "targetIntent": "CreationViewModel.setReportSchedule(_:for: .year)",
+  "expectedOutcome": "Persist the yearly switch; enabling after a disabled interval writes a fresh eligibleFrom baseline and never backfills that interval",
+  "version": "1.0.0"
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/action/v1",
+  "actionId": "creation.deleteReport",
+  "source": "user",
+  "targetIntent": "CreationView confirmation then CreationViewModel.deleteReport(_:)",
+  "expectedOutcome": "After confirmation, delete the report and source relations and mark its period invalidated; v1 exposes no regenerate action",
+  "requiresConfirmation": true,
+  "version": "1.0.0"
+}
