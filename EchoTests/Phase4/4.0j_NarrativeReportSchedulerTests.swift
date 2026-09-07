@@ -140,6 +140,24 @@ struct NarrativeReportSchedulerTests {
         #expect(reopened.yearlyEligibleFrom == firstBaseline)
     }
 
+    @Test("AC-1: a purged schedule row is recreated and initialized in the same pass")
+    func test_AC1_missingScheduleRowEstablishesBothBaselinesImmediately() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let actor = NarrativeReportActor(database: database, privacyActor: privacy)
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        try await database.executeWrite(sql: "DELETE FROM NarrativeReportSchedule", bindings: [])
+        try await database.executeWrite(
+            sql: "INSERT OR REPLACE INTO ConsentStore (id, hasConsented, consentVersion, consentedAt, policyVersion, updatedAt) VALUES (1, 1, 1, ?, 11, ?)",
+            bindings: [.double(now.timeIntervalSince1970), .double(now.timeIntervalSince1970)]
+        )
+        try await insertMemory(UUID(), into: database, at: now)
+
+        #expect(try await actor.establishEligibilityIfNeeded(at: now))
+        let schedule = try await actor.loadSchedule()
+        #expect(schedule.monthlyEligibleFrom == now)
+        #expect(schedule.yearlyEligibleFrom == now)
+    }
+
     @Test("AC-1: disabled schedules cannot claim stale periods or backfill after re-enable")
     func test_AC1_disabledScheduleSkipsMaterializedPeriods() async throws {
         let (database, privacy) = try await makeDatabase()
@@ -232,6 +250,22 @@ struct NarrativeReportSchedulerTests {
         #expect(deferred == .lowPower)
         #expect(userAllowsWork == .available)
         #expect(thermalStillDefers == .thermalConstrained)
+    }
+
+    @Test("AC-4: expiration before task-ID assignment requests deferred release")
+    func test_AC4_expirationRaceRequestsDeferredClaimRelease() {
+        #expect(AppDelegate.shouldReleaseNarrativeReportAfterEnqueue(
+            isTaskCancelled: false,
+            expirationObserved: true
+        ))
+        #expect(AppDelegate.shouldReleaseNarrativeReportAfterEnqueue(
+            isTaskCancelled: true,
+            expirationObserved: false
+        ))
+        #expect(!AppDelegate.shouldReleaseNarrativeReportAfterEnqueue(
+            isTaskCancelled: false,
+            expirationObserved: false
+        ))
     }
 
     @Test("AC-4: unavailable production generation fails closed before claiming a period")
@@ -348,6 +382,39 @@ struct NarrativeReportSchedulerTests {
         #expect(log.contentHash == nil)
         #expect(log.memoryIdDigest == nil)
         #expect(log.shareHandoffIdDigest == nil)
+    }
+
+    @Test("AC-3: report envelopes reject a paragraph above the character limit")
+    func test_AC3_reportEnvelopeEnforcesPerParagraphCharacterLimit() throws {
+        let sourceID = UUID()
+        let coverageStart = Date(timeIntervalSince1970: 1_764_547_200)
+        let coverageEnd = Date(timeIntervalSince1970: 1_767_225_600)
+        let envelope = NarrativeReportEnvelope(
+            title: "month:2025-12",
+            periodType: .month,
+            periodKey: "month:2025-12",
+            paragraphs: [
+                NarrativeReportParagraph(
+                    id: UUID(),
+                    text: String(
+                        repeating: "a",
+                        count: NarrativeReportLimits.maximumParagraphCharacters + 1
+                    ),
+                    sourceMemoryIDs: [sourceID],
+                    groundingStatus: .cited
+                ),
+            ],
+            coverage: NarrativeReportCoverage(
+                partialBaseline: false,
+                coverageStart: coverageStart,
+                coverageEnd: coverageEnd,
+                submittedSourceCount: 1
+            )
+        )
+
+        #expect(throws: NarrativeReportError.invalidReportEnvelope) {
+            try envelope.encoded()
+        }
     }
 
     @Test("AC-3: every publication-stage failure rolls back all visible success")
@@ -677,6 +744,34 @@ struct NarrativeReportSchedulerTests {
                 trigger: .foreground
             ) == .none)
         }
+    }
+
+    @Test("AC-7: revoking a report source hides its persisted derived text")
+    func test_AC7_sourceRevocationHidesPersistedReport() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let actor = NarrativeReportActor(database: database, privacyActor: privacy)
+        let sourceID = UUID()
+        let now = Date(timeIntervalSince1970: 1_767_268_800)
+        try await insertMemory(sourceID, into: database, at: now)
+        let period = try await insertClaimedPeriod(into: database, now: now)
+        let reportID = try await publish(
+            period: period,
+            sourceID: sourceID,
+            at: now,
+            database: database,
+            privacy: privacy
+        )
+        #expect(try await actor.loadReport(reportID: reportID) != nil)
+
+        try await privacy.updatePolicy(UserPolicy(
+            preferredLanguage: "en-US",
+            authorizedSourceTypes: ["photo"],
+            policyVersion: 12
+        ))
+
+        #expect(try await actor.listReports().isEmpty)
+        #expect(try await actor.loadReport(reportID: reportID) == nil)
+        #expect(try await count("NarrativeReport", in: database) == 1)
     }
 
     @Test("AC-7: full consent revocation clears every narrative-report table")

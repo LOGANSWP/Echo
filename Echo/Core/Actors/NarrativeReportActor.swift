@@ -133,6 +133,9 @@ public actor NarrativeReportActor {
     ) async throws -> Bool {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed else { throw NarrativeReportError.privacyDenied }
+        // Consent revocation removes this row. Recreate it before applying both baselines
+        // so the first post-consent scan establishes eligibility in the same pass.
+        _ = try await loadSchedule(traceID: traceID)
         let changed = try await database.executeWrite(
             sql: """
                 UPDATE NarrativeReportSchedule
@@ -420,6 +423,8 @@ public actor NarrativeReportActor {
             let sources = sourceRows.compactMap {
                 Self.source(from: $0, authorizedSourceTypes: policy.authorizedSourceTypes)
             }
+            guard sources.count == sourceRows.count,
+                  sources.allSatisfy({ $0.availability == .available }) else { continue }
             if let report = Self.report(from: row, sources: sources) {
                 reports.append(report)
             }
@@ -443,11 +448,14 @@ public actor NarrativeReportActor {
             sql: "SELECT memoryId, sourceType, ordinal FROM NarrativeReportSource WHERE reportId = ? ORDER BY ordinal",
             bindings: [.text(reportID.uuidString)]
         )
+        let sources = sourceRows.compactMap {
+            Self.source(from: $0, authorizedSourceTypes: policy.authorizedSourceTypes)
+        }
+        guard sources.count == sourceRows.count,
+              sources.allSatisfy({ $0.availability == .available }) else { return nil }
         return Self.report(
             from: row,
-            sources: sourceRows.compactMap {
-                Self.source(from: $0, authorizedSourceTypes: policy.authorizedSourceTypes)
-            }
+            sources: sources
         )
     }
 

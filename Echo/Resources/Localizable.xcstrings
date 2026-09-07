@@ -1174,6 +1174,23 @@
         }
       }
     },
+    "Creating narrative report": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creating narrative report"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在生成叙事报告"
+          }
+        }
+      }
+    },
     "Custom Tags": {
       "extractionState": "manual",
       "localizations": {

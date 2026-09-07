@@ -52,7 +52,7 @@ struct BackgroundTaskModel: Identifiable, Sendable, Equatable {
         case .dataSourceSync: return "Syncing photos"
         case .fullIndex:      return "Building vector index"
         case .modelLoad:      return "Loading AI model"
-        case .narrativeReport:return "Creating narrative report"
+        case .narrativeReport: return "Creating narrative report"
         case .unknown:        return "Unsupported saved task"
         }
     }

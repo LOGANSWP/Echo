@@ -142,6 +142,7 @@ public nonisolated enum NarrativeReportLimits {
     public nonisolated static let maximumModelInputBytes = 128 * 1_024
     public nonisolated static let maximumEnvelopeBytes = 256 * 1_024
     public nonisolated static let maximumParagraphs = 64
+    public nonisolated static let maximumParagraphCharacters = 8_000
     public nonisolated static let maximumReferencesPerParagraph = 16
 }
 
@@ -226,6 +227,7 @@ public nonisolated struct NarrativeReportEnvelope: Sendable, Codable, Equatable 
               paragraphs.count <= NarrativeReportLimits.maximumParagraphs,
               paragraphs.allSatisfy({
                   !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                      && $0.text.count <= NarrativeReportLimits.maximumParagraphCharacters
                       && $0.sourceMemoryIDs.count <= NarrativeReportLimits.maximumReferencesPerParagraph
               }),
               coverage.limitsVersion == NarrativeReportLimits.version,

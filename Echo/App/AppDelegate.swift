@@ -18,6 +18,13 @@ import Photos
 import PhotosUI
 import BackgroundTasks
 
+@MainActor
+private final class NarrativeReportBackgroundSession {
+    var work: Task<Void, Never>?
+    var taskID: String?
+    var expirationObserved = false
+}
+
 /// Echo 应用代理 — 负责后台任务注册与生命周期管理
 /// 后台任务包括：定时扫描、数据同步、索引构建（US-SYS-001）
 final class AppDelegate: NSObject, UIApplicationDelegate {
@@ -42,8 +49,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     private let awakeningCardRepository = AwakeningCardRepositoryActor()
     /// 3F.8: 唤醒管线（含地理围栏事件流消费）— 持有防释放（W-4 review fix）
     private var awakeningPipeline: AwakeningPipeline?
-    private var narrativeReportBackgroundWork: Task<Void, Never>?
-    private var narrativeReportBackgroundTaskID: String?
+    private var narrativeReportBackgroundSession: NarrativeReportBackgroundSession?
 
     func application(
         _ application: UIApplication,
@@ -262,22 +268,28 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
     private func handleNarrativeReportBackgroundTask(_ backgroundTask: BGProcessingTask) {
         scheduleNarrativeReportBackgroundTask()
-        narrativeReportBackgroundWork?.cancel()
+        narrativeReportBackgroundSession?.work?.cancel()
+        let session = NarrativeReportBackgroundSession()
+        narrativeReportBackgroundSession = session
         let work = Task { @MainActor [weak self] in
             guard let self else {
                 backgroundTask.setTaskCompleted(success: false)
                 return
             }
-            let success = await runNarrativeReportBackgroundScan()
-            narrativeReportBackgroundTaskID = nil
+            let success = await runNarrativeReportBackgroundScan(session: session)
+            session.taskID = nil
+            if narrativeReportBackgroundSession === session {
+                narrativeReportBackgroundSession = nil
+            }
             backgroundTask.setTaskCompleted(success: success)
         }
-        narrativeReportBackgroundWork = work
-        backgroundTask.expirationHandler = { [weak self] in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                narrativeReportBackgroundWork?.cancel()
-                if let taskID = narrativeReportBackgroundTaskID {
+        session.work = work
+        backgroundTask.expirationHandler = { [weak session] in
+            Task { @MainActor [weak session] in
+                guard let session else { return }
+                session.expirationObserved = true
+                session.work?.cancel()
+                if let taskID = session.taskID {
                     try? await AppComposition.shared.narrativeReportActor.releaseClaimForResource(
                         taskID: taskID
                     )
@@ -286,7 +298,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         }
     }
 
-    private func runNarrativeReportBackgroundScan() async -> Bool {
+    private func runNarrativeReportBackgroundScan(
+        session: NarrativeReportBackgroundSession
+    ) async -> Bool {
         let composition = AppComposition.shared
         await composition.bootstrap()
         await composition.awaitBootstrapCompletion()
@@ -302,7 +316,17 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
             )
             switch result {
             case .enqueued(let taskID, let periodKey):
-                narrativeReportBackgroundTaskID = taskID
+                session.taskID = taskID
+                if Self.shouldReleaseNarrativeReportAfterEnqueue(
+                    isTaskCancelled: Task.isCancelled,
+                    expirationObserved: session.expirationObserved
+                ) {
+                    try? await composition.narrativeReportActor.releaseClaimForResource(
+                        taskID: taskID
+                    )
+                    session.taskID = nil
+                    return false
+                }
                 while await TaskQueueActor.shared.activeTaskIDs().contains(taskID) {
                     try Task.checkCancellation()
                     try await Task.sleep(for: .milliseconds(100))
@@ -354,6 +378,14 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         if lowPowerModeEnabled, autoPauseOnLowPowerEnabled { return .lowPower }
         if thermallyConstrained { return .thermalConstrained }
         return .available
+    }
+
+    /// Covers expiration delivered before the queue task ID reaches the app delegate.
+    nonisolated static func shouldReleaseNarrativeReportAfterEnqueue(
+        isTaskCancelled: Bool,
+        expirationObserved: Bool
+    ) -> Bool {
+        isTaskCancelled || expirationObserved
     }
 
     /// iOS 26 limited 适配：授权为 limited 且尚无已选照片时，主动呈现系统照片选择器

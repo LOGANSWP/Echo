@@ -208,6 +208,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
     /// Production action boundary. Fixtures may bypass it but cannot serve as production evidence.
     private let exportCoordinator: CreationExportCoordinator?
     private let narrativeReportActor: NarrativeReportActor?
+    private var reportLibraryRequestGeneration = 0
     /// 创作源记忆（grounded 输入，经检索结果映射）— 3F.9 生产路径
     private var sourceMemories: [CreativeSource] = []
 
@@ -225,6 +226,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     func loadReportLibrary() {
         reportLibraryState = .loading
+        reportLibraryRequestGeneration += 1
+        let requestGeneration = reportLibraryRequestGeneration
         guard let narrativeReportActor else {
             reportLibraryState = .idle
             return
@@ -235,11 +238,14 @@ final class CreationViewModel: CreationSharePresentationReporting {
                 async let schedule = narrativeReportActor.loadSchedule()
                 async let reports = narrativeReportActor.listReports()
                 async let recoverable = narrativeReportActor.listRecoverablePeriods()
-                self.reportSchedule = try await schedule
-                self.narrativeReports = try await reports
-                self.recoverableReportPeriods = try await recoverable
+                let snapshot = try await (schedule, reports, recoverable)
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.reportSchedule = snapshot.0
+                self.narrativeReports = snapshot.1
+                self.recoverableReportPeriods = snapshot.2
                 self.reportLibraryState = .loaded
             } catch {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
                     message: EchoStrings.tr("Unable to load narrative reports. Please try again.")
                 )
@@ -249,6 +255,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     func setReportSchedule(_ enabled: Bool, for periodType: NarrativeReportPeriodType) {
         reportLibraryState = .loading
+        reportLibraryRequestGeneration += 1
+        let requestGeneration = reportLibraryRequestGeneration
         guard let narrativeReportActor else {
             reportLibraryState = .error(
                 message: EchoStrings.tr("Narrative report scheduling is unavailable.")
@@ -259,9 +267,12 @@ final class CreationViewModel: CreationSharePresentationReporting {
             guard let self else { return }
             do {
                 try await narrativeReportActor.setEnabled(enabled, for: periodType)
-                self.reportSchedule = try await narrativeReportActor.loadSchedule()
+                let schedule = try await narrativeReportActor.loadSchedule()
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.reportSchedule = schedule
                 self.reportLibraryState = .loaded
             } catch {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
                     message: EchoStrings.tr("Unable to update narrative report scheduling.")
                 )
@@ -271,6 +282,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     func openReport(_ reportID: UUID) {
         reportLibraryState = .loading
+        reportLibraryRequestGeneration += 1
+        let requestGeneration = reportLibraryRequestGeneration
         guard let narrativeReportActor else {
             reportLibraryState = .error(
                 message: EchoStrings.tr("Narrative report is unavailable.")
@@ -283,12 +296,14 @@ final class CreationViewModel: CreationSharePresentationReporting {
                 guard let report = try await narrativeReportActor.loadReport(reportID: reportID) else {
                     throw NarrativeReportError.periodUnavailable
                 }
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.creation = Self.creationModel(from: report)
                 self.selectedTemplate = .report
                 self.isFixtureBacked = false
                 self.reportLibraryState = .loaded
                 self.viewState = .generated
             } catch {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
                     message: EchoStrings.tr("Unable to open this narrative report.")
                 )
@@ -298,6 +313,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     func deleteReport(_ reportID: UUID) {
         reportLibraryState = .loading
+        reportLibraryRequestGeneration += 1
+        let requestGeneration = reportLibraryRequestGeneration
         guard let narrativeReportActor else {
             reportLibraryState = .error(
                 message: EchoStrings.tr("Unable to delete this narrative report.")
@@ -308,10 +325,15 @@ final class CreationViewModel: CreationSharePresentationReporting {
             guard let self else { return }
             do {
                 try await narrativeReportActor.deleteReport(reportID: reportID)
-                self.narrativeReports = try await narrativeReportActor.listReports()
-                self.recoverableReportPeriods = try await narrativeReportActor.listRecoverablePeriods()
+                async let reports = narrativeReportActor.listReports()
+                async let recoverable = narrativeReportActor.listRecoverablePeriods()
+                let snapshot = try await (reports, recoverable)
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.narrativeReports = snapshot.0
+                self.recoverableReportPeriods = snapshot.1
                 self.reportLibraryState = .loaded
             } catch {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
                     message: EchoStrings.tr("Unable to delete this narrative report.")
                 )
@@ -321,6 +343,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     func retryReport(_ period: NarrativeReportPeriod) {
         reportLibraryState = .loading
+        reportLibraryRequestGeneration += 1
+        let requestGeneration = reportLibraryRequestGeneration
         guard let narrativeReportActor else {
             reportLibraryState = .error(
                 message: EchoStrings.tr("Unable to retry this narrative report.")
@@ -334,9 +358,12 @@ final class CreationViewModel: CreationSharePresentationReporting {
                     periodType: period.periodType,
                     periodKey: period.periodKey
                 )
-                self.recoverableReportPeriods = try await narrativeReportActor.listRecoverablePeriods()
+                let recoverable = try await narrativeReportActor.listRecoverablePeriods()
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.recoverableReportPeriods = recoverable
                 self.reportLibraryState = .loaded
             } catch {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
                     message: EchoStrings.tr("Unable to retry this narrative report.")
                 )
@@ -346,6 +373,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     func scanNarrativeReportsNow() {
         reportLibraryState = .loading
+        reportLibraryRequestGeneration += 1
+        let requestGeneration = reportLibraryRequestGeneration
         guard let narrativeReportActor else {
             reportLibraryState = .error(
                 message: EchoStrings.tr("Narrative report scheduling is unavailable.")
@@ -363,6 +392,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
                     trigger: .userInitiated
                 )
                 guard result != .generationUnavailable else {
+                    guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                     self.reportLibraryState = .error(
                         message: EchoStrings.tr(
                             "Offline generation runtime is not available. Please try again."
@@ -370,11 +400,15 @@ final class CreationViewModel: CreationSharePresentationReporting {
                     )
                     return
                 }
-                self.recoverableReportPeriods = try await narrativeReportActor
-                    .listRecoverablePeriods()
-                self.narrativeReports = try await narrativeReportActor.listReports()
+                async let recoverable = narrativeReportActor.listRecoverablePeriods()
+                async let reports = narrativeReportActor.listReports()
+                let snapshot = try await (recoverable, reports)
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.recoverableReportPeriods = snapshot.0
+                self.narrativeReports = snapshot.1
                 self.reportLibraryState = .loaded
             } catch {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
                     message: EchoStrings.tr("Unable to start narrative report generation.")
                 )
