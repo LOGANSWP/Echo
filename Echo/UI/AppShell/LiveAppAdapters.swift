@@ -20,7 +20,6 @@ import Foundation
 /// - 唯一依赖图：经 AppComposition.shared 装配（ADR-007 §决策-1）
 @MainActor
 public enum LiveAppAdapters {
-
     /// 从 composition 装配生产 SearchPipeline（3F.6 多通道检索 + 反馈）。
     ///
     /// - Returns: 生产 SearchPipeline；无活跃 text generation 路由或该代向量存储未物化时返回 nil
@@ -114,30 +113,13 @@ public enum LiveAppAdapters {
     static func makeCreativePipeline(
         composition: AppComposition = .shared
     ) async -> CreativePipeline? {
-        guard let llmProvider = LiveAppAdapters.resolveLLMProvider() else { return nil }
-        let policy = await composition.privacyActor.getPolicy()
-        return CreativePipeline(
-            llmProvider: llmProvider,
-            aligner: LanguageAligner(
-                llmProvider: llmProvider,
-                preferredLanguage: policy.preferredLanguage
-            ),
-            privacyActor: composition.privacyActor
-        )
+        composition.creativePipeline
     }
 
     static func makeCreationExportCoordinator(
         composition: AppComposition = .shared
     ) -> CreationExportCoordinator {
         composition.creationExportCoordinator
-    }
-
-    /// 解析离线 LLM 推理来源 (ADR-009 决策 4)。
-    ///
-    /// 当前未获批捆绑 LLM 运行时（model-provenance-register 无 LLM 工件）→ 返回 nil。
-    /// LLM 运行时获批接入后在此装配（fail-closed：无运行时则不提供 grounded 生成）。
-    private static func resolveLLMProvider() -> (any LLMProvider)? {
-        nil
     }
 
     /// 装配生产 CanonicalMemoryRepositoryActor（详情页编辑/删除）。

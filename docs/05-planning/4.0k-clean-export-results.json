@@ -1,0 +1,52 @@
+{
+  "recordedAt": "2026-09-09T00:49:18.408393+00:00",
+  "decision": "ADR-024",
+  "implementation": "CreationExportService formats title and body only; internal provenance and export authorization unchanged",
+  "tests": {
+    "red": {
+      "tests": 2,
+      "issues": 13,
+      "log": "/tmp/echo-clean-export-red.log"
+    },
+    "final": {
+      "tests": 71,
+      "suites": 11,
+      "failures": 0,
+      "seconds": 1.731,
+      "log": "/tmp/echo-clean-export-final.log",
+      "sha256": "ddf13e9898133382a2f9f006bd6f16887b11ed93056d8e0c42afb09cc760e6c7"
+    },
+    "lint": "Seven affected Swift files, zero violations",
+    "scope": "Targeted export, PDF text extraction/multipage, ViewModel, source/privacy and sharing suites; no quality/device claim"
+  },
+  "live": {
+    "17": {
+      "device": "iPhone 17 Pro",
+      "normalApp": true,
+      "syntheticSource": "Blue circle test, production PhotoKit ingestion and saved description",
+      "clipboardText": "A blue circle dances on a white canvas, a silent symphony.\nIt whispers secrets through the light, a language unseen.\nThe edges blur, and the world becomes a dream.\nA blue circle, a silent testament to the unseen.",
+      "pdf": {
+        "containsInternalMarkers": false,
+        "pageCount": 1,
+        "text": "A blue circle dances on a white canvas, a silent symphony.\nIt whispers secrets through the light, a language unseen.\nThe edges blur, and the world becomes a dream.\nA blue circle, a silent testament to the unseen."
+      },
+      "clipboardMatchesPdf": true,
+      "newModel": false,
+      "fixture": false
+    },
+    "16": {
+      "device": "iPhone 16 Pro",
+      "normalApp": true,
+      "syntheticSource": "Blue circle test, production PhotoKit ingestion and saved description",
+      "clipboardText": "蓝圆在白板上流转\n像未完成的画布上留下的痕迹\n没有尽头的光晕在空气中扩散\n静默中藏着未说出口的音符",
+      "pdf": {
+        "containsInternalMarkers": false,
+        "pageCount": 1,
+        "text": "蓝圆在白板上流转\n像未完成的画布上留下的痕迹\n没有尽头的光晕在空气中扩散\n静默中藏着未说出口的音符"
+      },
+      "clipboardMatchesPdf": true,
+      "newModel": false,
+      "fixture": false
+    }
+  }
+}

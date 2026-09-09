@@ -94,14 +94,15 @@ struct CreationViewModelTests {
 
     // MARK: - US-SYN-003 AC-3: Preview / Copy / Export
 
-    @Test("US-SYN-003 AC-3: copy preserves citation semantics in plain text")
+    @Test("US-SYN-003 AC-3: copy contains creation text without internal source markers")
     func copyWritesToPasteboard() {
         let vm = CreationViewModel()
         vm.loadPreloaded(CreationFixtureLoader.load("creation-generated-letter")!)
         vm.copyToClipboard()
         let pasted = UIPasteboard.general.string
         #expect(pasted?.contains("small orange cat") == true)
-        #expect(pasted?.contains("🔗") == true)
+        #expect(pasted?.contains("🔗") == false)
+        #expect(pasted?.contains("MemoryID:") == false)
     }
 
     @Test("US-SYN-003 AC-3: export picker only presents in generated state")

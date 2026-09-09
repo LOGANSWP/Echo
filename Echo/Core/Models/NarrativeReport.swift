@@ -8,11 +8,13 @@
 //              production generation and AC-5 close in task 4.0k
 // Architecture: AGENTS.md §4.2, §4.3, §4.5, §7.3
 // Generated: 2026-09-07
+// Task 4.0k (2026-09-08): bounded actual coverage, source revisions and content-free resume identity.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
 
-public nonisolated enum NarrativeReportPeriodType: String, Sendable, Codable, CaseIterable {
+nonisolated public enum NarrativeReportPeriodType: String, Sendable, Codable, CaseIterable {
     case month
     case year
 
@@ -24,7 +26,7 @@ public nonisolated enum NarrativeReportPeriodType: String, Sendable, Codable, Ca
     }
 }
 
-public nonisolated enum NarrativeReportPeriodState: String, Sendable, Codable, Equatable {
+nonisolated public enum NarrativeReportPeriodState: String, Sendable, Codable, Equatable {
     case eligible
     case claimed
     case retryRequired
@@ -33,7 +35,7 @@ public nonisolated enum NarrativeReportPeriodState: String, Sendable, Codable, E
     case invalidated
 }
 
-public nonisolated enum NarrativeReportScanTrigger: String, Sendable, Codable, Equatable {
+nonisolated public enum NarrativeReportScanTrigger: String, Sendable, Codable, Equatable {
     case launch
     case foreground
     case background
@@ -43,14 +45,14 @@ public nonisolated enum NarrativeReportScanTrigger: String, Sendable, Codable, E
 /// A value-only calendar description that is safe to cross actor boundaries.
 /// Narrative reports intentionally use the Gregorian calendar; the time zone is
 /// captured when a period is materialized and never recomputed for that period.
-public nonisolated struct NarrativeReportCalendarContext: Sendable, Codable, Equatable {
-    public nonisolated let timeZoneIdentifier: String
+nonisolated public struct NarrativeReportCalendarContext: Sendable, Codable, Equatable {
+    nonisolated public let timeZoneIdentifier: String
 
-    public nonisolated init(timeZoneIdentifier: String) {
+    nonisolated public init(timeZoneIdentifier: String) {
         self.timeZoneIdentifier = timeZoneIdentifier
     }
 
-    public nonisolated func makeCalendar() throws -> Calendar {
+    nonisolated public func makeCalendar() throws -> Calendar {
         guard let timeZone = TimeZone(identifier: timeZoneIdentifier) else {
             throw NarrativeReportError.invalidCalendarBoundary
         }
@@ -60,14 +62,14 @@ public nonisolated struct NarrativeReportCalendarContext: Sendable, Codable, Equ
     }
 }
 
-public nonisolated struct NarrativeReportSchedule: Sendable, Codable, Equatable {
-    public nonisolated let monthlyEnabled: Bool
-    public nonisolated let yearlyEnabled: Bool
-    public nonisolated let monthlyEligibleFrom: Date?
-    public nonisolated let yearlyEligibleFrom: Date?
-    public nonisolated let updatedAt: Date
+nonisolated public struct NarrativeReportSchedule: Sendable, Codable, Equatable {
+    nonisolated public let monthlyEnabled: Bool
+    nonisolated public let yearlyEnabled: Bool
+    nonisolated public let monthlyEligibleFrom: Date?
+    nonisolated public let yearlyEligibleFrom: Date?
+    nonisolated public let updatedAt: Date
 
-    public nonisolated init(
+    nonisolated public init(
         monthlyEnabled: Bool = true,
         yearlyEnabled: Bool = true,
         monthlyEligibleFrom: Date? = nil,
@@ -81,7 +83,7 @@ public nonisolated struct NarrativeReportSchedule: Sendable, Codable, Equatable 
         self.updatedAt = updatedAt
     }
 
-    public nonisolated func eligibleFrom(for type: NarrativeReportPeriodType) -> Date? {
+    nonisolated public func eligibleFrom(for type: NarrativeReportPeriodType) -> Date? {
         switch type {
         case .month: monthlyEligibleFrom
         case .year: yearlyEligibleFrom
@@ -89,22 +91,22 @@ public nonisolated struct NarrativeReportSchedule: Sendable, Codable, Equatable 
     }
 }
 
-public nonisolated struct NarrativeReportPeriod: Sendable, Codable, Equatable, Identifiable {
-    public nonisolated var id: String { periodKey }
-    public nonisolated let periodType: NarrativeReportPeriodType
-    public nonisolated let periodKey: String
-    public nonisolated let calendarIdentifier: String
-    public nonisolated let timeZoneIdentifier: String
-    public nonisolated let startInstant: Date
-    public nonisolated let endInstant: Date
-    public nonisolated let coverageStart: Date
-    public nonisolated let partialBaseline: Bool
-    public nonisolated let state: NarrativeReportPeriodState
-    public nonisolated let revision: Int
-    public nonisolated let claimedAt: Date?
-    public nonisolated let taskID: String?
+nonisolated public struct NarrativeReportPeriod: Sendable, Codable, Equatable, Identifiable {
+    nonisolated public var id: String { periodKey }
+    nonisolated public let periodType: NarrativeReportPeriodType
+    nonisolated public let periodKey: String
+    nonisolated public let calendarIdentifier: String
+    nonisolated public let timeZoneIdentifier: String
+    nonisolated public let startInstant: Date
+    nonisolated public let endInstant: Date
+    nonisolated public let coverageStart: Date
+    nonisolated public let partialBaseline: Bool
+    nonisolated public let state: NarrativeReportPeriodState
+    nonisolated public let revision: Int
+    nonisolated public let claimedAt: Date?
+    nonisolated public let taskID: String?
 
-    public nonisolated init(
+    nonisolated public init(
         periodType: NarrativeReportPeriodType,
         periodKey: String,
         calendarIdentifier: String,
@@ -133,30 +135,30 @@ public nonisolated struct NarrativeReportPeriod: Sendable, Codable, Equatable, I
     }
 }
 
-public nonisolated enum NarrativeReportLimits {
-    public nonisolated static let version = 1
-    public nonisolated static let maximumSources = 256
-    public nonisolated static let maximumExcerptCharacters = 512
-    public nonisolated static let maximumBatches = 16
-    public nonisolated static let maximumAggregationLayers = 3
-    public nonisolated static let maximumModelInputBytes = 128 * 1_024
-    public nonisolated static let maximumEnvelopeBytes = 256 * 1_024
-    public nonisolated static let maximumParagraphs = 64
-    public nonisolated static let maximumParagraphCharacters = 8_000
-    public nonisolated static let maximumReferencesPerParagraph = 16
+nonisolated public enum NarrativeReportLimits {
+    nonisolated public static let version = 1
+    nonisolated public static let maximumSources = 256
+    nonisolated public static let maximumExcerptCharacters = 512
+    nonisolated public static let maximumBatches = 16
+    nonisolated public static let maximumAggregationLayers = 3
+    nonisolated public static let maximumModelInputBytes = 128 * 1_024
+    nonisolated public static let maximumEnvelopeBytes = 256 * 1_024
+    nonisolated public static let maximumParagraphs = 64
+    nonisolated public static let maximumParagraphCharacters = 8_000
+    nonisolated public static let maximumReferencesPerParagraph = 16
 }
 
-public nonisolated struct NarrativeReportCoverage: Sendable, Codable, Equatable {
-    public nonisolated let partialBaseline: Bool
-    public nonisolated let coverageStart: Date
-    public nonisolated let coverageEnd: Date
-    public nonisolated let submittedSourceCount: Int
-    public nonisolated let truncatedSourceCount: Int
-    public nonisolated let omittedPartitions: [String]
-    public nonisolated let limitsVersion: Int
-    public nonisolated let aggregationLayerCount: Int
+nonisolated public struct NarrativeReportCoverage: Sendable, Codable, Equatable {
+    nonisolated public let partialBaseline: Bool
+    nonisolated public let coverageStart: Date
+    nonisolated public let coverageEnd: Date
+    nonisolated public let submittedSourceCount: Int
+    nonisolated public let truncatedSourceCount: Int
+    nonisolated public let omittedPartitions: [String]
+    nonisolated public let limitsVersion: Int
+    nonisolated public let aggregationLayerCount: Int
 
-    public nonisolated init(
+    nonisolated public init(
         partialBaseline: Bool,
         coverageStart: Date,
         coverageEnd: Date,
@@ -177,13 +179,13 @@ public nonisolated struct NarrativeReportCoverage: Sendable, Codable, Equatable 
     }
 }
 
-public nonisolated struct NarrativeReportParagraph: Sendable, Codable, Equatable, Identifiable {
-    public nonisolated let id: UUID
-    public nonisolated let text: String
-    public nonisolated let sourceMemoryIDs: [UUID]
-    public nonisolated let groundingStatus: GroundingStatus
+nonisolated public struct NarrativeReportParagraph: Sendable, Codable, Equatable, Identifiable {
+    nonisolated public let id: UUID
+    nonisolated public let text: String
+    nonisolated public let sourceMemoryIDs: [UUID]
+    nonisolated public let groundingStatus: GroundingStatus
 
-    public nonisolated init(
+    nonisolated public init(
         id: UUID,
         text: String,
         sourceMemoryIDs: [UUID],
@@ -197,22 +199,28 @@ public nonisolated struct NarrativeReportParagraph: Sendable, Codable, Equatable
     }
 }
 
-public nonisolated struct NarrativeReportEnvelope: Sendable, Codable, Equatable {
-    public nonisolated static let currentSchemaVersion = 1
-    public nonisolated let schemaVersion: Int
-    public nonisolated let title: String
-    public nonisolated let periodType: NarrativeReportPeriodType
-    public nonisolated let periodKey: String
-    public nonisolated let paragraphs: [NarrativeReportParagraph]
-    public nonisolated let coverage: NarrativeReportCoverage
+nonisolated public struct NarrativeReportEnvelope: Sendable, Codable, Equatable {
+    nonisolated public static let currentSchemaVersion = 1
+    nonisolated public let schemaVersion: Int
+    nonisolated public let title: String
+    nonisolated public let periodType: NarrativeReportPeriodType
+    nonisolated public let periodKey: String
+    nonisolated public let paragraphs: [NarrativeReportParagraph]
+    nonisolated public let contributingMemoryIDs: [UUID]?
+    nonisolated public let modelCallCount: Int?
+    nonisolated public let omittedParagraphCount: Int?
+    nonisolated public let coverage: NarrativeReportCoverage
 
-    public nonisolated init(
+    nonisolated public init(
         schemaVersion: Int = Self.currentSchemaVersion,
         title: String,
         periodType: NarrativeReportPeriodType,
         periodKey: String,
         paragraphs: [NarrativeReportParagraph],
-        coverage: NarrativeReportCoverage
+        coverage: NarrativeReportCoverage,
+        contributingMemoryIDs: [UUID]? = nil,
+        modelCallCount: Int? = nil,
+        omittedParagraphCount: Int? = nil
     ) {
         self.schemaVersion = schemaVersion
         self.title = title
@@ -220,21 +228,40 @@ public nonisolated struct NarrativeReportEnvelope: Sendable, Codable, Equatable 
         self.periodKey = periodKey
         self.paragraphs = paragraphs
         self.coverage = coverage
+        self.contributingMemoryIDs = contributingMemoryIDs
+        self.modelCallCount = modelCallCount
+        self.omittedParagraphCount = omittedParagraphCount
     }
 
-    public nonisolated func encoded() throws -> Data {
+    nonisolated public func encoded() throws -> Data {
         guard schemaVersion == Self.currentSchemaVersion,
-              paragraphs.count <= NarrativeReportLimits.maximumParagraphs,
-              paragraphs.allSatisfy({
-                  !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                      && $0.text.count <= NarrativeReportLimits.maximumParagraphCharacters
-                      && $0.sourceMemoryIDs.count <= NarrativeReportLimits.maximumReferencesPerParagraph
-              }),
-              coverage.limitsVersion == NarrativeReportLimits.version,
-              (1...NarrativeReportLimits.maximumAggregationLayers)
-                  .contains(coverage.aggregationLayerCount) else {
+            paragraphs.count <= NarrativeReportLimits.maximumParagraphs,
+            paragraphs.allSatisfy({
+                !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    && $0.text.count <= NarrativeReportLimits.maximumParagraphCharacters
+                    && $0.sourceMemoryIDs.count <= NarrativeReportLimits.maximumReferencesPerParagraph
+            }),
+            coverage.limitsVersion == NarrativeReportLimits.version,
+            (1...NarrativeReportLimits.maximumAggregationLayers)
+                .contains(coverage.aggregationLayerCount)
+        else {
             throw NarrativeReportError.invalidReportEnvelope
         }
+        if let contributors = contributingMemoryIDs {
+            guard (1...24).contains(contributors.count), Set(contributors).count == contributors.count,
+                coverage.submittedSourceCount == contributors.count,
+                Set(paragraphs.flatMap(\.sourceMemoryIDs)).isSubset(of: Set(contributors)),
+                let modelCallCount, (1...32).contains(modelCallCount),
+                let omittedParagraphCount,
+                (0...(NarrativeReportLimits.maximumParagraphs * 32)).contains(omittedParagraphCount),
+                !paragraphs.isEmpty
+            else { throw NarrativeReportError.invalidReportEnvelope }
+        } else if modelCallCount != nil || omittedParagraphCount != nil {
+            throw NarrativeReportError.invalidReportEnvelope
+        }
+        guard coverage.submittedSourceCount >= 0, coverage.truncatedSourceCount >= 0,
+            coverage.coverageEnd > coverage.coverageStart
+        else { throw NarrativeReportError.invalidReportEnvelope }
         let data = try JSONEncoder().encode(self)
         guard data.count <= NarrativeReportLimits.maximumEnvelopeBytes else {
             throw NarrativeReportError.invalidReportEnvelope
@@ -242,9 +269,10 @@ public nonisolated struct NarrativeReportEnvelope: Sendable, Codable, Equatable 
         return data
     }
 
-    public nonisolated static func decode(_ data: Data) throws -> Self {
+    nonisolated public static func decode(_ data: Data) throws -> Self {
         guard !data.isEmpty, data.count <= NarrativeReportLimits.maximumEnvelopeBytes,
-              let value = try? JSONDecoder().decode(Self.self, from: data) else {
+            let value = try? JSONDecoder().decode(Self.self, from: data)
+        else {
             throw NarrativeReportError.invalidReportEnvelope
         }
         _ = try value.encoded()
@@ -252,38 +280,44 @@ public nonisolated struct NarrativeReportEnvelope: Sendable, Codable, Equatable 
     }
 }
 
-public nonisolated struct NarrativeReportSource: Sendable, Codable, Equatable {
-    public nonisolated let memoryID: UUID
-    public nonisolated let sourceType: String
-    public nonisolated let ordinal: Int
-    public nonisolated let availability: CitationSourceAvailability
+nonisolated public struct NarrativeReportSource: Sendable, Codable, Equatable {
+    nonisolated public let memoryID: UUID
+    nonisolated public let sourceType: String
+    nonisolated public let ordinal: Int
+    nonisolated public let sourceRevision: Double?
+    nonisolated public let contentDigest: String?
+    nonisolated public let availability: CitationSourceAvailability
 
-    public nonisolated init(
+    nonisolated public init(
         memoryID: UUID,
         sourceType: String,
         ordinal: Int,
-        availability: CitationSourceAvailability = .available
+        availability: CitationSourceAvailability = .available,
+        sourceRevision: Double? = nil,
+        contentDigest: String? = nil
     ) {
         self.memoryID = memoryID
         self.sourceType = SearchPipeline.normalizeSourceType(sourceType)
         self.ordinal = ordinal
         self.availability = availability
+        self.sourceRevision = sourceRevision
+        self.contentDigest = contentDigest
     }
 }
 
-public nonisolated struct PersistedNarrativeReport: Sendable, Equatable, Identifiable {
-    public nonisolated let id: UUID
-    public nonisolated let periodType: NarrativeReportPeriodType
-    public nonisolated let periodKey: String
-    public nonisolated let envelope: NarrativeReportEnvelope
-    public nonisolated let sources: [NarrativeReportSource]
-    public nonisolated let createdAt: Date
+nonisolated public struct PersistedNarrativeReport: Sendable, Equatable, Identifiable {
+    nonisolated public let id: UUID
+    nonisolated public let periodType: NarrativeReportPeriodType
+    nonisolated public let periodKey: String
+    nonisolated public let envelope: NarrativeReportEnvelope
+    nonisolated public let sources: [NarrativeReportSource]
+    nonisolated public let createdAt: Date
 
-    public nonisolated var sourceTypes: [String] {
+    nonisolated public var sourceTypes: [String] {
         Array(Set(sources.map(\.sourceType))).sorted()
     }
 
-    public nonisolated init(
+    nonisolated public init(
         id: UUID,
         periodType: NarrativeReportPeriodType,
         periodKey: String,
@@ -301,15 +335,15 @@ public nonisolated struct PersistedNarrativeReport: Sendable, Equatable, Identif
 }
 
 /// Validated, content-free values prepared by PrivacyActor and committed by DatabaseManager.
-public nonisolated struct NarrativeReportAuditPayload: Sendable, Equatable {
-    public nonisolated let traceID: String
-    public nonisolated let policyVersion: Int
-    public nonisolated let periodType: NarrativeReportPeriodType
-    public nonisolated let dataSourcesUsedJSON: String
-    public nonisolated let periodKeyDigest: String
-    public nonisolated let timestamp: Date
+nonisolated public struct NarrativeReportAuditPayload: Sendable, Equatable {
+    nonisolated public let traceID: String
+    nonisolated public let policyVersion: Int
+    nonisolated public let periodType: NarrativeReportPeriodType
+    nonisolated public let dataSourcesUsedJSON: String
+    nonisolated public let periodKeyDigest: String
+    nonisolated public let timestamp: Date
 
-    public nonisolated init(
+    nonisolated public init(
         traceID: String,
         policyVersion: Int,
         periodType: NarrativeReportPeriodType,
@@ -326,15 +360,15 @@ public nonisolated struct NarrativeReportAuditPayload: Sendable, Equatable {
     }
 }
 
-public nonisolated struct NarrativeReportPublication: Sendable {
-    public nonisolated let reportID: UUID
-    public nonisolated let period: NarrativeReportPeriod
-    public nonisolated let envelope: NarrativeReportEnvelope
-    public nonisolated let sources: [NarrativeReportSource]
-    public nonisolated let audit: NarrativeReportAuditPayload
-    public nonisolated let createdAt: Date
+nonisolated public struct NarrativeReportPublication: Sendable {
+    nonisolated public let reportID: UUID
+    nonisolated public let period: NarrativeReportPeriod
+    nonisolated public let envelope: NarrativeReportEnvelope
+    nonisolated public let sources: [NarrativeReportSource]
+    nonisolated public let audit: NarrativeReportAuditPayload
+    nonisolated public let createdAt: Date
 
-    public nonisolated init(
+    nonisolated public init(
         reportID: UUID = UUID(),
         period: NarrativeReportPeriod,
         envelope: NarrativeReportEnvelope,
@@ -351,12 +385,12 @@ public nonisolated struct NarrativeReportPublication: Sendable {
     }
 }
 
-public nonisolated struct NarrativeReportGenerationRequest: Sendable, Equatable {
-    public nonisolated let period: NarrativeReportPeriod
-    public nonisolated let sourceBatches: [[CreativeSource]]
-    public nonisolated let coverage: NarrativeReportCoverage
+nonisolated public struct NarrativeReportGenerationRequest: Sendable, Equatable {
+    nonisolated public let period: NarrativeReportPeriod
+    nonisolated public let sourceBatches: [[CreativeSource]]
+    nonisolated public let coverage: NarrativeReportCoverage
 
-    public nonisolated init(
+    nonisolated public init(
         period: NarrativeReportPeriod,
         sourceBatches: [[CreativeSource]],
         coverage: NarrativeReportCoverage
@@ -366,16 +400,16 @@ public nonisolated struct NarrativeReportGenerationRequest: Sendable, Equatable 
         self.coverage = coverage
     }
 
-    public nonisolated var sources: [CreativeSource] {
+    nonisolated public var sources: [CreativeSource] {
         sourceBatches.flatMap { $0 }
     }
 }
 
-public nonisolated struct NarrativeReportPreparedInput: Sendable, Equatable {
-    public nonisolated let request: NarrativeReportGenerationRequest
-    public nonisolated let sources: [NarrativeReportSource]
+nonisolated public struct NarrativeReportPreparedInput: Sendable, Equatable {
+    nonisolated public let request: NarrativeReportGenerationRequest
+    nonisolated public let sources: [NarrativeReportSource]
 
-    public nonisolated init(
+    nonisolated public init(
         request: NarrativeReportGenerationRequest,
         sources: [NarrativeReportSource]
     ) {
@@ -384,33 +418,38 @@ public nonisolated struct NarrativeReportPreparedInput: Sendable, Equatable {
     }
 }
 
-public nonisolated struct NarrativeReportResumePayload: Sendable, Codable, Equatable {
-    public nonisolated static let currentSchemaVersion = 1
-    public nonisolated let schemaVersion: Int
-    public nonisolated let periodType: NarrativeReportPeriodType
-    public nonisolated let periodKey: String
-    public nonisolated let aggregationCursor: Int
-    public nonisolated let limitsVersion: Int
+nonisolated public struct NarrativeReportResumePayload: Sendable, Codable, Equatable {
+    nonisolated public static let currentSchemaVersion = 2
+    nonisolated public let schemaVersion: Int
+    nonisolated public let periodType: NarrativeReportPeriodType
+    nonisolated public let periodKey: String
+    nonisolated public let executionIdentity: String?
+    nonisolated public let aggregationCursor: Int
+    nonisolated public let limitsVersion: Int
 
-    public nonisolated init(
+    nonisolated public init(
         schemaVersion: Int = Self.currentSchemaVersion,
         periodType: NarrativeReportPeriodType,
         periodKey: String,
         aggregationCursor: Int = 0,
+        executionIdentity: String? = nil,
         limitsVersion: Int = NarrativeReportLimits.version
     ) {
         self.schemaVersion = schemaVersion
         self.periodType = periodType
         self.periodKey = periodKey
         self.aggregationCursor = aggregationCursor
+        self.executionIdentity = executionIdentity
         self.limitsVersion = limitsVersion
     }
 
-    public nonisolated func encodedDescriptor(sourceTypes: [String]) throws -> Data {
-        guard schemaVersion == Self.currentSchemaVersion,
-              limitsVersion == NarrativeReportLimits.version,
-              aggregationCursor >= 0,
-              periodKey.hasPrefix("\(periodType.rawValue):") else {
+    nonisolated public func encodedDescriptor(sourceTypes: [String]) throws -> Data {
+        guard (1...Self.currentSchemaVersion).contains(schemaVersion),
+            Self.validIdentity(executionIdentity),
+            limitsVersion == NarrativeReportLimits.version,
+            aggregationCursor >= 0,
+            periodKey.hasPrefix("\(periodType.rawValue):")
+        else {
             throw NarrativeReportError.invalidReportEnvelope
         }
         let payload = try JSONEncoder().encode(self)
@@ -421,30 +460,40 @@ public nonisolated struct NarrativeReportResumePayload: Sendable, Codable, Equat
         ).encoded()
     }
 
-    public nonisolated static func decodeDescriptor(_ data: Data) throws -> Self {
+    nonisolated public static func decodeDescriptor(_ data: Data) throws -> Self {
         let descriptor = try TaskResumeDescriptor.decode(data)
         guard descriptor.operation == .search,
-              let payload = try? JSONDecoder().decode(Self.self, from: descriptor.payload),
-              payload.schemaVersion == Self.currentSchemaVersion,
-              payload.limitsVersion == NarrativeReportLimits.version,
-              payload.aggregationCursor >= 0,
-              payload.periodKey.hasPrefix("\(payload.periodType.rawValue):") else {
+            let payload = try? JSONDecoder().decode(Self.self, from: descriptor.payload),
+            (1...Self.currentSchemaVersion).contains(payload.schemaVersion),
+            Self.validIdentity(payload.executionIdentity),
+            payload.limitsVersion == NarrativeReportLimits.version,
+            payload.aggregationCursor >= 0,
+            payload.periodKey.hasPrefix("\(payload.periodType.rawValue):")
+        else {
             throw NarrativeReportError.invalidReportEnvelope
         }
         return payload
     }
+
+    nonisolated private static func validIdentity(_ identity: String?) -> Bool {
+        guard let identity else { return true }
+        return identity.utf8.count == 64
+            && identity.utf8.allSatisfy {
+                (48...57).contains($0) || (97...102).contains($0)
+            }
+    }
 }
 
-public nonisolated enum NarrativeReportResourceAvailability: Sendable, Equatable {
+nonisolated public enum NarrativeReportResourceAvailability: Sendable, Equatable {
     case available
     case lowPower
     case thermalConstrained
     case systemExpiration
 
-    public nonisolated var canStart: Bool { self == .available }
+    nonisolated public var canStart: Bool { self == .available }
 }
 
-public nonisolated enum NarrativeReportScanResult: Sendable, Equatable {
+nonisolated public enum NarrativeReportScanResult: Sendable, Equatable {
     case none
     case deferredForResources
     case generationUnavailable
@@ -453,8 +502,8 @@ public nonisolated enum NarrativeReportScanResult: Sendable, Equatable {
     case retryRequired(periodKey: String)
 }
 
-public nonisolated enum NarrativeReportAggregator {
-    public nonisolated static func prepare(
+nonisolated public enum NarrativeReportAggregator {
+    nonisolated public static func prepare(
         period: NarrativeReportPeriod,
         rows: [[String: DBValue]],
         authorizedSourceTypes: Set<String>,
@@ -476,9 +525,10 @@ public nonisolated enum NarrativeReportAggregator {
         }
         for row in orderedRows {
             guard let rawID = row["memoryId"]?.stringValue,
-                  let memoryID = UUID(uuidString: rawID),
-                  let rawType = row["sourceType"]?.stringValue,
-                  let timestamp = row["memoryTimestamp"]?.doubleValue else { continue }
+                let memoryID = UUID(uuidString: rawID),
+                let rawType = row["sourceType"]?.stringValue,
+                let timestamp = row["memoryTimestamp"]?.doubleValue
+            else { continue }
             let sourceType = SearchPipeline.normalizeSourceType(rawType)
             guard authorizedSourceTypes.contains(sourceType) else { continue }
             eligibleCount += 1
@@ -488,18 +538,25 @@ public nonisolated enum NarrativeReportAggregator {
             let projectedBytes = usedBytes + excerpt.utf8.count + memoryID.uuidString.utf8.count + 32
             guard projectedBytes <= NarrativeReportLimits.maximumModelInputBytes else { continue }
             usedBytes = projectedBytes
-            accepted.append(CreativeSource(
-                memoryID: memoryID,
-                assetID: "",
-                sourceType: sourceType,
-                text: excerpt.isEmpty ? nil : excerpt,
-                timestamp: timestamp
-            ))
-            sources.append(NarrativeReportSource(
-                memoryID: memoryID,
-                sourceType: sourceType,
-                ordinal: sources.count
-            ))
+            accepted.append(
+                CreativeSource(
+                    memoryID: memoryID,
+                    assetID: "",
+                    sourceType: sourceType,
+                    text: excerpt.isEmpty ? nil : excerpt,
+                    timestamp: timestamp,
+                    revision: row["updatedAt"]?.doubleValue
+                )
+            )
+            sources.append(
+                NarrativeReportSource(
+                    memoryID: memoryID,
+                    sourceType: sourceType,
+                    ordinal: sources.count,
+                    sourceRevision: row["updatedAt"]?.doubleValue,
+                    contentDigest: AuditContentHasher.sha256Hex(rawText)
+                )
+            )
         }
 
         let batchSize = max(
@@ -514,7 +571,13 @@ public nonisolated enum NarrativeReportAggregator {
             coverageStart: period.coverageStart,
             coverageEnd: period.endInstant,
             submittedSourceCount: accepted.count,
-            truncatedSourceCount: max(0, eligibleCount - accepted.count),
+            truncatedSourceCount: max(
+                0,
+                max(
+                    eligibleCount,
+                    Int(rows.first?["eligibleSourceCount"]?.intValue ?? 0)
+                ) - accepted.count
+            ),
             omittedPartitions: omittedPartitions
         )
         return NarrativeReportPreparedInput(
@@ -528,26 +591,30 @@ public nonisolated enum NarrativeReportAggregator {
     }
 }
 
-public nonisolated enum NarrativeReportPeriodPlanner {
-    public nonisolated static func completedPeriods(
+nonisolated public enum NarrativeReportPeriodPlanner {
+    nonisolated public static func completedPeriods(
         at now: Date,
         eligibleFrom: Date,
         calendar: Calendar
     ) throws -> [NarrativeReportPeriod] {
         guard eligibleFrom < now else { return [] }
         var candidates: [NarrativeReportPeriod] = []
-        candidates.append(contentsOf: try periods(
-            type: .month,
-            at: now,
-            eligibleFrom: eligibleFrom,
-            calendar: calendar
-        ))
-        candidates.append(contentsOf: try periods(
-            type: .year,
-            at: now,
-            eligibleFrom: eligibleFrom,
-            calendar: calendar
-        ))
+        candidates.append(
+            contentsOf: try periods(
+                type: .month,
+                at: now,
+                eligibleFrom: eligibleFrom,
+                calendar: calendar
+            )
+        )
+        candidates.append(
+            contentsOf: try periods(
+                type: .year,
+                at: now,
+                eligibleFrom: eligibleFrom,
+                calendar: calendar
+            )
+        )
         return candidates.sorted {
             if $0.endInstant == $1.endInstant {
                 return $0.periodType.tieBreakPriority < $1.periodType.tieBreakPriority
@@ -556,7 +623,7 @@ public nonisolated enum NarrativeReportPeriodPlanner {
         }
     }
 
-    private nonisolated static func periods(
+    nonisolated private static func periods(
         type: NarrativeReportPeriodType,
         at now: Date,
         eligibleFrom: Date,
@@ -576,12 +643,14 @@ public nonisolated enum NarrativeReportPeriodPlanner {
                 cursor = interval.end
                 continue
             }
-            results.append(makePeriod(
-                type: type,
-                interval: interval,
-                eligibleFrom: eligibleFrom,
-                calendar: calendar
-            ))
+            results.append(
+                makePeriod(
+                    type: type,
+                    interval: interval,
+                    eligibleFrom: eligibleFrom,
+                    calendar: calendar
+                )
+            )
             guard interval.end > cursor else {
                 throw NarrativeReportError.invalidCalendarBoundary
             }
@@ -590,7 +659,7 @@ public nonisolated enum NarrativeReportPeriodPlanner {
         return results
     }
 
-    private nonisolated static func makePeriod(
+    nonisolated private static func makePeriod(
         type: NarrativeReportPeriodType,
         interval: DateInterval,
         eligibleFrom: Date,
@@ -601,6 +670,7 @@ public nonisolated enum NarrativeReportPeriodPlanner {
         switch type {
         case .month:
             key = String(format: "month:%04d-%02d", components.year ?? 0, components.month ?? 0)
+
         case .year:
             key = String(format: "year:%04d", components.year ?? 0)
         }
@@ -617,12 +687,12 @@ public nonisolated enum NarrativeReportPeriodPlanner {
         )
     }
 
-    private nonisolated static func calendarIdentifier(_ identifier: Calendar.Identifier) -> String {
+    nonisolated private static func calendarIdentifier(_ identifier: Calendar.Identifier) -> String {
         identifier == .gregorian ? "gregorian" : String(describing: identifier)
     }
 }
 
-public nonisolated enum NarrativeReportError: Error, Sendable, Equatable {
+nonisolated public enum NarrativeReportError: Error, Sendable, Equatable {
     case invalidCalendarBoundary
     case scheduleUnavailable
     case periodUnavailable

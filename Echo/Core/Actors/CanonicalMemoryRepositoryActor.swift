@@ -6,6 +6,8 @@
 //            AGENTS.md D-002/D-003/D-004/D-005, §5 存储契约
 // Task: 3F.4 - Canonical storage and generation lifecycle; 4.0a - Discovery recent-memory API;
 //       4.0h - PhotoKit external-result gate and recoverable deletion intent
+//       4.0k - Atomic effective-text reads for manual grounded creation (US-SYN-003 AC-2)
+// AC coverage: 4.0k SQL byte-bounded effective-text reads (PR #79);
 // AC 覆盖: 确定性 ID (RFC 4122 派生), 事务 CRUD (canonical+vector+FTS 同事务/补偿),
 //          崩溃点故障注入 (无 half-write), 全删除边界 (D-005), 级联删除 (US-PRV-007),
 //          仅从 Echo 移除写 ExcludedAssets (US-PRV-004), 反馈 generation 身份
@@ -40,7 +42,6 @@ import CryptoKit
 /// - 向量写入 VectorStoreActor 在 SQLite 提交之后执行；任一失败触发补偿回滚
 ///   （删除已写向量 + 删除 canonical 行），保证不产生「向量存在但原文丢失」。
 public actor CanonicalMemoryRepositoryActor {
-
     public static let shared = CanonicalMemoryRepositoryActor()
 
     private let db: DatabaseManager
@@ -50,7 +51,7 @@ public actor CanonicalMemoryRepositoryActor {
 
     /// 故障注入点（测试用）— 模拟事务边界处的崩溃/失败。DEBUG only。
     #if DEBUG
-    private var fault: FaultPoint?
+        private var fault: FaultPoint?
     #endif
 
     public init(
@@ -71,32 +72,34 @@ public actor CanonicalMemoryRepositoryActor {
     ///
     /// 相同 `sourceLocator` + `sourceType` 恒产生相同 UUID，与摄入顺序无关
     /// （ADR-010 决策-1）。
-    public nonisolated static func deterministicID(sourceLocator: String, sourceType: String) -> UUID {
+    nonisolated public static func deterministicID(sourceLocator: String, sourceType: String) -> UUID {
         let namespace = "echo-memory-v1"
         let raw = Data("\(namespace)|\(sourceType)|\(sourceLocator)".utf8)
         let digest = SHA256.hash(data: raw)
         var b = Array(digest.prefix(16))
         b[6] = (b[6] & 0x0F) | 0x50
         b[8] = (b[8] & 0x3F) | 0x80
-        return UUID(uuid: (
-            b[0], b[1], b[2], b[3],
-            b[4], b[5], b[6], b[7],
-            b[8], b[9], b[10], b[11],
-            b[12], b[13], b[14], b[15]
-        ))
+        return UUID(
+            uuid: (
+                b[0], b[1], b[2], b[3],
+                b[4], b[5], b[6], b[7],
+                b[8], b[9], b[10], b[11],
+                b[12], b[13], b[14], b[15]
+            )
+        )
     }
 
     // MARK: - 确定性 representation ID 派生（WP3 步骤 1a-1f）
 
     /// 照片 representation ID 恒等于 canonical memory ID
     /// （vectorId == representationId == memoryId，交接计划 WP3 步骤 1a-1b2）。
-    public nonisolated static func photoRepresentationID(memoryID: UUID) -> UUID {
+    nonisolated public static func photoRepresentationID(memoryID: UUID) -> UUID {
         memoryID
     }
 
     /// OCR 表示 ID：deterministicID(memoryID|ocr, ocr_text)——与照片视觉表示解耦
     /// （vectorId == representationId，ADR-015 D-7 一对一），避免与 memoryID/视觉表示冲突。
-    public nonisolated static func ocrRepresentationID(memoryID: UUID) -> UUID {
+    nonisolated public static func ocrRepresentationID(memoryID: UUID) -> UUID {
         deterministicID(
             sourceLocator: "\(memoryID.uuidString)|ocr",
             sourceType: "ocr_text"
@@ -105,7 +108,7 @@ public actor CanonicalMemoryRepositoryActor {
 
     /// 视频帧 representation ID：与既有帧向量 ID 公式完全一致
     /// （deterministicID(assetId|frameN, video_frame)），零语义漂移。
-    public nonisolated static func videoFrameRepresentationID(sourceLocator: String, frameIndex: Int) -> UUID {
+    nonisolated public static func videoFrameRepresentationID(sourceLocator: String, frameIndex: Int) -> UUID {
         deterministicID(
             sourceLocator: "\(sourceLocator)|frame\(frameIndex)",
             sourceType: "video_frame"
@@ -114,7 +117,7 @@ public actor CanonicalMemoryRepositoryActor {
 
     /// 音频 representation ID：父 memory + 固定 「audio」 组件 key 的确定性派生
     /// （交接计划 WP3 步骤 1e-1f）。
-    public nonisolated static func audioRepresentationID(memoryID: UUID) -> UUID {
+    nonisolated public static func audioRepresentationID(memoryID: UUID) -> UUID {
         deterministicID(
             sourceLocator: "\(memoryID.uuidString.lowercased())|audio",
             sourceType: "video_audio"
@@ -129,27 +132,27 @@ public actor CanonicalMemoryRepositoryActor {
     private var deletionCacheActor: SearchResultCacheActor?
 
     #if DEBUG
-    public enum FaultPoint: Sendable, Equatable {
-        /// 在向量写入前注入失败（模拟向量存储故障）→ 触发补偿回滚
-        case vectorWrite
-        /// 在 canonical 提交后、向量写入前注入崩溃 → 补偿清理 canonical
-        case afterCanonicalWrite
-        /// 在 deleteMemory 向量清理前注入失败（模拟 DB 删除故障，3F.5 W-03）
-        case deleteFail
-        /// WP3 steps 3k-3t2: 删除管线阶段注入点
-        case cacheInvalidation
-        case vectorDeletePersist
-        case auditPurge
-        case canonicalTransaction
-    }
+        public enum FaultPoint: Sendable, Equatable {
+            /// 在向量写入前注入失败（模拟向量存储故障）→ 触发补偿回滚
+            case vectorWrite
+            /// 在 canonical 提交后、向量写入前注入崩溃 → 补偿清理 canonical
+            case afterCanonicalWrite
+            /// 在 deleteMemory 向量清理前注入失败（模拟 DB 删除故障，3F.5 W-03）
+            case deleteFail
+            /// WP3 steps 3k-3t2: 删除管线阶段注入点
+            case cacheInvalidation
+            case vectorDeletePersist
+            case auditPurge
+            case canonicalTransaction
+        }
 
-    public func configureDeletionCollaborators(cache: SearchResultCacheActor) {
-        deletionCacheActor = cache
-    }
+        public func configureDeletionCollaborators(cache: SearchResultCacheActor) {
+            deletionCacheActor = cache
+        }
 
-    public func setFault(_ fault: FaultPoint?) {
-        self.fault = fault
-    }
+        public func setFault(_ fault: FaultPoint?) {
+            self.fault = fault
+        }
     #endif
 
     // MARK: - Transactional Commit (US-ING-006)
@@ -171,19 +174,19 @@ public actor CanonicalMemoryRepositoryActor {
         try await writeCanonicalTransaction(memory: memory, representations: representations)
 
         #if DEBUG
-        if fault == .afterCanonicalWrite {
-            // 崩溃点：canonical 已提交但向量未写 → 补偿清理，保证无 half-write
-            try await compensateCanonical(memoryId: memory.memoryId)
-            try await writeTransactionAudit(traceID: traceID, rolledBack: true)
-            throw CanonicalRepositoryError.crashAfterCanonicalWrite
-        }
+            if fault == .afterCanonicalWrite {
+                // 崩溃点：canonical 已提交但向量未写 → 补偿清理，保证无 half-write
+                try await compensateCanonical(memoryId: memory.memoryId)
+                try await writeTransactionAudit(traceID: traceID, rolledBack: true)
+                throw CanonicalRepositoryError.crashAfterCanonicalWrite
+            }
 
-        // Phase 2: 向量写入（逐 generation）
-        if fault == .vectorWrite {
-            try await compensateCanonical(memoryId: memory.memoryId)
-            try await writeTransactionAudit(traceID: traceID, rolledBack: true)
-            throw CanonicalRepositoryError.vectorWriteInjected
-        }
+            // Phase 2: 向量写入（逐 generation）
+            if fault == .vectorWrite {
+                try await compensateCanonical(memoryId: memory.memoryId)
+                try await writeTransactionAudit(traceID: traceID, rolledBack: true)
+                throw CanonicalRepositoryError.vectorWriteInjected
+            }
         #endif
 
         do {
@@ -218,9 +221,69 @@ public actor CanonicalMemoryRepositoryActor {
 
     // MARK: - Reads
 
+    /// Task 4.0k / US-SYN-003: atomically read the same persisted text used by editing.
+    /// The caller owns the operation checkpoint; this read never changes original text.
+    public func loadCreationSource(memoryID: UUID, maximumTextBytes: Int? = nil) async throws -> CreativeSource? {
+        let limit = maximumTextBytes ?? Int.max
+        guard limit >= 0 else { throw GenerationRuntimeError.contextLimit }
+        let rows = try await db.executeQuery(
+            sql: """
+                WITH source AS (
+                    SELECT m.memoryId, m.sourceType, m.canonicalText, m.createdAt, m.updatedAt,
+                           m.originalTimestamp, e.title, e.description, e.tagsJSON, e.updatedAt AS editUpdatedAt,
+                           COALESCE(length(CAST(m.canonicalText AS BLOB)), 0)
+                           + COALESCE(length(CAST(e.title AS BLOB)), 0)
+                           + COALESCE(length(CAST(e.description AS BLOB)), 0)
+                           + COALESCE(length(CAST(e.tagsJSON AS BLOB)), 0) AS sourceBytes
+                    FROM Memory m LEFT JOIN MemoryUserEdit e ON e.memoryId = m.memoryId
+                    WHERE m.memoryId = ?1
+                )
+                SELECT memoryId, '' AS sourceLocator, sourceType, createdAt, updatedAt,
+                       originalTimestamp, editUpdatedAt, sourceBytes,
+                       CASE WHEN sourceBytes <= ?2 THEN canonicalText END AS canonicalText,
+                       CASE WHEN sourceBytes <= ?2 THEN title END AS title,
+                       CASE WHEN sourceBytes <= ?2 THEN description END AS description,
+                       CASE WHEN sourceBytes <= ?2 THEN tagsJSON END AS tagsJSON
+                FROM source
+                """,
+            bindings: [.text(memoryID.uuidString), .int(Int64(limit))]
+        )
+        guard let row = rows.first else { return nil }
+        guard let size = row["sourceBytes"]?.intValue, size <= Int64(limit) else {
+            throw GenerationRuntimeError.contextLimit
+        }
+        guard let memory = Self.rowToMemory(row) else { return nil }
+        let tags: [String]
+        if let json = row["tagsJSON"]?.stringValue {
+            tags = try JSONDecoder().decode([String].self, from: Data(json.utf8))
+        } else {
+            tags = []
+        }
+        let text = MemoryEditActor.effectiveText(
+            title: row["title"]?.stringValue ?? "",
+            description: row["description"]?.stringValue ?? "",
+            tags: tags,
+            canonicalText: memory.canonicalText
+        )
+        // Joining adds separators; validate the bounded effective text without truncation.
+        if maximumTextBytes != nil {
+            var remaining = limit
+            try GenerationInputBudget.consume(text, remaining: &remaining)
+        }
+        return CreativeSource(
+            memoryID: memory.memoryId,
+            assetID: "",
+            sourceType: memory.sourceType,
+            text: text,
+            timestamp: (memory.originalTimestamp ?? memory.createdAt).timeIntervalSince1970,
+            revision: max(memory.updatedAt.timeIntervalSince1970, row["editUpdatedAt"]?.doubleValue ?? 0)
+        )
+    }
+
     public func loadMemory(memoryId: UUID) async throws -> Memory? {
         let rows = try await db.executeQuery(
-            sql: "SELECT memoryId, sourceLocator, canonicalText, sourceType, createdAt, updatedAt, recoverability, originalTimestamp, userEdited, userLocked FROM Memory WHERE memoryId = ?",
+            sql:
+                "SELECT memoryId, sourceLocator, canonicalText, sourceType, createdAt, updatedAt, recoverability, originalTimestamp, userEdited, userLocked FROM Memory WHERE memoryId = ?",
             bindings: [.text(memoryId.uuidString)]
         )
         return rows.first.flatMap { Self.rowToMemory($0) }
@@ -260,14 +323,16 @@ public actor CanonicalMemoryRepositoryActor {
     /// Returns every canonical PhotoKit identity used by foreground deletion reconciliation.
     func loadPhotoSourceReferences() async throws -> [PhotoSourceMemoryReference] {
         let rows = try await db.executeQuery(
-            sql: "SELECT memoryId, sourceLocator, sourceType FROM Memory WHERE sourceType IN ('photo', 'video') ORDER BY sourceType, sourceLocator, memoryId",
+            sql:
+                "SELECT memoryId, sourceLocator, sourceType FROM Memory WHERE sourceType IN ('photo', 'video') ORDER BY sourceType, sourceLocator, memoryId",
             bindings: []
         )
         return rows.compactMap { row in
             guard let rawMemoryID = row["memoryId"]?.stringValue,
-                  let memoryID = UUID(uuidString: rawMemoryID),
-                  let sourceLocator = row["sourceLocator"]?.stringValue,
-                  let sourceType = row["sourceType"]?.stringValue else { return nil }
+                let memoryID = UUID(uuidString: rawMemoryID),
+                let sourceLocator = row["sourceLocator"]?.stringValue,
+                let sourceType = row["sourceType"]?.stringValue
+            else { return nil }
             return PhotoSourceMemoryReference(
                 memoryID: memoryID,
                 sourceLocator: sourceLocator,
@@ -278,17 +343,18 @@ public actor CanonicalMemoryRepositoryActor {
 
     public func loadRepresentations(memoryId: UUID) async throws -> [Representation] {
         let rows = try await db.executeQuery(
-            sql: "SELECT representationId, memoryId, modality, preprocessVersion, contentHash FROM Representation WHERE memoryId = ? ORDER BY representationId",
+            sql:
+                "SELECT representationId, memoryId, modality, preprocessVersion, contentHash FROM Representation WHERE memoryId = ? ORDER BY representationId",
             bindings: [.text(memoryId.uuidString)]
         )
         return rows.compactMap { Self.rowToRepresentation($0) }
     }
 
-    /// FTS5 canonical 文本检索（US-ING-006 AC-3：FTS5 与主事务同步提交）。
-    ///
-    /// F-3: 用户查询中的 FTS5 语法字符（引号、`*`、括号、AND/OR 等）会导致
-    /// MATCH 运行时错误或异常结果。查询按空白分词，每 token 作为短语（引号包裹 +
-    /// 内嵌引号转义）以隐式 AND 组合，杜绝语法注入；空查询返回空数组。
+    // FTS5 canonical 文本检索（US-ING-006 AC-3：FTS5 与主事务同步提交）。
+    //
+    // F-3: 用户查询中的 FTS5 语法字符（引号、`*`、括号、AND/OR 等）会导致
+    // MATCH 运行时错误或异常结果。查询按空白分词，每 token 作为短语（引号包裹 +
+    // 内嵌引号转义）以隐式 AND 组合，杜绝语法注入；空查询返回空数组。
     // MARK: - Vector→Memory Forward Mapping (WP1 步骤 3/4)
 
     /// WP1 步骤 3：单个向量 ID → canonical memory 的类型化映射。
@@ -310,19 +376,22 @@ public actor CanonicalMemoryRepositoryActor {
             return .ambiguous(vectorID: vectorID, generationID: generationID, candidateMemoryIDs: candidates)
         }
         guard let idString = row["memoryId"]?.stringValue,
-              let memoryID = UUID(uuidString: idString),
-              let modalityRaw = row["modality"]?.stringValue,
-              let modality = Modality(rawValue: modalityRaw) else {
+            let memoryID = UUID(uuidString: idString),
+            let modalityRaw = row["modality"]?.stringValue,
+            let modality = Modality(rawValue: modalityRaw)
+        else {
             return .missing(vectorID: vectorID, generationID: generationID)
         }
         // ADR-015 D-7: vectorId == representationId，一对一绑定
-        return .mapped(CanonicalVectorBinding(
-            vectorID: vectorID,
-            representationID: vectorID,
-            memoryID: memoryID,
-            modality: modality,
-            generationID: generationID
-        ))
+        return .mapped(
+            CanonicalVectorBinding(
+                vectorID: vectorID,
+                representationID: vectorID,
+                memoryID: memoryID,
+                modality: modality,
+                generationID: generationID
+            )
+        )
     }
 
     /// WP1 步骤 4：批量映射 —— 调用方单次仓库交互，结果按入参 ID 键控。
@@ -359,8 +428,9 @@ public actor CanonicalMemoryRepositoryActor {
     ) async throws -> MemoryDeletionJournal {
         if let existing = try await db.loadDeletionJournals(memoryId: memoryId).first {
             guard existing.intentKind == .photoLibraryAndEcho,
-                  existing.phase == .planned,
-                  existing.sourceDeletionState == .prepared else {
+                existing.phase == .planned,
+                existing.sourceDeletionState == .prepared
+            else {
                 throw CanonicalRepositoryError.deletionAlreadyInProgress(memoryId: memoryId.uuidString)
             }
             return existing
@@ -399,7 +469,8 @@ public actor CanonicalMemoryRepositoryActor {
         outcome: SourceDeletionOutcome
     ) async throws -> MemoryDeletionJournal {
         guard let journal = try await db.loadDeletionJournals(memoryId: memoryId).first,
-              journal.intentKind == .photoLibraryAndEcho else {
+            journal.intentKind == .photoLibraryAndEcho
+        else {
             throw CanonicalRepositoryError.memoryNotFound(memoryId: memoryId.uuidString)
         }
         let updated = MemoryDeletionJournal(
@@ -449,8 +520,8 @@ public actor CanonicalMemoryRepositoryActor {
         guard memory != nil || existingJournal != nil else { return false }
 
         if let existingJournal,
-           existingJournal.intentKind == .photoLibraryAndEcho,
-           existingJournal.sourceDeletionState != .confirmedDeleted {
+            existingJournal.intentKind == .photoLibraryAndEcho,
+            existingJournal.sourceDeletionState != .confirmedDeleted {
             throw CanonicalRepositoryError.externalDeletionNotConfirmed(memoryId: memoryId.uuidString)
         }
 
@@ -486,18 +557,18 @@ public actor CanonicalMemoryRepositoryActor {
         }
 
         #if DEBUG
-        if fault == .deleteFail {
-            throw CanonicalRepositoryError.deleteInjected
-        }
+            if fault == .deleteFail {
+                throw CanonicalRepositoryError.deleteInjected
+            }
         #endif
 
         if journal.phase.ordinal < MemoryDeletionPhase.cacheInvalidated.ordinal {
             if let cache = deletionCacheActor {
                 _ = try await cache.invalidate(memoryID: memoryId)
                 #if DEBUG
-                if fault == .cacheInvalidation {
-                    throw CanonicalRepositoryError.deleteInjected
-                }
+                    if fault == .cacheInvalidation {
+                        throw CanonicalRepositoryError.deleteInjected
+                    }
                 #endif
             }
             journal = try await advanceDeletionJournal(journal, to: .cacheInvalidated)
@@ -530,9 +601,9 @@ public actor CanonicalMemoryRepositoryActor {
                 }
             }
             #if DEBUG
-            if fault == .vectorDeletePersist {
-                vectorPersistenceError = vectorPersistenceError ?? CanonicalRepositoryError.deleteInjected
-            }
+                if fault == .vectorDeletePersist {
+                    vectorPersistenceError = vectorPersistenceError ?? CanonicalRepositoryError.deleteInjected
+                }
             #endif
             // Durable vector cleanup is a phase boundary. Keep the journal at
             // cacheInvalidated so the entire idempotent phase can be replayed.
@@ -545,9 +616,9 @@ public actor CanonicalMemoryRepositoryActor {
         if journal.phase.ordinal < MemoryDeletionPhase.auditPurged.ordinal {
             _ = try await privacyActor.purgeAuditRecords(subject: subject, traceID: journal.traceID)
             #if DEBUG
-            if fault == .auditPurge {
-                throw CanonicalRepositoryError.deleteInjected
-            }
+                if fault == .auditPurge {
+                    throw CanonicalRepositoryError.deleteInjected
+                }
             #endif
             journal = try await advanceDeletionJournal(journal, to: .auditPurged)
         }
@@ -563,15 +634,20 @@ public actor CanonicalMemoryRepositoryActor {
                     bindings: [.text($0.uuidString)]
                 )
             }
-            try await db.executeTransaction(indexCleanup + [
-                .init(sql: "DELETE FROM MemoryFTS WHERE memoryId = ?", bindings: [.text(memoryId.uuidString)]),
-                .init(sql: "DELETE FROM translationCache WHERE memoryId = ?", bindings: [.text(memoryId.uuidString)]),
-                .init(sql: "DELETE FROM Memory WHERE memoryId = ?", bindings: [.text(memoryId.uuidString)]),
-            ])
+            try await db.executeTransaction(
+                indexCleanup + [
+                    .init(sql: "DELETE FROM MemoryFTS WHERE memoryId = ?", bindings: [.text(memoryId.uuidString)]),
+                    .init(
+                        sql: "DELETE FROM translationCache WHERE memoryId = ?",
+                        bindings: [.text(memoryId.uuidString)]
+                    ),
+                    .init(sql: "DELETE FROM Memory WHERE memoryId = ?", bindings: [.text(memoryId.uuidString)]),
+                ]
+            )
             #if DEBUG
-            if fault == .canonicalTransaction {
-                throw CanonicalRepositoryError.deleteInjected
-            }
+                if fault == .canonicalTransaction {
+                    throw CanonicalRepositoryError.deleteInjected
+                }
             #endif
             journal = try await advanceDeletionJournal(journal, to: .canonicalDeleted)
         }
@@ -582,8 +658,8 @@ public actor CanonicalMemoryRepositoryActor {
             try await excludedAssets.add(assetId: locator, sourceType: st, traceID: journal.traceID)
             excludedActuallyWritten = true
         } else if journal.intentKind == .externalCascade,
-                  let locator = effectiveLocator,
-                  let st = effectiveType {
+            let locator = effectiveLocator,
+            let st = effectiveType {
             let removed = try await excludedAssets.recordCascadeCleanup(
                 assetId: locator,
                 sourceType: st,
@@ -597,32 +673,36 @@ public actor CanonicalMemoryRepositoryActor {
         // If the transaction fails, the canonicalDeleted journal remains recoverable and no
         // partial completion evidence can be duplicated by the next foreground retry.
         let policy = await privacyActor.getPolicy()
-        var completionAuditWrites = [PrivacyActor.makeAuditWrite(
-            eventType: .memoryDeleted,
-            traceID: journal.traceID,
-            policyVersion: policy.policyVersion,
-            success: true,
-            sourceType: effectiveType,
-            excludedWritten: excludedActuallyWritten,
-            content: nil,
-            preservedOriginal: journal.intentKind == .echoOnly,
-            sourceDeletionRequested: journal.intentKind == .photoLibraryAndEcho,
-            sourceDeletionCompleted: journal.intentKind == .photoLibraryAndEcho ? true : nil,
-            sourceDeletionOutcome: journal.intentKind == .photoLibraryAndEcho
-                ? journal.sourceDeletionOutcome.rawValue : nil
-        )]
-        if journal.intentKind == .externalCascade {
-            completionAuditWrites.append(PrivacyActor.makeAuditWrite(
-                eventType: .cascadeDeleteFromOriginal,
+        var completionAuditWrites = [
+            PrivacyActor.makeAuditWrite(
+                eventType: .memoryDeleted,
                 traceID: journal.traceID,
                 policyVersion: policy.policyVersion,
                 success: true,
                 sourceType: effectiveType,
-                affectedCount: 1,
-                excludedWritten: false,
-                excludedAutoCleaned: excludedAutoCleaned,
-                userNotified: false
-            ))
+                excludedWritten: excludedActuallyWritten,
+                content: nil,
+                preservedOriginal: journal.intentKind == .echoOnly,
+                sourceDeletionRequested: journal.intentKind == .photoLibraryAndEcho,
+                sourceDeletionCompleted: journal.intentKind == .photoLibraryAndEcho ? true : nil,
+                sourceDeletionOutcome: journal.intentKind == .photoLibraryAndEcho
+                    ? journal.sourceDeletionOutcome.rawValue : nil
+            ),
+        ]
+        if journal.intentKind == .externalCascade {
+            completionAuditWrites.append(
+                PrivacyActor.makeAuditWrite(
+                    eventType: .cascadeDeleteFromOriginal,
+                    traceID: journal.traceID,
+                    policyVersion: policy.policyVersion,
+                    success: true,
+                    sourceType: effectiveType,
+                    affectedCount: 1,
+                    excludedWritten: false,
+                    excludedAutoCleaned: excludedAutoCleaned,
+                    userNotified: false
+                )
+            )
         }
         try await db.executeTransaction(completionAuditWrites)
 
@@ -657,21 +737,24 @@ public actor CanonicalMemoryRepositoryActor {
     /// Converts only a trusted original-file cascade into the no-exclusion deletion intent.
     private func promoteEchoOnlyJournalToExternalCascade(memoryID: UUID) async throws {
         guard let journal = try await db.loadDeletionJournals(memoryId: memoryID).first,
-              journal.intentKind == .echoOnly else { return }
-        try await db.upsertDeletionJournal(MemoryDeletionJournal(
-            operationID: journal.operationID,
-            memoryID: journal.memoryID,
-            auditSubjectHash: journal.auditSubjectHash,
-            traceID: journal.traceID,
-            phase: journal.phase,
-            vectorIDsByGeneration: journal.vectorIDsByGeneration,
-            sourceLocator: journal.sourceLocator,
-            sourceType: journal.sourceType,
-            writeExcluded: false,
-            intentKind: .externalCascade,
-            sourceDeletionState: .confirmedDeleted,
-            sourceDeletionOutcome: .confirmedDeleted
-        ))
+            journal.intentKind == .echoOnly
+        else { return }
+        try await db.upsertDeletionJournal(
+            MemoryDeletionJournal(
+                operationID: journal.operationID,
+                memoryID: journal.memoryID,
+                auditSubjectHash: journal.auditSubjectHash,
+                traceID: journal.traceID,
+                phase: journal.phase,
+                vectorIDsByGeneration: journal.vectorIDsByGeneration,
+                sourceLocator: journal.sourceLocator,
+                sourceType: journal.sourceType,
+                writeExcluded: false,
+                intentKind: .externalCascade,
+                sourceDeletionState: .confirmedDeleted,
+                sourceDeletionOutcome: .confirmedDeleted
+            )
+        )
     }
 
     /// WP3 steps 5a-5f：consent revoke 三接通组合入口——
@@ -698,13 +781,16 @@ public actor CanonicalMemoryRepositoryActor {
         )
         let matchingJournalIDs: [UUID] = try await db.loadAllDeletionJournals().compactMap { journal in
             guard journal.sourceLocator == assetId,
-                  journal.sourceType == sourceType,
-                  journal.intentKind == .echoOnly else { return nil }
+                journal.sourceType == sourceType,
+                journal.intentKind == .echoOnly
+            else { return nil }
             return journal.memoryID
         }
-        let memoryIDs = Set(rows.compactMap {
-            $0["memoryId"]?.stringValue.flatMap { UUID(uuidString: $0) }
-        } + matchingJournalIDs).sorted { $0.uuidString < $1.uuidString }
+        let memoryIDs = Set(
+            rows.compactMap {
+                $0["memoryId"]?.stringValue.flatMap { UUID(uuidString: $0) }
+            } + matchingJournalIDs
+        ).sorted { $0.uuidString < $1.uuidString }
         var deleted = 0
         for mid in memoryIDs {
             try await promoteEchoOnlyJournalToExternalCascade(memoryID: mid)
@@ -715,11 +801,12 @@ public actor CanonicalMemoryRepositoryActor {
 
         var excludedAutoCleaned = try await excludedAssets.hasCleanupNotice(assetId: assetId)
         if deleted == 0 {
-            excludedAutoCleaned = try await excludedAssets.recordCascadeCleanup(
-                assetId: assetId,
-                sourceType: sourceType,
-                traceID: traceID
-            ) || excludedAutoCleaned
+            excludedAutoCleaned =
+                try await excludedAssets.recordCascadeCleanup(
+                    assetId: assetId,
+                    sourceType: sourceType,
+                    traceID: traceID
+                ) || excludedAutoCleaned
             let policy = await privacyActor.getPolicy()
             try await privacyActor.writeAuditLog(
                 eventType: .cascadeDeleteFromOriginal,
@@ -742,9 +829,9 @@ public actor CanonicalMemoryRepositoryActor {
         var writes: [DatabaseManager.DBWrite] = [
             .init(
                 sql: """
-                INSERT OR REPLACE INTO Memory (memoryId, sourceLocator, canonicalText, sourceType, createdAt, updatedAt, recoverability, originalTimestamp, userEdited, userLocked)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
+                    INSERT OR REPLACE INTO Memory (memoryId, sourceLocator, canonicalText, sourceType, createdAt, updatedAt, recoverability, originalTimestamp, userEdited, userLocked)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
                 bindings: [
                     .text(memory.memoryId.uuidString),
                     .text(memory.sourceLocator),
@@ -777,19 +864,21 @@ public actor CanonicalMemoryRepositoryActor {
             ),
         ]
         for rep in representations {
-            writes.append(.init(
-                sql: """
-                INSERT OR REPLACE INTO Representation (representationId, memoryId, modality, preprocessVersion, contentHash)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                bindings: [
-                    .text(rep.representationId.uuidString),
-                    .text(rep.memoryId.uuidString),
-                    .text(rep.modality.rawValue),
-                    .text(rep.preprocessVersion),
-                    .text(rep.contentHash),
-                ]
-            ))
+            writes.append(
+                .init(
+                    sql: """
+                        INSERT OR REPLACE INTO Representation (representationId, memoryId, modality, preprocessVersion, contentHash)
+                        VALUES (?, ?, ?, ?, ?)
+                        """,
+                    bindings: [
+                        .text(rep.representationId.uuidString),
+                        .text(rep.memoryId.uuidString),
+                        .text(rep.modality.rawValue),
+                        .text(rep.preprocessVersion),
+                        .text(rep.contentHash),
+                    ]
+                )
+            )
         }
         try await db.executeTransaction(writes)
     }
@@ -817,8 +906,9 @@ public actor CanonicalMemoryRepositoryActor {
 
     private static func rowToMemory(_ row: [String: DBValue]) -> Memory? {
         guard let memoryId = row["memoryId"]?.stringValue.flatMap({ UUID(uuidString: $0) }),
-              let sourceLocator = row["sourceLocator"]?.stringValue,
-              let sourceType = row["sourceType"]?.stringValue else { return nil }
+            let sourceLocator = row["sourceLocator"]?.stringValue,
+            let sourceType = row["sourceType"]?.stringValue
+        else { return nil }
         return Memory(
             memoryId: memoryId,
             sourceLocator: sourceLocator,
@@ -835,9 +925,10 @@ public actor CanonicalMemoryRepositoryActor {
 
     private static func rowToRepresentation(_ row: [String: DBValue]) -> Representation? {
         guard let repId = row["representationId"]?.stringValue.flatMap({ UUID(uuidString: $0) }),
-              let mid = row["memoryId"]?.stringValue.flatMap({ UUID(uuidString: $0) }),
-              let modalityRaw = row["modality"]?.stringValue,
-              let modality = Modality(rawValue: modalityRaw) else { return nil }
+            let mid = row["memoryId"]?.stringValue.flatMap({ UUID(uuidString: $0) }),
+            let modalityRaw = row["modality"]?.stringValue,
+            let modality = Modality(rawValue: modalityRaw)
+        else { return nil }
         return Representation(
             representationId: repId,
             memoryId: mid,
@@ -852,11 +943,11 @@ public actor CanonicalMemoryRepositoryActor {
 
 /// 待写入 generation 向量存储的条目。
 public struct CanonicalVectorEntry: Sendable {
-    public nonisolated let id: UUID
-    public nonisolated let vector: [Float]
-    public nonisolated let metadata: Data?
+    nonisolated public let id: UUID
+    nonisolated public let vector: [Float]
+    nonisolated public let metadata: Data?
 
-    public nonisolated init(id: UUID, vector: [Float], metadata: Data? = nil) {
+    nonisolated public init(id: UUID, vector: [Float], metadata: Data? = nil) {
         self.id = id
         self.vector = vector
         self.metadata = metadata
@@ -865,10 +956,10 @@ public struct CanonicalVectorEntry: Sendable {
 
 /// 级联删除结果（US-PRV-007）。
 public struct CascadeDeleteResult: Sendable, Equatable {
-    public nonisolated let deletedCount: Int
-    public nonisolated let excludedAutoCleaned: Bool
+    nonisolated public let deletedCount: Int
+    nonisolated public let excludedAutoCleaned: Bool
 
-    public nonisolated init(deletedCount: Int, excludedAutoCleaned: Bool) {
+    nonisolated public init(deletedCount: Int, excludedAutoCleaned: Bool) {
         self.deletedCount = deletedCount
         self.excludedAutoCleaned = excludedAutoCleaned
     }
@@ -893,20 +984,28 @@ public enum CanonicalRepositoryError: Error, LocalizedError, Sendable {
         switch self {
         case .crashAfterCanonicalWrite:
             return "Injected crash after canonical write (test fault)"
+
         case .vectorWriteInjected:
             return "Injected vector write failure (test fault)"
+
         case .deleteInjected:
             return "Injected canonical delete failure (test fault)"
+
         case .generationMissing(let generationId):
             return "Generation vector store missing: \(generationId)"
+
         case .vectorWriteFailed(let error):
             return "Vector write failed: \(error.localizedDescription)"
+
         case .memoryNotFound(let memoryId):
             return "Canonical memory not found: \(memoryId)"
+
         case .invalidMemoryID(let memoryId):
             return "Invalid memory UUID: \(memoryId)"
+
         case .deletionAlreadyInProgress(let memoryId):
             return "A deletion is already in progress for memory: \(memoryId)"
+
         case .externalDeletionNotConfirmed(let memoryId):
             return "External source deletion is not confirmed for memory: \(memoryId)"
         }

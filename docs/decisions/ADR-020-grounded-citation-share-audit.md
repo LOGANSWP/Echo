@@ -1,7 +1,7 @@
 # ADR-020: Grounded 引用与用户中介分享审计边界
 
-**状态**: 已接受  
-**日期**: 2026-09-07  
+**状态**: 已接受
+**日期**: 2026-09-07
 **决策人**: Codex 规格合理性复审（依据人类指令）
 
 ## 背景
@@ -35,6 +35,8 @@
 
 ### 3. 计数语义固定
 
+> **分层补充（4.0k / ADR-023 §3）**：本 ADR 的单次 allow-list 规则应用于每一个叶子/reduce 调用。reduce 只获得实际提交子结果中的有效叶子 ID；v1 省略中间 noSource/partialNoSource 子段落并记录 coverage，禁止借全周期 ID 洗掉缺失来源。最终展示锚点与派生数据关系分开，后者覆盖实际贡献输入以支持撤权及 D-005。无效 ID 拒绝成为锚点，仍按既有三态降级；结构损坏才整次 fail-closed。
+
 - `sourceMemoryCount`：通过生成前当前策略过滤、实际提交给模型的唯一 MemoryID 数量。
 - `citationCount`：解析后通过 allow-list 的 anchor occurrence 数量；同一来源在不同段落重复引用分别计数，同一段内重复 ID 去重。
 - `noSourceCount`：状态为 `noSource` 或 `partialNoSource` 的段落数量。
@@ -43,8 +45,8 @@
 ### 4. 复制、导出与分享重新授权
 
 - 复制到系统剪贴板以及任何 Markdown/PDF/plain-text 系统分享准备都属于用户中介的内容交接，统一通过 composition-owned export coordinator，并在读取内容或准备 payload 前按引用来源类型执行当前 UserPolicy + PrivacyCheckpoint。
-- 生成后来源撤权时，禁止继续导出其派生正文；显示可恢复的授权错误，允许用户返回或基于仍授权来源重新生成。单纯资产离线/消失但策略仍允许时，可保留正文并以 `NoSource`/不可用引用诚实导出。
-- Markdown、PDF 与 plain text 都必须保留每段可理解的来源标记；多页 PDF 不得因分页截断正文或引用。外部导出不得包含 `assetID`、`sourceLocator` 或可猜测来源 App 的字段。
+- 生成后来源撤权时，禁止继续导出其派生正文；显示可恢复的授权错误，允许用户返回或基于仍授权来源重新生成。单纯资产离线/消失但策略仍允许时，可交接正文，App 内继续诚实显示来源不可用状态（ADR-024）。
+- 按 ADR-024，Markdown、PDF 与 plain text 默认只含标题和正文，不附加内部 ID、来源脚注或状态标记；来源核查保留在 App 内，多页 PDF 不得截断正文。外部导出不得包含 `assetID`、`sourceLocator` 或可猜测来源 App 的字段。
 - R-001 解释为 Echo 不主动上传、不调用网络服务、不选择或观察后续接收目标。用户明确触发的复制或系统 share/export 是受控交接；交接后的目标行为由用户与系统管理。
 
 ### 5. 呈现事实与失败语义

@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "evidenceKind": "research_coreml_conversion_summary",
+  "productionApproval": "not_granted",
+  "deviceEvidence": "Mac only; no iPhone or simulator inference",
+  "limitations": [
+    "Short forced-prefix logit checks are not content acceptance",
+    "Int4 comparisons retain FP16 reference thresholds and are not a quantization acceptance gate",
+    "No production context, peak memory, full App, language retry or quality approval"
+  ],
+  "runs": [
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/conversion/report.json",
+      "reportSHA256": "7d55fb07fd8dc989b42417e3cad28de6465876b6eb1fb5965d34b4eaff0d6393",
+      "packageFiles": [
+        {
+          "path": "Data/com.apple.CoreML/model.mlmodel",
+          "bytes": 684101,
+          "sha256": "c81d2da060ce0d666722c544321771b895a5bab5efdf7e2ee1f532e3ebef2e86"
+        },
+        {
+          "path": "Data/com.apple.CoreML/weights/weight.bin",
+          "bytes": 1192503040,
+          "sha256": "3f99bb2256f9f81a53f928b2894f56bc8429693f0a3e1da58919b80241af923f"
+        },
+        {
+          "path": "Manifest.json",
+          "bytes": 617,
+          "sha256": "b36c517a94f3e829b4181791d14b01be653c1ac4e74bdfdbb16f605bae86c948"
+        }
+      ],
+      "packageBytes": 1193187758,
+      "context": 128,
+      "quantization": null,
+      "sourceScriptSHA256": "dfb55ce8f744e829824d159f69b436179a4a522b6a8fb01a12a20d024c560a0f",
+      "hostNumericalResult": {
+        "comparisonCount": 8,
+        "passedCount": 8,
+        "top1EqualCount": 8,
+        "worstMaxAbs": 0.04208183288574219,
+        "worstRMSE": 0.01110046363727171,
+        "hostLoadSeconds": 7.0308892499999995
+      },
+      "stateBytes": 14680064
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/conversion-int4-block32/report.json",
+      "reportSHA256": "d3a8362e6e6530dc8a97b4a8ddda68b5299f53b23f3a578014059b1ee7e8f930",
+      "packageFiles": [
+        {
+          "path": "Data/com.apple.CoreML/model.mlmodel",
+          "bytes": 711447,
+          "sha256": "f93466c3c965d5e3df434d9d26e0f9382bc0f39b1b663b61fcdc0d2da4ef2443"
+        },
+        {
+          "path": "Data/com.apple.CoreML/weights/weight.bin",
+          "bytes": 335741120,
+          "sha256": "1324284d0cc98d41160cde8a057fc441aa8b94ce2fe2aa50561d44413314d0c5"
+        },
+        {
+          "path": "Manifest.json",
+          "bytes": 617,
+          "sha256": "9950d29be057b27e2e6db49e1a7e38f739747820fe7583a29c901ef885654cb9"
+        }
+      ],
+      "packageBytes": 336453184,
+      "context": 128,
+      "quantization": {
+        "dtype": "int4",
+        "mode": "linear_symmetric",
+        "granularity": "per_block",
+        "block_size": 32,
+        "weight_threshold": 2048
+      },
+      "sourceScriptSHA256": "2cc720f8552a19b769e8073e13d8538781054e9162670dc2365089c615a6c5a3",
+      "hostNumericalResult": {
+        "comparisonCount": 8,
+        "passedCount": 0,
+        "top1EqualCount": 7,
+        "worstMaxAbs": 9.132568597793579,
+        "worstRMSE": 2.752774878721644,
+        "hostLoadSeconds": 6.505593290999997
+      },
+      "stateBytes": 14680064
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/conversion-context1024/report.json",
+      "reportSHA256": "6eb4a2d2d51e32c3d769061b4bc99922a947eb090ac5b5035d82f491a43e4505",
+      "packageFiles": [
+        {
+          "path": "Data/com.apple.CoreML/model.mlmodel",
+          "bytes": 684947,
+          "sha256": "06e463e5f096eb719729b7f1b2646e612288736d459cb532c62197fdfc04f67f"
+        },
+        {
+          "path": "Data/com.apple.CoreML/weights/weight.bin",
+          "bytes": 1192966848,
+          "sha256": "83b6e32139f4e7672fc3a445c8ed3d43ad9e7cf74334589f34c15b1ffb0f5d17"
+        },
+        {
+          "path": "Manifest.json",
+          "bytes": 617,
+          "sha256": "b017df48e74b8219c10cf06ab178dd75337d2259b2dc1408a3c4a28e28bdebc0"
+        }
+      ],
+      "packageBytes": 1193652412,
+      "context": 1024,
+      "quantization": null,
+      "sourceScriptSHA256": "6ec749a0903ef1033cb3f009ca7781c70e48bafe6d4cdd4ef79be970e786d743",
+      "hostNumericalResult": {
+        "comparisonCount": 8,
+        "passedCount": 8,
+        "top1EqualCount": 8,
+        "worstMaxAbs": 0.06415367126464844,
+        "worstRMSE": 0.011123473086832229,
+        "hostLoadSeconds": 5.255164082999997
+      },
+      "stateBytes": 117440512
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/conversion-context1024-int4-block32/report.json",
+      "reportSHA256": "92ab913cee472466b82bc68f53997af1d1828212a5b8b6ec73a8f2286c426eea",
+      "packageFiles": [
+        {
+          "path": "Data/com.apple.CoreML/model.mlmodel",
+          "bytes": 712294,
+          "sha256": "a73da40746573888df1c30fa89f48836128f67a78d07924b6b93abb88bd44486"
+        },
+        {
+          "path": "Data/com.apple.CoreML/weights/weight.bin",
+          "bytes": 335875200,
+          "sha256": "81260ba501e5c82a508201252a60259db287e44d70a9499b9ee91448c54a5fd0"
+        },
+        {
+          "path": "Manifest.json",
+          "bytes": 617,
+          "sha256": "b409c3b6f05ff4464d462f306a7141b6aff3c49f5c2b8d3f5b0e334514f3b8bb"
+        }
+      ],
+      "packageBytes": 336588111,
+      "context": 1024,
+      "quantization": {
+        "dtype": "int4",
+        "mode": "linear_symmetric",
+        "granularity": "per_block",
+        "block_size": 32,
+        "weight_threshold": 2048
+      },
+      "sourceScriptSHA256": "7ad0afa7b4acaba82f2aed66c014462fe7770430fa4e926a98771a45c67733d4",
+      "hostNumericalResult": {
+        "comparisonCount": 8,
+        "passedCount": 0,
+        "top1EqualCount": 7,
+        "worstMaxAbs": 9.128662347793579,
+        "worstRMSE": 2.7517616064734556,
+        "hostLoadSeconds": 2.030885542
+      },
+      "stateBytes": 117440512
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/conversion-context1024-int8-channel/report.json",
+      "reportSHA256": "16e04799bbbf9b28ee0ddf0e0909c40c11ce044743e0385e941383e2e20bafea",
+      "packageFiles": [
+        {
+          "path": "Data/com.apple.CoreML/model.mlmodel",
+          "bytes": 712539,
+          "sha256": "2f1fdf54e39e73f5db901b85d6ddc6b746a5d0f906a4ab3d2cbb3f274e9cb343"
+        },
+        {
+          "path": "Data/com.apple.CoreML/weights/weight.bin",
+          "bytes": 597729152,
+          "sha256": "24cb6248d93c55437655bdfe1c218528c7c593c0fdda9374322e03ae8ac7bfd8"
+        },
+        {
+          "path": "Manifest.json",
+          "bytes": 617,
+          "sha256": "8af72a6bed1986da0ef7dd35bd4f60237d67ce2b6c75c1f6ed060d892b8e1f14"
+        }
+      ],
+      "packageBytes": 598442308,
+      "context": 1024,
+      "quantization": {
+        "dtype": "int8",
+        "mode": "linear_symmetric",
+        "granularity": "per_channel",
+        "weight_threshold": 2048
+      },
+      "sourceScriptSHA256": "74e0fb8138fea3ad04f26319bcbf0c210da3bfa3f1e7a65de371daefec6c2cde",
+      "hostNumericalResult": {
+        "comparisonCount": 8,
+        "passedCount": 0,
+        "top1EqualCount": 8,
+        "worstMaxAbs": 1.629429817199707,
+        "worstRMSE": 0.31757168626168997,
+        "hostLoadSeconds": 10.806363375000004
+      },
+      "stateBytes": 117440512
+    }
+  ]
+}

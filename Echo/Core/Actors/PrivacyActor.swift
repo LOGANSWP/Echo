@@ -24,6 +24,8 @@
 //           R-007 (禁止 unchecked Sendable), R-008 (跨 Actor 调用必须 await)
 // 重要: 所有 struct stored/computed properties 必须 nonisolated（项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor）
 // Generated: 2026-07-05 (Stub), 2026-07-07 (Task 2.1 Full Implementation); Updated: 2026-09-07 (4.0j)
+// Task 4.0k (2026-09-08): typed outputLanguage/uiLanguage/retry-count audit validation.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
@@ -64,14 +66,14 @@ public enum PrivacyDecision: String, Sendable, Codable {
 /// - sourceTypes: 涉及的数据源
 /// - decision: 授权结果
 public struct PrivacyCheckpoint: Sendable, Codable {
-    public nonisolated let traceID: String
-    public nonisolated let timestamp: Date
-    public nonisolated let operation: PrivacyOperation
-    public nonisolated let policyVersion: Int
-    public nonisolated let sourceTypes: [String]
-    public nonisolated let decision: PrivacyDecision
+    nonisolated public let traceID: String
+    nonisolated public let timestamp: Date
+    nonisolated public let operation: PrivacyOperation
+    nonisolated public let policyVersion: Int
+    nonisolated public let sourceTypes: [String]
+    nonisolated public let decision: PrivacyDecision
 
-    public nonisolated init(
+    nonisolated public init(
         traceID: String = UUID().uuidString,
         timestamp: Date = Date(),
         operation: PrivacyOperation,
@@ -88,7 +90,7 @@ public struct PrivacyCheckpoint: Sendable, Codable {
     }
 
     /// 检查点是否允许继续执行
-    public nonisolated var isAllowed: Bool {
+    nonisolated public var isAllowed: Bool {
         decision == .allowed
     }
 }
@@ -100,11 +102,11 @@ public struct PrivacyCheckpoint: Sendable, Codable {
 /// 对应 US-PRV-001，由 PrivacyActor 管理。
 /// TODO (Phase 2, Task 2.1): 实现完整的策略持久化与授权管理。
 public struct UserPolicy: Sendable, Codable {
-    public nonisolated let preferredLanguage: String
-    public nonisolated var authorizedSourceTypes: Set<String>
-    public nonisolated let policyVersion: Int
+    nonisolated public let preferredLanguage: String
+    nonisolated public var authorizedSourceTypes: Set<String>
+    nonisolated public let policyVersion: Int
 
-    public nonisolated init(
+    nonisolated public init(
         preferredLanguage: String = "zh-Hans",
         authorizedSourceTypes: Set<String> = ["photo", "note", "voice", "video", "thirdParty"],
         policyVersion: Int = 1
@@ -115,7 +117,7 @@ public struct UserPolicy: Sendable, Codable {
     }
 
     /// 检查指定数据源是否已授权
-    public nonisolated func isAuthorized(sourceType: String) -> Bool {
+    nonisolated public func isAuthorized(sourceType: String) -> Bool {
         authorizedSourceTypes.contains(sourceType)
     }
 }
@@ -145,7 +147,6 @@ public struct UserPolicy: Sendable, Codable {
 /// guard checkpoint.isAllowed else { return }
 /// ```
 public actor PrivacyActor {
-
     // MARK: - Singleton
 
     public static let shared = PrivacyActor()
@@ -207,12 +208,12 @@ public actor PrivacyActor {
             bindings: []
         )
         if let row = rows.first,
-           let language = row["preferredLanguage"]?.stringValue,
-           let sourcesJSON = row["authorizedSourceTypes"]?.stringValue,
-           let version = row["policyVersion"]?.intValue {
+            let language = row["preferredLanguage"]?.stringValue,
+            let sourcesJSON = row["authorizedSourceTypes"]?.stringValue,
+            let version = row["policyVersion"]?.intValue {
             let sources: Set<String>
             if let data = sourcesJSON.data(using: .utf8),
-               let decoded = try? JSONDecoder().decode([String].self, from: data) {
+                let decoded = try? JSONDecoder().decode([String].self, from: data) {
                 sources = Set(decoded)
             } else {
                 sources = ["photo", "note", "voice", "video"]
@@ -342,15 +343,16 @@ public actor PrivacyActor {
         // 注意：此处的 event 映射为最近似的事件类型，Pipeline 特有事件（如图片/视频摄入）
         // 应由具体 Pipeline 在操作成功后通过 writeAuditLog() 单独写入。
         let elapsedMs = Int(Date().timeIntervalSince(startTime) * 1000)
-        let event: AuditEvent = switch operation {
-        case .search:    .retrieval
-        case .ingest:    .memoryIngested
-        case .sync:      .dataSourceChangeSynced
-        case .delete:    .memoryDeleted
-        case .awakening: .scheduledScanCompleted
-        case .feedback:  .feedbackReceived
-        case .migration: .deviceMigrationCompleted
-        }
+        let event: AuditEvent =
+            switch operation {
+            case .search: .retrieval
+            case .ingest: .memoryIngested
+            case .sync: .dataSourceChangeSynced
+            case .delete: .memoryDeleted
+            case .awakening: .scheduledScanCompleted
+            case .feedback: .feedbackReceived
+            case .migration: .deviceMigrationCompleted
+            }
         try? await writeAuditLog(
             eventType: event,
             traceID: traceID,
@@ -409,31 +411,42 @@ public actor PrivacyActor {
         periodType: String? = nil,
         shareHandoffIdDigest: String? = nil,
         dataSourcesUsed: String? = nil,
-        periodKeyDigest: String? = nil
+        periodKeyDigest: String? = nil,
+        outputLanguage: String? = nil,
+        uiLanguage: String? = nil,
+        languageRetryCount: Int? = nil
     ) async throws {
+        let languages: Set<String> = ["en-US", "zh-Hans"]
+        guard outputLanguage.map(languages.contains) ?? true,
+            uiLanguage.map(languages.contains) ?? true,
+            languageRetryCount.map({ (0...1).contains($0) }) ?? true,
+            eventType != .generationLanguageChecked || (uiLanguage != nil && languageRetryCount != nil),
+            eventType != .generationLanguageChecked || !success || outputLanguage == uiLanguage
+        else {
+            throw AuditValidationError.invalidCreationFields
+        }
         let validExportFormats: Set<String> = ["plainText", "markdown", "pdf"]
         let validPeriodTypes: Set<String> = ["month", "year"]
-        let hasValidShareDigest = shareHandoffIdDigest.map {
-            $0.count == 64 && $0.allSatisfy(\.isHexDigit)
-        } ?? false
-        let hasValidPeriodDigest = periodKeyDigest.map {
-            $0.count == 64 && $0.allSatisfy(\.isHexDigit)
-        } ?? false
+        let hasValidShareDigest =
+            shareHandoffIdDigest.map {
+                $0.count == 64 && $0.allSatisfy(\.isHexDigit)
+            } ?? false
+        let hasValidPeriodDigest =
+            periodKeyDigest.map {
+                $0.count == 64 && $0.allSatisfy(\.isHexDigit)
+            } ?? false
         guard exportFormat.map(validExportFormats.contains) ?? true,
-              periodType.map(validPeriodTypes.contains) ?? true,
-              sourceMemoryCount.map({ $0 >= 0 }) ?? true,
-              citationCount.map({ $0 >= 0 }) ?? true,
-              noSourceCount.map({ $0 >= 0 }) ?? true,
-              eventType == .creationSharePresented || shareHandoffIdDigest == nil,
-              eventType != .creationSharePresented || (
-                exportFormat != nil && sharePresented != nil && hasValidShareDigest
-              ),
-              eventType == .narrativeReportGenerated || (
-                dataSourcesUsed == nil && periodKeyDigest == nil
-              ),
-              eventType != .narrativeReportGenerated || (
-                periodType != nil && dataSourcesUsed != nil && hasValidPeriodDigest
-              ) else {
+            periodType.map(validPeriodTypes.contains) ?? true,
+            sourceMemoryCount.map({ $0 >= 0 }) ?? true,
+            citationCount.map({ $0 >= 0 }) ?? true,
+            noSourceCount.map({ $0 >= 0 }) ?? true,
+            eventType == .creationSharePresented || shareHandoffIdDigest == nil,
+            eventType != .creationSharePresented
+                || (exportFormat != nil && sharePresented != nil && hasValidShareDigest),
+            eventType == .narrativeReportGenerated || (dataSourcesUsed == nil && periodKeyDigest == nil),
+            eventType != .narrativeReportGenerated
+                || (periodType != nil && dataSourcesUsed != nil && hasValidPeriodDigest)
+        else {
             throw AuditValidationError.invalidCreationFields
         }
         let write = Self.makeAuditWrite(
@@ -477,7 +490,10 @@ public actor PrivacyActor {
             periodType: periodType,
             shareHandoffIdDigest: shareHandoffIdDigest,
             dataSourcesUsed: dataSourcesUsed,
-            periodKeyDigest: periodKeyDigest
+            periodKeyDigest: periodKeyDigest,
+            outputLanguage: outputLanguage,
+            uiLanguage: uiLanguage,
+            languageRetryCount: languageRetryCount
         )
         try await db.executeWrite(sql: write.sql, bindings: write.bindings)
     }
@@ -524,14 +540,17 @@ public actor PrivacyActor {
         shareHandoffIdDigest: String? = nil,
         dataSourcesUsed: String? = nil,
         periodKeyDigest: String? = nil,
+        outputLanguage: String? = nil,
+        uiLanguage: String? = nil,
+        languageRetryCount: Int? = nil,
         timestamp: Date = Date()
     ) -> DatabaseManager.DBWrite {
         // Hash content fields before persistence (AGENTS.md §5.4).
         let contentHash = content.map { AuditContentHasher.sha256Hex($0) }
         return DatabaseManager.DBWrite(
             sql: """
-                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest, dataSourcesUsed, periodKeyDigest)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO AuditLog (eventType, timestamp, traceID, policyVersion, success, sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, frameCount, audioTranscriptLength, hasAudio, contentHash, subjectKind, subjectHash, action, resumePoint, userChoiceOnRestart, outcome, cardIdDigest, memoryIdDigest, feelingAssociatedToSource, editedFields, reindexed, conflictResolvedWith, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest, dataSourcesUsed, periodKeyDigest, outputLanguage, uiLanguage, languageRetryCount)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
             bindings: [
                 .text(eventType.rawValue),
@@ -576,6 +595,9 @@ public actor PrivacyActor {
                 shareHandoffIdDigest.map { .text($0) } ?? .null,
                 dataSourcesUsed.map { .text($0) } ?? .null,
                 periodKeyDigest.map { .text($0) } ?? .null,
+                outputLanguage.map(DBBinding.text) ?? .null,
+                uiLanguage.map(DBBinding.text) ?? .null,
+                languageRetryCount.map { .int(Int64($0)) } ?? .null,
             ]
         )
     }
@@ -590,11 +612,12 @@ public actor PrivacyActor {
         await ensurePolicyLoaded()
         let canonicalTypes = Array(Set(sourceTypes.map(SearchPipeline.normalizeSourceType))).sorted()
         guard checkpoint.isAllowed,
-              checkpoint.operation == .search,
-              checkpoint.policyVersion == policy.policyVersion,
-              checkpoint.sourceTypes == canonicalTypes,
-              canonicalTypes.allSatisfy({ policy.authorizedSourceTypes.contains($0) }),
-              period.periodKey.hasPrefix("\(period.periodType.rawValue):") else {
+            checkpoint.operation == .search,
+            checkpoint.policyVersion == policy.policyVersion,
+            checkpoint.sourceTypes == canonicalTypes,
+            canonicalTypes.allSatisfy({ policy.authorizedSourceTypes.contains($0) }),
+            period.periodKey.hasPrefix("\(period.periodType.rawValue):")
+        else {
             throw AuditValidationError.invalidNarrativeReportFields
         }
         let encodedTypes = try JSONEncoder().encode(canonicalTypes)
@@ -658,7 +681,7 @@ public actor PrivacyActor {
                        sourceDeletionOutcome, excludedAutoCleaned, userNotified,
                        templateType, sourceMemoryCount, citationCount, noSourceCount,
                        exportFormat, sharePresented, periodType, shareHandoffIdDigest,
-                       dataSourcesUsed, periodKeyDigest
+                       dataSourcesUsed, periodKeyDigest, outputLanguage, uiLanguage, languageRetryCount
                 FROM AuditLog WHERE eventType = ? ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.text(eventType.rawValue), .int(Int64(limit)), .int(Int64(offset))]
@@ -674,7 +697,7 @@ public actor PrivacyActor {
                        sourceDeletionOutcome, excludedAutoCleaned, userNotified,
                        templateType, sourceMemoryCount, citationCount, noSourceCount,
                        exportFormat, sharePresented, periodType, shareHandoffIdDigest,
-                       dataSourcesUsed, periodKeyDigest
+                       dataSourcesUsed, periodKeyDigest, outputLanguage, uiLanguage, languageRetryCount
                 FROM AuditLog ORDER BY timestamp DESC LIMIT ? OFFSET ?
                 """
             bindings = [.int(Int64(limit)), .int(Int64(offset))]

@@ -5,6 +5,7 @@
 //            docs/01-spec/用户故事与验收标准规格书.md → US-SYN-002 (溯源锚点), US-SYN-003 (grounded 生成),
 //            US-SYN-007 (术语表注入), US-SYN-008 (合成失败模板降级)
 // 任务: 3F.9 + 4.0a + 4.0i - Grounded creation and verifiable citations
+// AC coverage: 4.0k source-read and pre-render aggregate limits (PR #79);
 // AC 覆盖: US-SYN-002 AC-1/3 ✅ (多锚点/NoSource/partialNoSource), AC-5 ✅ (.synthesis 审计),
 //          US-SYN-003 AC-2 ✅ (版本化 JSON + exact allow-list), AC-6 ✅ (.creativeGeneration typed 审计),
 //          US-SYN-007 AC-1 ✅ (Prompt 注入术语表子集), US-SYN-008 AC-1/5 ✅ (失败模板降级 + .synthesisFallback 审计),
@@ -13,6 +14,9 @@
 // 架构约束: AGENTS.md §4.1 (Pipeline 契约: 审计强制 / 错误分级 / 纯函数), R-006 (PrivacyCheckpoint 入口),
 //           §4.2 (仅持有不可变引用); actor 声明合法 (v5.12)
 // 生成时间: 2026-08-11 | Updated: 2026-09-07 (4.0i, ADR-020)
+// Task 4.0k (2026-09-08): canonical source snapshots, structured language alignment and real prompt budgets.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
+// US-SYN-003 AC-1: reject prose as a poem before publishing success; preserve model-authored verse.
 // ==========================================
 
 import Foundation
@@ -28,43 +32,46 @@ public enum CreativeTemplate: String, Sendable, Equatable {
 }
 
 /// grounded 创作源记忆 — 检索结果输入 (US-SYN-003 AC-2 严格引用检索结果)。
-public nonisolated struct CreativeSource: Sendable, Equatable {
+nonisolated public struct CreativeSource: Sendable, Equatable {
     /// 源记忆 ID
-    public nonisolated let memoryID: UUID
+    nonisolated public let memoryID: UUID
     /// 数据源引用 (PHAsset.localIdentifier / note 定位符)
-    public nonisolated let assetID: String
+    nonisolated public let assetID: String
     /// 数据源类型 ("photo" / "note" / "voice" / "video_frame" 等)
-    public nonisolated let sourceType: String
+    nonisolated public let sourceType: String
     /// 源文本 (nil = 图片/视频帧无文本)
-    public nonisolated let text: String?
+    nonisolated public let text: String?
     /// 记忆时间戳
-    public nonisolated let timestamp: TimeInterval
+    nonisolated public let timestamp: TimeInterval
+    nonisolated public let revision: TimeInterval?
 
-    public nonisolated init(
+    nonisolated public init(
         memoryID: UUID,
         assetID: String,
         sourceType: String,
         text: String?,
-        timestamp: TimeInterval
+        timestamp: TimeInterval,
+        revision: TimeInterval? = nil
     ) {
         self.memoryID = memoryID
         self.assetID = assetID
         self.sourceType = sourceType
         self.text = text
         self.timestamp = timestamp
+        self.revision = revision
     }
 }
 
 /// 溯源锚点 — `[🔗 MemoryID:xxx]` (US-SYN-002 AC-1)。
-public nonisolated struct SourceAnchor: Sendable, Equatable {
+nonisolated public struct SourceAnchor: Sendable, Equatable {
     /// 源记忆 ID
-    public nonisolated let memoryID: UUID
+    nonisolated public let memoryID: UUID
     /// Canonical source type is carried internally for current-policy revalidation.
-    public nonisolated let sourceType: String?
+    nonisolated public let sourceType: String?
     /// Refreshed at the copy/export/navigation boundary; never inferred from model output.
-    public nonisolated let availability: CitationSourceAvailability
+    nonisolated public let availability: CitationSourceAvailability
 
-    public nonisolated init(
+    nonisolated public init(
         memoryID: UUID,
         sourceType: String? = nil,
         availability: CitationSourceAvailability = .available
@@ -73,10 +80,9 @@ public nonisolated struct SourceAnchor: Sendable, Equatable {
         self.sourceType = sourceType
         self.availability = availability
     }
-
 }
 
-public nonisolated enum CitationSourceAvailability: String, Sendable, Codable, Equatable {
+nonisolated public enum CitationSourceAvailability: String, Sendable, Codable, Equatable {
     case available
     case offlineUnavailable
     case missing
@@ -84,24 +90,24 @@ public nonisolated enum CitationSourceAvailability: String, Sendable, Codable, E
 }
 
 /// Provenance state for one generated paragraph. This proves source identity, not factual accuracy.
-public nonisolated enum GroundingStatus: String, Sendable, Codable, Equatable {
+nonisolated public enum GroundingStatus: String, Sendable, Codable, Equatable {
     case cited
     case noSource
     case partialNoSource
 }
 
 /// grounded 生成段落 — AI 生成文本 + 溯源锚点 (US-SYN-002/003 AC-2)。
-public nonisolated struct GroundedParagraph: Sendable, Equatable, Identifiable {
+nonisolated public struct GroundedParagraph: Sendable, Equatable, Identifiable {
     /// 段落唯一标识（确定性）
-    public nonisolated let id: UUID
+    nonisolated public let id: UUID
     /// 段落文本
-    public nonisolated let text: String
+    nonisolated public let text: String
     /// All validated source anchors in model-declared order, deduplicated within the paragraph.
-    public nonisolated let anchors: [SourceAnchor]
+    nonisolated public let anchors: [SourceAnchor]
     /// Whether every, none, or only part of the model-declared references passed the allow-list.
-    public nonisolated let groundingStatus: GroundingStatus
+    nonisolated public let groundingStatus: GroundingStatus
 
-    public nonisolated init(
+    nonisolated public init(
         id: UUID,
         text: String,
         anchors: [SourceAnchor],
@@ -112,37 +118,36 @@ public nonisolated struct GroundedParagraph: Sendable, Equatable, Identifiable {
         self.anchors = anchors
         self.groundingStatus = groundingStatus
     }
-
 }
 
 /// grounded 创作输出 — 含 source anchors (ADR-013 决策 3)。
-public nonisolated struct CreativeOutput: Sendable, Equatable {
+nonisolated public struct CreativeOutput: Sendable, Equatable {
     /// 选中的创作模板
-    public nonisolated let template: CreativeTemplate
+    nonisolated public let template: CreativeTemplate
     /// 结果标题（叙事报告含周期, US-SYN-004 AC-5）
-    public nonisolated let title: String?
+    nonisolated public let title: String?
     /// 报告周期（US-SYN-004: 月/年）
-    public nonisolated let periodType: String?
+    nonisolated public let periodType: String?
     /// 生成段落（含溯源锚点）
-    public nonisolated let paragraphs: [GroundedParagraph]
+    nonisolated public let paragraphs: [GroundedParagraph]
     /// 引用的源记忆数
-    public nonisolated let sourceMemoryCount: Int
+    nonisolated public let sourceMemoryCount: Int
     /// Canonical source types actually submitted to the model, retained for action-time policy checks.
-    public nonisolated let sourceTypes: [String]
+    nonisolated public let sourceTypes: [String]
     /// 空态原因（无匹配源记忆时非 nil → empty state）
-    public nonisolated let emptyReason: String?
+    nonisolated public let emptyReason: String?
     /// 合成是否走了失败降级模板 (US-SYN-008)
-    public nonisolated let didFallback: Bool
+    nonisolated public let didFallback: Bool
     /// Count of validated anchor occurrences; duplicate IDs within one paragraph count once.
-    public nonisolated var citationCount: Int {
+    nonisolated public var citationCount: Int {
         paragraphs.reduce(0) { $0 + $1.anchors.count }
     }
     /// Paragraphs carrying either noSource or partialNoSource.
-    public nonisolated var noSourceCount: Int {
+    nonisolated public var noSourceCount: Int {
         paragraphs.count { $0.groundingStatus != .cited }
     }
 
-    public nonisolated init(
+    nonisolated public init(
         template: CreativeTemplate,
         title: String? = nil,
         periodType: String? = nil,
@@ -178,23 +183,27 @@ public enum CreativeError: Error, LocalizedError, Sendable, Equatable {
     /// The model output did not satisfy ADR-020's bounded, versioned envelope contract (L2).
     case invalidStructuredOutput(CreativeProtocolFailure)
 
-    public nonisolated var errorDescription: String? {
+    nonisolated public var errorDescription: String? {
         switch self {
         case .runtimeUnavailable:
             return "Offline LLM runtime is not available."
+
         case .privacyDenied(let sourceTypes):
             return "Privacy validation denied for sources: \(sourceTypes.joined(separator: ", "))"
+
         case .alignmentFailed:
             return "Language alignment failed after the maximum retry count."
+
         case .noSources:
             return "No source memories matched this template."
+
         case .invalidStructuredOutput(let failure):
             return "The generated response did not satisfy the grounded-output contract: \(failure.rawValue)."
         }
     }
 }
 
-public nonisolated enum CreativeProtocolFailure: String, Sendable, Equatable {
+nonisolated public enum CreativeProtocolFailure: String, Sendable, Equatable {
     case oversizedPayload
     case malformedEnvelope
     case unsupportedSchemaVersion
@@ -202,22 +211,25 @@ public nonisolated enum CreativeProtocolFailure: String, Sendable, Equatable {
     case emptyParagraph
     case paragraphTooLong
     case tooManyReferences
+    case templateMismatch
 }
 
 /// Named limits make the local generation boundary deterministic and reviewable.
-public nonisolated enum CreativeGenerationLimits {
-    public nonisolated static let maximumPayloadBytes = 262_144
-    public nonisolated static let maximumParagraphs = 64
-    public nonisolated static let maximumParagraphCharacters = 8_000
-    public nonisolated static let maximumReferencesPerParagraph = 16
+nonisolated public enum CreativeGenerationLimits {
+    nonisolated public static let maximumPayloadBytes = 262_144
+    nonisolated public static let maximumParagraphs = 64
+    nonisolated public static let maximumParagraphCharacters = 8_000
+    nonisolated public static let maximumReferencesPerParagraph = 16
+    nonisolated public static let poemLineRange = 3...6
+    nonisolated public static let targetPoemLineCount = 4
 }
 
-private nonisolated struct CreativeGenerationEnvelope: Decodable {
+nonisolated private struct CreativeGenerationEnvelope: Decodable {
     let schemaVersion: Int
     let paragraphs: [CreativeGenerationParagraph]
 }
 
-private nonisolated struct CreativeGenerationParagraph: Decodable {
+nonisolated private struct CreativeGenerationParagraph: Decodable {
     let text: String
     let sourceMemoryIDs: [UUID]
 }
@@ -241,7 +253,6 @@ private nonisolated struct CreativeGenerationParagraph: Decodable {
 ///   → 返回 CreativeOutput
 /// ```
 public actor CreativePipeline {
-
     /// 离线 LLM 推理来源 (ADR-009 决策 4) — nil 表示运行时未落地
     private let llmProvider: (any LLMProvider)?
     /// 语言对齐器 (R-004)
@@ -250,17 +261,20 @@ public actor CreativePipeline {
     private let privacyActor: PrivacyActor
     /// 领域术语表 (US-SYN-007 AC-1: Prompt 注入术语表子集)
     private let terminology: TerminologyTable
+    private let canonicalRepository: CanonicalMemoryRepositoryActor?
 
     public init(
         llmProvider: (any LLMProvider)?,
         aligner: LanguageAligner,
         privacyActor: PrivacyActor = .shared,
-        terminology: TerminologyTable = .empty
+        terminology: TerminologyTable = .empty,
+        canonicalRepository: CanonicalMemoryRepositoryActor? = nil
     ) {
         self.llmProvider = llmProvider
         self.aligner = aligner
         self.privacyActor = privacyActor
         self.terminology = terminology
+        self.canonicalRepository = canonicalRepository
     }
 
     // MARK: - Public API
@@ -326,22 +340,58 @@ public actor CreativePipeline {
         }
 
         // Exact allow-list and unique submitted sources define the only legal citation identities.
+        guard Set(sources.map(\.memoryID)).count <= GenerationInputBudget.maximumSources else {
+            throw GenerationRuntimeError.contextLimit
+        }
         var submittedIDs: Set<UUID> = []
-        let submittedSources = sources.filter { submittedIDs.insert($0.memoryID).inserted }
+        let uniqueSources = sources.filter { submittedIDs.insert($0.memoryID).inserted }
+        var currentSources = uniqueSources
+        if let canonicalRepository {
+            currentSources = []
+            var remaining = GenerationInputBudget.maximumBytes
+            for source in uniqueSources {
+                guard let current = try await canonicalRepository.loadCreationSource(
+                    memoryID: source.memoryID, maximumTextBytes: remaining
+                ) else {
+                    throw GenerationRuntimeError.privacyDenied
+                }
+                try GenerationInputBudget.consume(current.text ?? "", remaining: &remaining)
+                currentSources.append(current)
+            }
+        }
+        let submittedSources = currentSources
+        try GenerationInputBudget.validate(submittedSources.map {
+            GenerationPassage(text: $0.text ?? "", sourceMemoryIDs: [$0.memoryID])
+        })
+        guard submittedSources.allSatisfy({ !($0.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+        else {
+            throw CreativeError.noSources
+        }
         let submittedSourceTypes = Dictionary(
             uniqueKeysWithValues: submittedSources.map {
                 ($0.memoryID, SearchPipeline.normalizeSourceType($0.sourceType))
             }
         )
-        let groundedPrompt = buildGroundedPrompt(template: template, sources: submittedSources)
-
         do {
-            let generated = try await aligner.align(prompt: groundedPrompt, traceID: traceID)
-            let paragraphs = try parseParagraphs(
-                from: generated,
-                allowedMemoryIDs: submittedIDs,
-                sourceTypes: submittedSourceTypes
+            let aligned = try await generatePassages(
+                template: template,
+                passages: submittedSources.map {
+                    GenerationPassage(text: $0.text ?? "", sourceMemoryIDs: [$0.memoryID])
+                },
+                sourceTypes: submittedSourceTypes,
+                traceID: traceID,
+                deadline: ProcessInfo.processInfo.systemUptime + 120,
+                sourceSnapshots: submittedSources,
+                useEffectiveSourceText: true
             )
+            let paragraphs = aligned.paragraphs
+            if template == .poem {
+                let lines = paragraphs.flatMap { $0.text.split(whereSeparator: \.isNewline) }
+                    .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+                guard CreativeGenerationLimits.poemLineRange.contains(lines.count) else {
+                    throw CreativeError.invalidStructuredOutput(.templateMismatch)
+                }
+            }
             let output = CreativeOutput(
                 template: template,
                 paragraphs: paragraphs,
@@ -385,6 +435,12 @@ public actor CreativePipeline {
                 outcome: error.errorDescription
             )
             throw error
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch NarrativeReportError.resourceDeferred {
+            throw NarrativeReportError.resourceDeferred
+        } catch let error as GenerationRuntimeError {
+            throw error
         } catch {
             // 对齐失败 → 失败降级模板 (US-SYN-008) — 模板内容固定，不含 LLM 生成成分
             try? await privacyActor.writeAuditLog(
@@ -416,34 +472,164 @@ public actor CreativePipeline {
 
     // MARK: - Private Helpers
 
-    /// 构建 grounded prompt — 源文本摘要 + 术语表子集 (US-SYN-007 AC-1)。
-    private func buildGroundedPrompt(template: CreativeTemplate, sources: [CreativeSource]) -> String {
-        var lines: [String] = ["Generate a \(template.rawValue) grounded strictly in the source memories below."]
-        lines.append("Each statement MUST reference its source memory. Do not invent facts.")
-
-        if !terminology.isEmpty {
-            let termLines = terminology.entries.keys.sorted().map { key in
-                let entry = terminology.entries[key] ?? [:]
-                let zh = entry["zh-Hans"] ?? ""
-                let en = entry["en-US"] ?? ""
-                return "\(key): \(zh) / \(en)"
-            }
-            lines.append("Use these product terms verbatim:")
-            lines.append(contentsOf: termLines)
+    /// 4.0k: absence and configured artifact failure remain distinct before a report claim.
+    public func validateAvailability(traceID: String) async throws {
+        let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        guard let llmProvider else { throw CreativeError.runtimeUnavailable }
+        if let provider = llmProvider as? any StructuredLLMProvider {
+            try await provider.validateAvailability(traceID: traceID)
         }
-
-        for source in sources {
-            let text = source.text ?? "[no text — \(source.sourceType)]"
-            lines.append("MemoryID \(source.memoryID.uuidString): \(text)")
-        }
-
-        lines.append("Return JSON only using this exact shape:")
-        lines.append(#"{"schemaVersion":1,"paragraphs":[{"text":"...","sourceMemoryIDs":["opaque-memory-uuid"]}]}"#)
-        lines.append("Use only MemoryIDs listed above. Use an empty sourceMemoryIDs array when no source supports a paragraph.")
-        return lines.joined(separator: "\n")
     }
 
-    private func parseParagraphs(
+    public func retryRuntime(traceID: String) async throws {
+        let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        guard let provider = llmProvider as? any StructuredLLMProvider else { throw CreativeError.runtimeUnavailable }
+        try await provider.retryAvailability(traceID: traceID)
+    }
+
+    public func configurationIdentity(traceID: String) async throws -> String {
+        let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let data = try encoder.encode(terminology.entries)
+        return AuditContentHasher.sha256Hex(data.base64EncodedString())
+    }
+
+    public func passagesFit(
+        template: CreativeTemplate,
+        passages: [GenerationPassage],
+        sourceTypes: [UUID: String],
+        traceID: String,
+        deadline: Double,
+        isReduction: Bool = false
+    ) async throws -> Bool {
+        let checkpoint = await privacyActor.validate(
+            operation: .search,
+            traceID: traceID,
+            sourceTypes: Array(Set(sourceTypes.values)).sorted()
+        )
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        guard let provider = llmProvider as? any StructuredLLMProvider else { return true }
+        let policy = await privacyActor.getPolicy()
+        let request = try GenerationPrompt.request(
+            template: template,
+            passages: passages,
+            sourceTypes: Array(Set(sourceTypes.values)).sorted(),
+            context: .init(
+                language: policy.preferredLanguage,
+                traceID: traceID,
+                deadline: deadline,
+                terminology: terminology
+            ),
+            isReduction: isReduction
+        )
+        do {
+            _ = try await provider.tokenCount(request: request)
+            _ = try await provider.tokenCount(request: request.languageRetry())
+            return true
+        } catch GenerationRuntimeError.contextLimit {
+            return false
+        } catch GenerationTokenizerError.inputBudget {
+            return false
+        }
+    }
+
+    public func generatePassages(
+        template: CreativeTemplate,
+        passages: [GenerationPassage],
+        sourceTypes: [UUID: String],
+        traceID: String,
+        deadline: Double,
+        isReduction: Bool = false,
+        sourceSnapshots: [CreativeSource] = [],
+        excerptScalarLimit: Int? = nil,
+        useEffectiveSourceText: Bool = false
+    ) async throws -> AlignedGeneration {
+        let checkpoint = await privacyActor.validate(
+            operation: .search,
+            traceID: traceID,
+            sourceTypes: Array(Set(sourceTypes.values)).sorted()
+        )
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        let actualIDs = Set(passages.flatMap(\.sourceMemoryIDs))
+        guard !passages.isEmpty, !actualIDs.isEmpty, actualIDs == Set(sourceTypes.keys),
+            passages.allSatisfy({ !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+        else {
+            throw GenerationRuntimeError.invalidRequest
+        }
+        let policy = await privacyActor.getPolicy()
+        let sourceValidation: GenerationSourceValidation?
+        if let canonicalRepository {
+            guard Set(sourceSnapshots.map(\.memoryID)) == actualIDs else {
+                throw GenerationRuntimeError.invalidRequest
+            }
+            sourceValidation = GenerationSourceValidation(
+                repository: canonicalRepository,
+                sources: sourceSnapshots,
+                excerptScalarLimit: excerptScalarLimit,
+                useEffectiveSourceText: useEffectiveSourceText
+            )
+        } else {
+            sourceValidation = nil
+        }
+        let request = try GenerationPrompt.request(
+            template: template,
+            passages: passages,
+            sourceTypes: Array(Set(sourceTypes.values)).sorted(),
+            context: .init(
+                language: policy.preferredLanguage,
+                traceID: traceID,
+                deadline: deadline,
+                terminology: terminology
+            ),
+            isReduction: isReduction
+        )
+        let aligned: AlignedGeneration
+        do {
+            aligned = try await aligner.alignEnvelope(request: request, sourceValidation: sourceValidation)
+        } catch GenerationRuntimeError.languageFallback {
+            try await privacyActor.writeAuditLog(
+                eventType: .generationLanguageChecked,
+                traceID: traceID,
+                policyVersion: checkpoint.policyVersion,
+                success: false,
+                uiLanguage: policy.preferredLanguage,
+                languageRetryCount: 1
+            )
+            throw GenerationRuntimeError.languageFallback
+        }
+        let final = await privacyActor.validate(operation: .search, traceID: traceID, sourceTypes: request.sourceTypes)
+        guard final.isAllowed, final.policyVersion == checkpoint.policyVersion else {
+            throw GenerationRuntimeError.privacyDenied
+        }
+        try await privacyActor.writeAuditLog(
+            eventType: .generationLanguageChecked,
+            traceID: traceID,
+            policyVersion: final.policyVersion,
+            outputLanguage: policy.preferredLanguage,
+            uiLanguage: policy.preferredLanguage,
+            languageRetryCount: aligned.languageRetryCount
+        )
+        return AlignedGeneration(
+            paragraphs: aligned.paragraphs.map { paragraph in
+                GroundedParagraph(
+                    id: paragraph.id,
+                    text: paragraph.text,
+                    anchors: paragraph.anchors.map {
+                        SourceAnchor(memoryID: $0.memoryID, sourceType: sourceTypes[$0.memoryID])
+                    },
+                    groundingStatus: paragraph.groundingStatus
+                )
+            },
+            languageRetryCount: aligned.languageRetryCount,
+            modelCallCount: aligned.modelCallCount
+        )
+    }
+
+    nonisolated static func parseParagraphs(
         from generated: String,
         allowedMemoryIDs: Set<UUID>,
         sourceTypes: [UUID: String]
@@ -499,10 +685,10 @@ public actor CreativePipeline {
         }
     }
 
-    private nonisolated static func stableParagraphID(index: Int, text: String) -> UUID {
-        let bytes = Array(AuditContentHasher.sha256Hex("\(index):\(text)").utf8.prefix(32))
-        let string = String(decoding: bytes, as: UTF8.self)
-        let formatted = "\(string.prefix(8))-\(string.dropFirst(8).prefix(4))-\(string.dropFirst(12).prefix(4))-\(string.dropFirst(16).prefix(4))-\(string.dropFirst(20).prefix(12))"
+    nonisolated private static func stableParagraphID(index: Int, text: String) -> UUID {
+        let string = String(AuditContentHasher.sha256Hex("\(index):\(text)").prefix(32))
+        let formatted =
+            "\(string.prefix(8))-\(string.dropFirst(8).prefix(4))-\(string.dropFirst(12).prefix(4))-\(string.dropFirst(16).prefix(4))-\(string.dropFirst(20).prefix(12))"
         return UUID(uuidString: formatted) ?? UUID()
     }
 
@@ -510,5 +696,4 @@ public actor CreativePipeline {
     private func alignerFallbackText() -> String {
         "Unable to generate this creation right now. Please try again later."
     }
-
 }

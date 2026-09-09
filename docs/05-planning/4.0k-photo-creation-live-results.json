@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "task": "4.0k",
+  "scope": "normal-app-photo-creation-live-review",
+  "tests": {
+    "passed": 34,
+    "suites": 4,
+    "photoScenarios": 4
+  },
+  "originalSourceCounts": {
+    "ios26": 50,
+    "ios18": 37,
+    "originalTextSources": 0,
+    "originalUserEdits": 0
+  },
+  "syntheticPhoto": {
+    "title": "Blue circle test",
+    "description": "A blue circle is centered on a white background. This is a synthetic test image.",
+    "source": "simctl addmedia -> PhotoKit resync -> detail edit",
+    "fixtureGeneration": false
+  },
+  "ios26": {
+    "normalAppGenerationPassed": true,
+    "body": "A blue circle is centered on a white background.",
+    "citationAvailable": true,
+    "fastPredictionRevalidated": true,
+    "leftOnGeneratedScreen": true
+  },
+  "ios18": {
+    "blankPhotoHonestEmptyState": true,
+    "normalAppGenerationPassed": false,
+    "reason": "deadline",
+    "fastPredictionStillTimesOut": true,
+    "experimentalAffineGraphInstalled": false
+  },
+  "budgetRelaxed": false,
+  "deviceQualified": false,
+  "releaseApproved": false,
+  "logs": {
+    "red": {
+      "path": "/tmp/echo-4.0k-photo-source-red.log",
+      "sha256": "3980bcd72bc1fe2b4356103b53c403256a5beb1f2d496b1889e683b4302f48d2"
+    },
+    "green": {
+      "path": "/tmp/echo-4.0k-photo-source-final.log",
+      "sha256": "78368484cd7a6da8f8fd40e0175d701ea91aac13abe9cba6c3310499eac68b6a"
+    },
+    "ios18_cpu": {
+      "path": "/tmp/echo-ios18-cpu-probe.log",
+      "sha256": "6e92b0bb7cadfc69fd7b88e3dacddb8c701cbb5dfba7999f0aef61bbcacdaae4"
+    },
+    "ios18_fast": {
+      "path": "/tmp/echo-ios18-fast-probe.log",
+      "sha256": "5a224076ed3ddee1cdf3c6b2d473d176991dfec000f093bc5e4d66f8989fa9cb"
+    },
+    "ios18_gpu": {
+      "path": "/tmp/echo-ios18-gpu-probe.log",
+      "sha256": "3b464e77d368be9b433b271ee0950847f5d5f2dddb2c0c7dc43c956e0dd7cc5b"
+    },
+    "ios18_affine": {
+      "path": "/tmp/echo-ios18-affine-probe.log",
+      "sha256": "5f9543473d132604985bd22bb38b6e78aa7355d5082b1ab6fe728525abdcefa6"
+    },
+    "ios18_affine_gpu": {
+      "path": "/tmp/echo-ios18-affine-gpu-probe.log",
+      "sha256": "fc9e0897225a53c4a59f1f981776154cac5c02f903d960fa2119b4d1d76a09e5"
+    }
+  },
+  "computeBackend": "simulator-cpu-rms-fp32-fast-prediction-v2"
+}

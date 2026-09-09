@@ -65,7 +65,7 @@ final class ResumeProgressViewModel {
         static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
             case (.idle, .idle), (.checking, .checking), (.none, .none),
-                 (.resumed, .resumed), (.restarted, .restarted):
+                (.resumed, .resumed), (.restarted, .restarted):
                 return true
 
             case (.prompt(let l), .prompt(let r)):
@@ -90,6 +90,8 @@ final class ResumeProgressViewModel {
     enum ErrorLevel: Equatable, Sendable {
         /// L2 可恢复: Toast + 重试按钮
         case l2Recoverable(message: String)
+        case l3Blocking(message: String)
+        case restartRequired
     }
 
     deinit {}
@@ -224,9 +226,11 @@ final class ResumeProgressViewModel {
                     return
                 }
 
-                self.viewState = .error(.l2Recoverable(
-                    message: "Saved progress storage is not available."
-                ))
+                self.viewState = .error(
+                    .l2Recoverable(
+                        message: "Saved progress storage is not available."
+                    )
+                )
             } catch is CancellationError {
                 self.viewState = .idle
             } catch {
@@ -234,9 +238,11 @@ final class ResumeProgressViewModel {
                     self.viewState = .idle
                     return
                 }
-                self.viewState = .error(.l2Recoverable(
-                    message: "Unable to check saved progress. Please try again."
-                ))
+                self.viewState = .error(
+                    .l2Recoverable(
+                        message: "Unable to check saved progress. Please try again."
+                    )
+                )
             }
         }
     }
@@ -268,9 +274,13 @@ final class ResumeProgressViewModel {
                 await self.presentNextPending(after: .resumed)
             } catch {
                 guard !Task.isCancelled else { return }
-                self.viewState = .error(.l2Recoverable(
-                    message: "Unable to continue this task. Review access and try again."
-                ))
+                self.lastResumeTarget = progress
+                self.viewState = .error(
+                    Self.recoveryError(
+                        error,
+                        message: "Unable to continue this task. Review access and try again."
+                    )
+                )
             }
         }
     }
@@ -302,11 +312,28 @@ final class ResumeProgressViewModel {
                 await self.presentNextPending(after: .restarted)
             } catch {
                 guard !Task.isCancelled else { return }
-                self.viewState = .error(.l2Recoverable(
-                    message: "Unable to restart this task. Review access and try again."
-                ))
+                self.viewState = .error(
+                    Self.recoveryError(
+                        error,
+                        message: "Unable to restart this task. Review access and try again."
+                    )
+                )
             }
         }
+    }
+
+    func restartAfterIdentityChange() {
+        guard case .error(.restartRequired) = viewState, let target = lastResumeTarget else { return }
+        viewState = .prompt(target)
+        restartTask()
+    }
+
+    private static func recoveryError(_ error: Error, message: String) -> ErrorLevel {
+        if error as? GenerationRuntimeError == .restartRequired { return .restartRequired }
+        if ErrorClassifier.classify(error) == .l3Blocking {
+            return .l3Blocking(message: ErrorSeverity.l3Blocking.userFacingMessageKey)
+        }
+        return .l2Recoverable(message: message)
     }
 
     /// 关闭恢复提示弹窗（不改变任务状态）。
@@ -386,9 +413,11 @@ final class ResumeProgressViewModel {
         }
         isFixtureBacked = false
         isPromptPresented = false
-        viewState = .error(.l2Recoverable(
-            message: "This saved task type is not supported by this app version."
-        ))
+        viewState = .error(
+            .l2Recoverable(
+                message: "This saved task type is not supported by this app version."
+            )
+        )
     }
 
     // MARK: - Fixture Injection

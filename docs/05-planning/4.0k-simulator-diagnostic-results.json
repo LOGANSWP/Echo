@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "scope": "simulator-engineering-diagnostic",
+  "deviceQualified": false,
+  "releaseApproved": false,
+  "artifactManifestSHA256": "5a605e013f9bd0e2cfed9d7c44b99bc396628f82088c4aadd61865b1005a7a7f",
+  "prefix": {
+    "comparisons": 8,
+    "top1Matches": 8,
+    "maximumSampledLogitError": 1.4976062774658203,
+    "rawSHA256": "ba9af4a48fa505ce383948a93fe6131603aa5f1ed9f138fe0475c17eed9217dc"
+  },
+  "generation": {
+    "elapsedSeconds": 15.584146208362654,
+    "predictionCalls": 306,
+    "stopReason": "eos",
+    "body": "A paper boat floated upright for ten seconds, then tipped to the left. No other changes were recorded.",
+    "rawSHA256": "274771d3bbfb88485fcb0d24b678321d14c418c9efdbb450cf7e03aac26c5976"
+  },
+  "converterSHA256": "1a16e2fd8d63752455be0d080c749d13bfc1006d2f98cefac96f8e4a9880b29b",
+  "reproduction": {
+    "protobufSemanticEquality": true,
+    "identicalQuantizedWeights": true,
+    "note": "Package UUID and protobuf map serialization may differ; fixed compiled inventory is verified separately."
+  },
+  "chinesePromptV4": {
+    "elapsedSeconds": 18.830796083435416,
+    "predictionCalls": 320,
+    "stopReason": "eos",
+    "body": "纸舟漂浮10秒，向左倾倒，其他无变化。",
+    "rawSHA256": "ecb01625bb7adf1315724b5bd15ce71c30451f8b2fe9c93f3286daff1d83d4fb"
+  }
+}

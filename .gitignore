@@ -37,6 +37,7 @@ Echo/Resources/Models/*.aimodel/
 # inference at runtime (E5Embedder loads it from Bundle.main) — committed.
 Echo/Resources/Models/*.safetensors
 Echo/Resources/Models/**/*.safetensors
+Echo/Resources/Models/OfflineGeneration.bundle/
 # Keep .gitkeep to preserve directory structure
 !Echo/Resources/Models/.gitkeep
 
@@ -50,3 +51,10 @@ compile_commands.json
 
 # Pinned model conversion sources (fetched via prepare_models.sh; not committed)
 PinnedModels/
+
+# Debug-only real-model simulator derivative; rebuilt from pinned local artifacts.
+Echo/Resources/Models/OfflineGenerationSimulator.bundle/
+
+# Local Python interpreter caches.
+__pycache__/
+*.pyc

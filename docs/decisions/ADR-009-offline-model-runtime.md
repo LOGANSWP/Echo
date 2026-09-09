@@ -21,6 +21,8 @@
 
 ## 备选方案
 
+> **执行合同补充（2026-09-07，ADR-023）**：具体模型审批前先完成候选/设备/预算材料；ModelManifestActor 只登记身份，不授予分发许可。批准清单须覆盖全部运行时权重与 tokenizer/template/config，不能以源 checkpoint 或单个 Manifest.json 摘要替代。token/上下文/输出、会话 KV 状态、逐层 provenance、语言失败与恢复重放的可测合同见 ADR-023。
+
 | 方案 | 描述 | 结论 |
 |------|------|------|
 | **A（采纳）** | 保留离线 generation：不可变捆绑 LLM 运行时 + Language Aligner | ✅ 满足 v1 创作闭环、R-004/R-005，全离线 |

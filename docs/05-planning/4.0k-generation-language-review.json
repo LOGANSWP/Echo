@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "evidenceKind": "research_language_and_retry_review",
+  "formalLanguageGate": "not_evaluated",
+  "productionApproval": "not_granted",
+  "reviewer": "Codex; human quality review pending",
+  "method": "macOS NaturalLanguage, confidence >= 0.9; envelope parsed first, each paragraph minus UUID metadata; no guessed name/quote exclusions; ICU script signal only. Not iOS production LanguageAligner.",
+  "originalGenerationCount": 120,
+  "additionalSelectedLogicalCalls": 2,
+  "additionalModelCalls": 4,
+  "evidence": [
+    {
+      "path": "PinnedModels/offline-generation-evaluation/language-measurements-v1.json",
+      "sha256": "cc99ebdb798d7800af4136b760b9293369fe3c9c1e3c2f3c626189f1b531f880"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/coreml-int4-language-retry-v1.json",
+      "sha256": "206d97133c6e24d6b5810f5b6c8675ce027f95cdd3fe962e0c3603bab0ac576f"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/language-probe-controls-v1.json",
+      "sha256": "4f0b307c9e96826131f65050c8112afe916daeed765f20c9836d3a3542d2f10f"
+    }
+  ],
+  "hostControls": {
+    "caseCount": 7,
+    "passed": 7
+  },
+  "runs": [
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen2.5-0.5b/screen-v1.json",
+      "reportSHA256": "0de07a860bfae7d1b2f42ee157c152d5f31c584a161915db54f72f4ecad149e5",
+      "caseCount": 8,
+      "validSchemaCount": 0,
+      "matchedCount": 0
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/screen-v1.json",
+      "reportSHA256": "3653c5bee03c8b9c3f3b80d02ba34bea8001ca6ec2b7cd6d3ac0eb338c6dfd09",
+      "caseCount": 8,
+      "validSchemaCount": 0,
+      "matchedCount": 0
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen2.5-0.5b/screen-v2.json",
+      "reportSHA256": "a3d854687262c910158931c391be879203a24fc6806b823b455ee90dea663f4f",
+      "caseCount": 8,
+      "validSchemaCount": 0,
+      "matchedCount": 0
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/screen-v2.json",
+      "reportSHA256": "d8b7928e8e91c4827953536b0a01bc772b2a50fb2e4ea224df99f6e7fbd5a10b",
+      "caseCount": 8,
+      "validSchemaCount": 0,
+      "matchedCount": 0
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen2.5-1.5b/screen-v2.json",
+      "reportSHA256": "fffa280d660d3579ae3fcdbfa68cc587dd81d1b16d9171f23d3ee1983322c6df",
+      "caseCount": 8,
+      "validSchemaCount": 1,
+      "matchedCount": 1
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/screen-v2-grammar-v1.json",
+      "reportSHA256": "63ede6be682e07754c3c4e879369b7effb69812f5ceef856ebb62b834ead0957",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/source-paragraphs-v1-grammar-v1.json",
+      "reportSHA256": "4ff1c3c260754e059e8b1064346cde2a362485dfc5c0c7fb9363c63a35db4fd0",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen2.5-1.5b/source-paragraphs-v1-grammar-v1.json",
+      "reportSHA256": "7b015e3aeae3593bd64c2a6261473af7d6342373090d7ea4de919936c6d48bc1",
+      "caseCount": 8,
+      "validSchemaCount": 7,
+      "matchedCount": 7
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-1.7b/source-paragraphs-v1-grammar-v1-mps-fp16.json",
+      "reportSHA256": "943a91b8057c5692af0f920e45bccde212b1aa460ed7684cf15aba899495dcd0",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-1.7b/screen-v2-grammar-v1-mps-fp16.json",
+      "reportSHA256": "961425fdd6befa59b8c6adbee37717dd40447e1091a971f0d196b09e7671bd56",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-1.7b/observations-v1-grammar-v1-hostselect-mps-fp16.json",
+      "reportSHA256": "82563b73069cd06391dfa3e60fc7f221f3df3a010e71e1a89eb7fd1ddbf4a3ed",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/observations-v1-grammar-v1-hostselect-mps-fp16.json",
+      "reportSHA256": "3f9b05cfeb1ca95c56af9f7b78d8333a650f2ca94b6c07835442a4146b2db523",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/coreml-int4-context1024-observations-v1.json",
+      "reportSHA256": "61eab9b713c868665b42e7ba3954733302fb3f35d15d4aa77e73d9db1b526351",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 6
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/coreml-fp16-context1024-observations-v1.json",
+      "reportSHA256": "a2d65c44daef0847a99350b6c02ac52daef3aa390ae4189b2624607b52f5119c",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/coreml-int8-context1024-observations-v1.json",
+      "reportSHA256": "8819b6167a626fd7590fe3c185118b275ea2f080bb0efa70b2fa5ecd5ca77fb5",
+      "caseCount": 8,
+      "validSchemaCount": 8,
+      "matchedCount": 8
+    }
+  ],
+  "retryResults": [
+    {
+      "caseID": "zh-single",
+      "outcome": "language_fallback",
+      "modelCallCount": 2,
+      "attempts": [
+        {
+          "retry": false,
+          "inputTokens": 255,
+          "outputTokens": 224,
+          "stopReason": "eos"
+        },
+        {
+          "retry": true,
+          "inputTokens": 309,
+          "outputTokens": 226,
+          "stopReason": "eos"
+        }
+      ],
+      "findings": [
+        "No publication is attempted by this research CLI.",
+        "UUID-only paragraphs remain after retry; typed fallback, no third call."
+      ]
+    },
+    {
+      "caseID": "zh-source-injection",
+      "outcome": "validated_language_screen",
+      "modelCallCount": 2,
+      "attempts": [
+        {
+          "retry": false,
+          "inputTokens": 282,
+          "outputTokens": 197,
+          "stopReason": "eos"
+        },
+        {
+          "retry": true,
+          "inputTokens": 336,
+          "outputTokens": 151,
+          "stopReason": "eos"
+        }
+      ],
+      "findings": [
+        "Retry removes the UUID-only paragraph.",
+        "Labelled untrusted commands remain in the prose; passing language does not resolve prompt compliance or factual review."
+      ]
+    }
+  ],
+  "retryMatchedCount": 1,
+  "retryDenominator": 2,
+  "denominatorWarning": "Two deliberately selected development failures are not an unbiased formal retry sample; 1/2 does not satisfy or estimate the >=95% acceptance gate."
+}

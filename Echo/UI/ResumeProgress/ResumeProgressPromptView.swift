@@ -108,11 +108,21 @@ struct ResumeProgressPromptView: View {
                     title: EchoStrings.tr("Unable to check saved progress"),
                     message: EchoStrings.tr(errorMessage(for: level))
                 )
-                Button(action: { viewModel.retry() }) {
-                    Label("Retry", systemImage: "arrow.clockwise")
+                if case .l3Blocking = level {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        Link("Open Settings", destination: url)
+                            .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                    }
+                } else if case .restartRequired = level {
+                    Button(EchoStrings.tr("Restart")) { viewModel.restartAfterIdentityChange() }
+                        .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                } else {
+                    Button(action: { viewModel.retry() }) {
+                        Label("Retry", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                    .accessibilityIdentifier("resume-prompt-retry")
                 }
-                .buttonStyle(EchoActionButtonStyle(role: .recovery))
-                .accessibilityIdentifier("resume-prompt-retry")
             }
         }
         .accessibilityElement(children: .contain)
@@ -121,8 +131,11 @@ struct ResumeProgressPromptView: View {
 
     private func errorMessage(for level: ResumeProgressViewModel.ErrorLevel) -> String {
         switch level {
-        case .l2Recoverable(let msg):
+        case .l2Recoverable(let msg), .l3Blocking(let msg):
             return msg
+
+        case .restartRequired:
+            return "Generation inputs or settings changed. Restart is required."
         }
     }
 

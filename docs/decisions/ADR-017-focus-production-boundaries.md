@@ -1,7 +1,7 @@
 # ADR-017: Focus 生产写入、来源与创作边界
 
-**状态**: 已接受  
-**日期**: 2026-09-03  
+**状态**: 已接受
+**日期**: 2026-09-03
 **决策人**: Codex 规格合理性评审（依据用户指示）
 
 ## 背景
@@ -57,7 +57,7 @@ PhotoKit 删除流程为：验证来源、权限与 `canPerform(.delete)` → �
 - `.creationSharePresented`：本地导出准备完成且系统 share sheet 成功呈现后记录 `exportFormat`、`sharePresented=true`，报告可附 `periodType`。
 - `.narrativeReportGenerated`：报告生成后记录 `periodType`、实际使用的数据源类别和幂等周期键摘要。
 
-`sharePresented` 使用结构化布尔字段，不哈希；MemoryID、周期幂等键和自由文本只保存摘要。Echo 不持久化 `activityType`、目标 App、用户完成状态或导出原文。复制与所有导出准备前重新执行当前 UserPolicy + PrivacyCheckpoint，所有格式保留引用。只有系统控制器实际呈现回调后才写 true；用户关闭已呈现的 share sheet 不算失败，准备或未进入呈现回调即失败按 L2 并写 false。真实呈现后的审计写入失败不得改写事实，须进入不含原文/目标的幂等 L2 重试。审计字段必须使用专用 typed columns，不得编码进 `sourceLanguage`；完整规则见 ADR-020。
+`sharePresented` 使用结构化布尔字段，不哈希；MemoryID、周期幂等键和自由文本只保存摘要。Echo 不持久化 `activityType`、目标 App、用户完成状态或导出原文。复制与所有导出准备前重新执行当前 UserPolicy + PrivacyCheckpoint，按 ADR-024，所有外部格式默认只含标题和正文，引用及来源状态留在 App 内。只有系统控制器实际呈现回调后才写 true；用户关闭已呈现的 share sheet 不算失败，准备或未进入呈现回调即失败按 L2 并写 false。真实呈现后的审计写入失败不得改写事实，须进入不含原文/目标的幂等 L2 重试。审计字段必须使用专用 typed columns，不得编码进 `sourceLanguage`；完整规则见 ADR-020。
 
 ### 7. 叙事报告采用持久的 earliest-eligible 调度（由 ADR-021/022 收紧）
 

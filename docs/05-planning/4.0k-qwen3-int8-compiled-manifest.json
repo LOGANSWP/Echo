@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "scope": "research_compiled_coreml_directory_only",
+  "productionApproval": "not_granted",
+  "configuration": {
+    "context": 1024,
+    "minimumTarget": "iOS18",
+    "toolchain": "Xcode 26.5 (17F42)",
+    "quantization": "int8 per-channel; FP16 compute/state"
+  },
+  "files": [
+    {
+      "path": "analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "b83f555ed7bf1946ec810e6e205c13470d624a9d27cd4997189f3d4ff3a9ad6f"
+    },
+    {
+      "path": "coremldata.bin",
+      "sizeBytes": 2617,
+      "sha256": "ba8ebfaa7d8f18a4c592e05d8349d9110977490b2fb7b61fffb7cf62823acd83"
+    },
+    {
+      "path": "metadata.json",
+      "sizeBytes": 18316,
+      "sha256": "45781319213c38c4aed983ab8d4992d6bc855491cee64023cf64234d339efc42"
+    },
+    {
+      "path": "model.mil",
+      "sizeBytes": 726091,
+      "sha256": "22630672db541c9bece04187083d4598a6539bf21f389578ac098c8471e43988"
+    },
+    {
+      "path": "weights/weight.bin",
+      "sizeBytes": 597729152,
+      "sha256": "24cb6248d93c55437655bdfe1c218528c7c593c0fdda9374322e03ae8ac7bfd8"
+    }
+  ]
+}

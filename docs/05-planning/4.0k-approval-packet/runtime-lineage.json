@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "productionApproval": "not_granted",
+  "files": [
+    {
+      "path": "Scripts/Research/GenerationTokenizer.swift",
+      "sizeBytes": 7946,
+      "sha256": "c3998d7b4aba2d101841725388b20fe2b4f717ce0a653379b7a4ef8c8bb4d77d"
+    },
+    {
+      "path": "Scripts/Research/GenerationEnvelopeGrammar.swift",
+      "sizeBytes": 8624,
+      "sha256": "47610727fb28d56d17157a19a95a9d5c292a4f5571174a4ac04d1af520c3b15d"
+    },
+    {
+      "path": "Scripts/Research/GenerationBudget.swift",
+      "sizeBytes": 2006,
+      "sha256": "69a0fcf6cea999d40ab66736bf5417ed9633d577ca5eb4baf8e6f4e292139cbc"
+    },
+    {
+      "path": "Scripts/Research/GenerationMemory.swift",
+      "sizeBytes": 1484,
+      "sha256": "c00d973edf36ed90499039edf9ddc97cb19f0233f1c18df6f4b4e3732d0396e7"
+    },
+    {
+      "path": "Scripts/Research/GenerationNativeProbe.swift",
+      "sizeBytes": 9115,
+      "sha256": "d10382a5c373d3631e027fa0ab18bbd0b69dd16fbcd9140d6016d7aa79a55262"
+    },
+    {
+      "path": "Scripts/Research/GenerationCoreMLProbe.swift",
+      "sizeBytes": 9001,
+      "sha256": "f9c1caf70ae66fffee31e5a4c411e9a8afc6f8ffb83c3f5568fe934732dec7cc"
+    },
+    {
+      "path": "Scripts/Research/GenerationLanguageProbe.swift",
+      "sizeBytes": 1758,
+      "sha256": "82648144678dd328534476353cdad8c963c4eef5286f10bcd134baa9cda92583"
+    },
+    {
+      "path": "Scripts/convert_generation_candidate.py",
+      "sizeBytes": 22311,
+      "sha256": "dfb55ce8f744e829824d159f69b436179a4a522b6a8fb01a12a20d024c560a0f"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/convert-context1024.py",
+      "sizeBytes": 22328,
+      "sha256": "6ec749a0903ef1033cb3f009ca7781c70e48bafe6d4cdd4ef79be970e786d743"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/quantize-context1024-int8.py",
+      "sizeBytes": 3802,
+      "sha256": "74e0fb8138fea3ad04f26319bcbf0c210da3bfa3f1e7a65de371daefec6c2cde"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/conversion-context1024/report.json",
+      "sizeBytes": 8157,
+      "sha256": "6eb4a2d2d51e32c3d769061b4bc99922a947eb090ac5b5035d82f491a43e4505"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/conversion-context1024-int8-channel/report.json",
+      "sizeBytes": 9355,
+      "sha256": "16e04799bbbf9b28ee0ddf0e0909c40c11ce044743e0385e941383e2e20bafea"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/approval-compiled-v1/compile-control.json",
+      "sizeBytes": 1027,
+      "sha256": "48c97455a01a47b10a480cafb02dd1e5a82083c83fee43d1cc8233800f041b39"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/approval-compiled-v1/native-validation.json",
+      "sizeBytes": 14770,
+      "sha256": "ea92b3e25aa8afabb279e45f998b1cbcc2c90b705c7bc7fccbb8049a0f6c5aac"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/generation-native-probe",
+      "sizeBytes": 312584,
+      "sha256": "0e95313ee2b8eeab6328f124929e48a40e993d245f5c6f3ee6cde5aca0e01cb2"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/generation-compiled-coreml-probe",
+      "sizeBytes": 184576,
+      "sha256": "9fce9e64a4944dfa584d1d5493fc2ad906c289e9ecb49c7a475485b98d17f9cc"
+    },
+    {
+      "path": "PinnedModels/offline-generation-evaluation/generation-language-probe",
+      "sizeBytes": 106120,
+      "sha256": "caddf7cc454505f6704f726ae4da78a2acec837fa11d867163e8b83794ded816"
+    },
+    {
+      "path": "Scripts/build_generation_approval_packet.py",
+      "sizeBytes": 12900,
+      "sha256": "4a6e7900c0f97cda37332ee2f1ecb177eea1277ce66ee9a74744069b3080c4d6"
+    },
+    {
+      "path": "Scripts/generation_approval_inventory.py",
+      "sizeBytes": 2116,
+      "sha256": "f2a723935cc1f8f8dcb4a8a90b98ae3f714c3da8787089bec755726ee713082d"
+    }
+  ],
+  "nativeDirectLibraries": [
+    "/usr/lib/libSystem.B.dylib",
+    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+    "/System/Library/Frameworks/CoreML.framework/Versions/A/CoreML",
+    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+    "/usr/lib/libobjc.A.dylib",
+    "/usr/lib/swift/libswiftCore.dylib",
+    "/usr/lib/swift/libswiftCoreFoundation.dylib",
+    "/usr/lib/swift/libswiftDispatch.dylib",
+    "/usr/lib/swift/libswiftIOKit.dylib",
+    "/usr/lib/swift/libswiftMetal.dylib",
+    "/usr/lib/swift/libswiftObjectiveC.dylib",
+    "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+    "/usr/lib/swift/libswiftXPC.dylib",
+    "/usr/lib/swift/libswift_Builtin_float.dylib",
+    "/usr/lib/swift/libswift_Concurrency.dylib"
+  ],
+  "toolchain": {
+    "xcode": "Xcode 26.5\nBuild version 17F42",
+    "swift": "Apple Swift version 6.3.2 (swiftlang-6.3.2.1.108 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+    "coremlcompiler": "3520.5.1"
+  },
+  "historicalDependencyLimit": "Top-level conversion versions and script/report identities were captured earlier; this current transitive inventory cannot retroactively attest every historical wheel.",
+  "path": "Official pinned safetensors -> fixed first-party Qwen3 conversion -> context1024 FP16 -> per-channel int8 -> Xcode iOS18 compatibility compilation -> native direct-load reference probe",
+  "productionRuntime": "Proposed system Core ML + first-party Swift tokenizer/runtime, no Python or third-party inference library in App.",
+  "releaseBuild": "Not built; exact final App bundle/compiler output hashes require the later release gate."
+}

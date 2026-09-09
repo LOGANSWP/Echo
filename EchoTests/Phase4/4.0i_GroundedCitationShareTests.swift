@@ -160,9 +160,9 @@ struct GroundedCitationShareTests {
         }
     }
 
-    @Test("AC-3/4: plain text, Markdown, and PDF preserve citations without source locators")
+    @Test("AC-3/4: exports preserve text and internal provenance without exposing source identifiers")
     @MainActor
-    func everyExportPreservesCitationSemantics() async throws {
+    func everyExportPreservesBodyAndInternalProvenance() async throws {
         let output = CreativeOutput(
             template: .report,
             title: "2026 September Report",
@@ -192,9 +192,11 @@ struct GroundedCitationShareTests {
         let pdf = try await CreationExportService.pdf(from: output)
 
         for export in [plainText, markdown] {
-            #expect(export.contains("MemoryID:11111111"))
-            #expect(export.contains("MemoryID:22222222"))
-            #expect(export.contains("NoSource"))
+            #expect(!export.contains("11111111-1111-1111-1111-111111111111"))
+            #expect(!export.contains("22222222-2222-2222-2222-222222222222"))
+            #expect(!export.contains("NoSource"))
+            #expect(export.contains("A fully grounded sentence."))
+            #expect(export.contains("This paragraph has no validated source."))
             #expect(export.contains("private-source-locator") == false)
         }
 
@@ -283,7 +285,8 @@ struct GroundedCitationShareTests {
 
         let authorized = try await coordinator.authorize(output: output, traceID: "authorized-export")
         #expect(authorized.paragraphs[0].anchors[0].availability == .offlineUnavailable)
-        #expect(CreationExportService.plainText(from: authorized).contains("SourceUnavailable"))
+        #expect(!CreationExportService.plainText(from: authorized).contains("SourceUnavailable"))
+        #expect(CreationExportService.plainText(from: authorized).contains(authorized.paragraphs[0].text))
 
         try await privacy.updatePolicy(UserPolicy(
             preferredLanguage: "en-US",

@@ -6,12 +6,13 @@
 // AC 覆盖: US-SYS-001 AC-4 (raw task type 保留、恢复描述校验、事务性 Restart checkpoint)
 // 架构约束: AGENTS.md §4.3 (长任务与队列契约), AGENTS.md §4.5 (断点续传契约)
 // 生成时间: 2026-07-04
+// Task 4.0k (2026-09-08): transactional Restart descriptor and progress replacement.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
 
 public actor ProgressActor {
-
     public static let shared = ProgressActor()
     private let db: DatabaseManager
 
@@ -47,7 +48,7 @@ public actor ProgressActor {
 
     /// 更新已处理索引
     public func updateProgress(taskId: String, lastProcessedIndex: Int, lastProcessedId: String?) async throws {
-        guard let _ = try await load(taskId: taskId) else {
+        guard try await load(taskId: taskId) != nil else {
             throw DatabaseError.notFound(id: taskId)
         }
         try await db.executeWrite(
@@ -64,12 +65,14 @@ public actor ProgressActor {
     /// 加载指定任务的进度
     public func load(taskId: String) async throws -> TaskProgress? {
         let rows = try await db.executeQuery(
-            sql: "SELECT taskId, taskType, lastProcessedId, lastProcessedIndex, totalCount, resumeData, createdAt, updatedAt FROM TaskProgress WHERE taskId = ?",
+            sql:
+                "SELECT taskId, taskType, lastProcessedId, lastProcessedIndex, totalCount, resumeData, createdAt, updatedAt FROM TaskProgress WHERE taskId = ?",
             bindings: [.text(taskId)]
         )
         guard let row = rows.first,
-              let id = row["taskId"]?.stringValue,
-              let typeStr = row["taskType"]?.stringValue else { return nil }
+            let id = row["taskId"]?.stringValue,
+            let typeStr = row["taskType"]?.stringValue
+        else { return nil }
 
         return TaskProgress(
             taskId: id,
@@ -95,12 +98,14 @@ public actor ProgressActor {
     /// 加载全部活跃任务进度（3F.11 fix：后台任务面板真实数据源，US-SYS-001 AC-2）。
     public func loadAll() async throws -> [TaskProgress] {
         let rows = try await db.executeQuery(
-            sql: "SELECT taskId, taskType, lastProcessedId, lastProcessedIndex, totalCount, resumeData, createdAt, updatedAt FROM TaskProgress",
+            sql:
+                "SELECT taskId, taskType, lastProcessedId, lastProcessedIndex, totalCount, resumeData, createdAt, updatedAt FROM TaskProgress",
             bindings: []
         )
         return rows.compactMap { row in
             guard let id = row["taskId"]?.stringValue,
-                  let typeStr = row["taskType"]?.stringValue else { return nil }
+                let typeStr = row["taskType"]?.stringValue
+            else { return nil }
             return TaskProgress(
                 taskId: id,
                 rawTaskType: typeStr,
@@ -116,27 +121,37 @@ public actor ProgressActor {
 
     /// Atomically replaces an unchanged saved checkpoint with an index-zero retry record.
     /// The updatedAt precondition prevents a stale prompt from erasing newer progress.
-    public func resetForRestart(_ progress: TaskProgress) async throws -> TaskProgress {
+    public func resetForRestart(_ progress: TaskProgress, resumeData: Data? = nil, totalCount: Int? = nil) async throws
+        -> TaskProgress {
+        let descriptor = resumeData ?? progress.resumeData
+        if let descriptor { _ = try TaskResumeDescriptor.decode(descriptor) }
+        let count = totalCount ?? progress.totalCount
+        guard count >= 0 else { throw TaskRecoveryError.launcherMismatch }
         let now = Date()
         let reset = TaskProgress(
             taskId: progress.taskId,
             rawTaskType: progress.rawTaskType,
             lastProcessedIndex: 0,
-            totalCount: progress.totalCount,
+            totalCount: count,
             lastProcessedId: nil,
-            resumeData: progress.resumeData,
+            resumeData: descriptor,
             updatedAt: now,
             createdAt: progress.createdAt
         )
         let changed = try await db.executeConditionalTransaction(
-            [DatabaseManager.DBWrite(
-                sql: """
-                    UPDATE TaskProgress
-                    SET lastProcessedIndex = 0, lastProcessedId = NULL, updatedAt = ?
-                    WHERE taskId = ?
-                    """,
-                bindings: [.double(now.timeIntervalSince1970), .text(progress.taskId)]
-            )],
+            [
+                DatabaseManager.DBWrite(
+                    sql: """
+                        UPDATE TaskProgress
+                        SET lastProcessedIndex = 0, lastProcessedId = NULL, updatedAt = ?, resumeData = ?, totalCount = ?
+                        WHERE taskId = ?
+                        """,
+                    bindings: [
+                        .double(now.timeIntervalSince1970), descriptor.map(DBBinding.blob) ?? .null,
+                        .int(Int64(count)), .text(progress.taskId),
+                    ]
+                ),
+            ],
             conditionSQL: "SELECT taskId FROM TaskProgress WHERE taskId = ? AND updatedAt = ?",
             conditionBindings: [
                 .text(progress.taskId),

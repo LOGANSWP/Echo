@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "scope": "debug-simulator-engineering-only",
+  "sourceApprovalPacketSHA256": "0e202c15169faf241d6ca77fa905493c7d3e57ba1e27f8df2d67c4fc58f136a7",
+  "sourceWeightsSHA256": "24cb6248d93c55437655bdfe1c218528c7c593c0fdda9374322e03ae8ac7bfd8",
+  "transform": "Fixed width 4 with valid_count and causal padding isolation; 113 FP32 RMS normalizations; all 199 quantized tensors equal the approved graph; packed blob offsets differ",
+  "userDirection": "先不用考虑真机，先在模拟器走通",
+  "deviceQualificationApproved": false,
+  "releaseApproved": false,
+  "files": [
+    {
+      "path": "NOTICE.md",
+      "sizeBytes": 2457,
+      "sha256": "df324ae48313ca3679d02fbaa8bae4ff9e090ef29f645ddbc39b8c8975d900df"
+    },
+    {
+      "path": "Qwen06BSimulatorPrefill4.mlmodelc/analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "fe0acd595d883c71f86cf3266f66658e1710cad535f5dbd82f33b9f7278e1457"
+    },
+    {
+      "path": "Qwen06BSimulatorPrefill4.mlmodelc/coremldata.bin",
+      "sizeBytes": 2300,
+      "sha256": "3bfdf8a8485f40ffc68520f841d6820786114df9a819fd57f64cd7791def628c"
+    },
+    {
+      "path": "Qwen06BSimulatorPrefill4.mlmodelc/metadata.json",
+      "sizeBytes": 18204,
+      "sha256": "d5621443bb305c1720e5827f8d57a43d5f71cde5e79022a372ae11f39fb27396"
+    },
+    {
+      "path": "Qwen06BSimulatorPrefill4.mlmodelc/model.mil",
+      "sizeBytes": 761129,
+      "sha256": "31d6896ea9d56ae149bfb888eb85c0ae26b249a1e8a3b580ec4161f15c1fd6c3"
+    },
+    {
+      "path": "Qwen06BSimulatorPrefill4.mlmodelc/weights/weight.bin",
+      "sizeBytes": 597727040,
+      "sha256": "520ac694a62aba1ff8d221141d64c84986ba781c8439a8569229efbd2f281d53"
+    },
+    {
+      "path": "Qwen3Tokenizer/LICENSE",
+      "sizeBytes": 11343,
+      "sha256": "832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e"
+    },
+    {
+      "path": "Qwen3Tokenizer/config.json",
+      "sizeBytes": 726,
+      "sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd"
+    },
+    {
+      "path": "Qwen3Tokenizer/generation_config.json",
+      "sizeBytes": 239,
+      "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+    },
+    {
+      "path": "Qwen3Tokenizer/tokenizer.json",
+      "sizeBytes": 11422654,
+      "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    },
+    {
+      "path": "Qwen3Tokenizer/tokenizer_config.json",
+      "sizeBytes": 9732,
+      "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+    }
+  ],
+  "prefillBatchSize": 4,
+  "quantizedTensorCount": 199
+}

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "evidenceKind": "native_swift_coreml_research_review",
+  "productionApproval": "not_granted",
+  "minimumAPISupport": "Core ML state APIs available since iOS 18 / macOS 15; only macOS 26.5 host tested",
+  "compiler": "Swift 6 mode, optimization, strict-concurrency=complete, warnings-as-errors",
+  "configuration": "Qwen3-0.6B context1024 int8/per-channel, FP16 state/compute, CPU_AND_GPU",
+  "researchOnly": true,
+  "runs": [
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/native-swift-coreml-int8-v1.json",
+      "reportSHA256": "c3997bca01fc8b4cd31e68a4f952a48ba2ed1522c48816ea3074a696c529ccfe",
+      "controlPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/native-swift-coreml-int8-v1-control.json",
+      "controlSHA256": "1116f3b27fae8b6fe471e3cd32cf2919ff754cae00225b04406bca2125465c27",
+      "sourceAndBinaryIdentities": {
+        "PinnedModels/offline-generation-evaluation/generation-coreml-probe": "d0d959611d66aa95f237a6b0f690c4edd1744c998189381a6418e84ff02896d9",
+        "Scripts/Research/GenerationCoreMLProbe.swift": "20d5c138ffcba6f1568912a1387310e36a7b53131f8540a7c016e1e2db981aee",
+        "PinnedModels/offline-generation-evaluation/qwen3-0.6b/native-swift-prefix-input-v1.json": "15487740f0f52495af44c61431159b17254861eee4c4803e93d3663c328c37ce",
+        "PinnedModels/offline-generation-evaluation/qwen3-0.6b/context1024-int8-manifest.json": "78cae2badd0285acba2af7ae7271c50e316324f829a43d853467166aa9b4b9d6"
+      },
+      "predictionCalls": 45,
+      "referencePositions": 8,
+      "top1MatchCount": 8,
+      "referenceScope": "Only official FP32 top-32 logit values sampled at eight positions; not full-logit numerical parity. Quantization error remains measured.",
+      "stateCount": 56,
+      "compilationSeconds": 0.3267532081808895,
+      "loadSeconds": 4.542876500170678,
+      "maximumResidentSetBytes": 1419476992,
+      "sampleMaxAbsoluteError": 1.4194812774658203
+    },
+    {
+      "reportPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/native-swift-coreml-int8-memory-v2.json",
+      "reportSHA256": "bffcaaca05f797a1782291235f847a8b445ef724873ff2753d87e611334abd3a",
+      "controlPath": "PinnedModels/offline-generation-evaluation/qwen3-0.6b/native-swift-coreml-int8-memory-v2-control.json",
+      "controlSHA256": "5ae456b21d187935ec1b8c7d75de103c656f7355ef8ae5335624d2404e9ad100",
+      "sourceAndBinaryIdentities": {
+        "PinnedModels/offline-generation-evaluation/generation-coreml-probe": "72c83205571e9d052626541a2f0fa630b1bceb63b21091fdd2caba63fedc77a3",
+        "Scripts/Research/GenerationCoreMLProbe.swift": "57b39499f04b70526ed3fec4b90619428f1325b8e7577cc8a2ad4b0cac7aed69",
+        "PinnedModels/offline-generation-evaluation/qwen3-0.6b/native-swift-prefix-input-v1.json": "15487740f0f52495af44c61431159b17254861eee4c4803e93d3663c328c37ce",
+        "PinnedModels/offline-generation-evaluation/qwen3-0.6b/context1024-int8-manifest.json": "78cae2badd0285acba2af7ae7271c50e316324f829a43d853467166aa9b4b9d6"
+      },
+      "predictionCalls": 45,
+      "referencePositions": 8,
+      "top1MatchCount": 8,
+      "referenceScope": "Only official FP32 top-32 logit values sampled at eight positions; not full-logit numerical parity. Quantization error remains measured.",
+      "stateCount": 56,
+      "compilationSeconds": 0.30938754160888493,
+      "loadSeconds": 2.7723127498757094,
+      "maximumResidentSetBytes": 1437138944,
+      "sampleMaxAbsoluteError": 1.4194812774658203,
+      "kernelPhysicalFootprintPeakBytes": 873645304,
+      "selectedMemorySamples": [
+        {
+          "stage": "before_compile",
+          "residentBytes": 6864896,
+          "residentPeakBytes": 6864896,
+          "physicalFootprintBytes": 2048480,
+          "kernelPhysicalFootprintPeakBytes": 2048480
+        },
+        {
+          "stage": "after_compile",
+          "residentBytes": 58425344,
+          "residentPeakBytes": 59719680,
+          "physicalFootprintBytes": 31539824,
+          "kernelPhysicalFootprintPeakBytes": 51430000
+        },
+        {
+          "stage": "after_load",
+          "residentBytes": 683442176,
+          "residentPeakBytes": 1437138944,
+          "physicalFootprintBytes": 445285552,
+          "kernelPhysicalFootprintPeakBytes": 810321600
+        },
+        {
+          "stage": "smoke-1_position_20",
+          "residentBytes": 708050944,
+          "residentPeakBytes": 1437138944,
+          "physicalFootprintBytes": 873219320,
+          "kernelPhysicalFootprintPeakBytes": 873219320
+        },
+        {
+          "stage": "smoke-2_position_23",
+          "residentBytes": 708263936,
+          "residentPeakBytes": 1437138944,
+          "kernelPhysicalFootprintPeakBytes": 873645304,
+          "physicalFootprintBytes": 873612536
+        }
+      ]
+    }
+  ],
+  "concurrencyFinding": "MainActor-owned MLModel crossed into the asynchronous prediction API is rejected by Swift 6. This single-owner CLI keeps model/state lifetime in one nonisolated async function; no unchecked Sendable and no unsafe isolation. Actor-based reusable production ownership remains unimplemented.",
+  "limitations": [
+    "No Python runtime in model process, but input reference tokens were prepared by the existing research oracle.",
+    "Tokenizer and Core ML were exercised as separate native CLIs; no complete Swift structured-generation pipeline yet.",
+    "Short prefixes only; no iPhone, full context, cancellation latency, repeated report load, or full App/model coexistence.",
+    "RSS and Darwin physical footprint have different accounting; no 1.5GB App gate result is claimed.",
+    "Mac short-prefix checks are not additional structured generations or formal quality samples."
+  ]
+}

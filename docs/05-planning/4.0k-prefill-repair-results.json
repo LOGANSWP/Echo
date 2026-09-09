@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "scope": "debug-simulator-prefill-repair",
+  "sourceApprovalPacketSHA256": "0e202c15169faf241d6ca77fa905493c7d3e57ba1e27f8df2d67c4fc58f136a7",
+  "simulatorArtifactIdentity": "6a67bb65383697558556a14f2e1a7d12c2f79ad9e688f55bbe27466f75cdefff",
+  "artifactBytes": 609956067,
+  "quantizedTensorCount": 199,
+  "quantizedTensorValuesAndScalesUnchanged": true,
+  "fixedInputWidth": 4,
+  "paddingUsesExplicitValidCount": true,
+  "limits": {
+    "contextTokens": 1024,
+    "inputTokens": 768,
+    "outputTokens": 256,
+    "callSeconds": 60,
+    "kvBytes": 117440512
+  },
+  "deviceQualificationApproved": false,
+  "productQualityApproved": false,
+  "releaseApproved": false,
+  "tests": {
+    "swift": {
+      "tests": 19,
+      "suites": 4,
+      "failures": 0,
+      "elapsedSeconds": 82.095,
+      "log": "/tmp/echo-prefill-real17.log"
+    },
+    "paddingAndCausality": "passed",
+    "finalRegression": {
+      "tests": 38,
+      "suites": 7,
+      "failures": 0,
+      "elapsedSeconds": 345.76,
+      "log": "/tmp/echo-prefill-final-regression.log",
+      "logSHA256": "38f6bbe6192e8e2576642f6bb7fb50804e4e4d2d70ea5c30517dd6ffe2eb24f6"
+    },
+    "totalSwiftTests": 57,
+    "totalSwiftSuites": 11,
+    "python": {
+      "tests": 3,
+      "failures": 0,
+      "log": "/tmp/echo-prefill-final-python.log",
+      "syntaxCheck": "Four conversion, resource preparation and padding-test Python files compiled successfully without writing bytecode."
+    }
+  },
+  "liveIOS18": {
+    "device": "iPhone 16 Pro / iOS 18.2",
+    "normalApp": true,
+    "fixture": false,
+    "source": "Production-ingested synthetic blue-circle photo with persisted user description",
+    "sourceMemoryID": "B2995C59-30AE-5606-9EF6-BA52164C938A",
+    "template": "poem",
+    "language": "zh-Hans",
+    "generationSucceeded": true,
+    "observedElapsedSeconds": 52.521,
+    "screenHash": "0fycdyq",
+    "verseLines": [
+      "蓝圆映白屏",
+      "合成测试图",
+      "记忆在虚空中",
+      "时间的褶皱"
+    ],
+    "visibleSourceLinks": 1,
+    "sourceNavigationVerified": true,
+    "detailScreenHash": "0uql121"
+  },
+  "liveIOS26": {
+    "device": "iPhone 17 Pro / iOS 26.5",
+    "normalApp": true,
+    "fixture": false,
+    "template": "poem",
+    "language": "en-US",
+    "generationSucceeded": true,
+    "screenHash": "04ktwzm",
+    "verseLines": [
+      "A blue circle dances on a white canvas, a silent symphony.",
+      "It whispers secrets through the light, a language unseen.",
+      "The edges blur, and the world becomes a dream.",
+      "A blue circle, a silent testament to the unseen."
+    ],
+    "visibleSourceLinks": 1
+  },
+  "contentQuality": {
+    "chinesePoemAccepted": false,
+    "reason": "The successful Chinese output still contains test metadata and noun phrases. Engineering success does not establish literary quality or factual entailment.",
+    "alternativePromptAndSamplingExperimentsInstalled": false,
+    "formalAcceptanceCorpusUsedForTuning": false
+  },
+  "rejectedGraphExperiments": [
+    "Flexible input graph with scalar-inferred causal mask: numerical failure",
+    "Corrected flexible input graph: iOS 18 model execution-plan failure"
+  ],
+  "fullTaskDone": false,
+  "logSHA256": {
+    "/tmp/echo-prefill-real17.log": "39c01ca85874fb58ed2e8ef1db42226bab5698f9f9ab1d3072aebd3d50412cdb",
+    "/tmp/echo-prefill-budget-green.log": "680a08e889540e398067eb607d1fc8596ed794fc8744b281a85da1f7b82bd385",
+    "/tmp/echo-prefill-padding-tests.log": "1c4dfc6eaff8b9b856bddfdd80986af4bb1af80d350d57fb0368febf2595655b",
+    "/tmp/echo-prefill-project-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/echo-prefill-fixed4-ios18.log": "ea07535ad88bb15fd757624c8174ab3e5041442d613c0afee81bf105b2deb34d",
+    "/tmp/echo-prefill-final-python.log": "9cb0a3bab7d8896fe4758d3d7b78e6f476f45934116d4ca6093c800051fdd9dc"
+  },
+  "sourceFilesSHA256": {
+    "Scripts/convert_generation_prefill.py": "741ffe2aa2b4bc21b3861958391936bd0d2f32acf36d894804952fb3c86d251d",
+    "Scripts/convert_generation_simulator.py": "73f67e54c831ab4e6543e5385048406c02a0ff26579a9e1b634193339315fcb0",
+    "Echo/Core/Actors/BundledGenerationActor.swift": "1dd66f0ae3f95c4541b7f6e2e5fddb19b8f01e2813ca85fb50f5be96034660c8",
+    "Echo/Core/Services/GenerationBudget.swift": "4b4645fa21cddb83a3330201bf441905fc33d950d4704a5b2d6c9055ba12d65b"
+  },
+  "finalLiveReview": {
+    "sameFinalBuildInstalledOnBoth": true,
+    "iOS18ScreenHash": "0fycdyq",
+    "iOS26ScreenHash": "04ktwzm",
+    "bothLeftOnPoemResult": true,
+    "fixture": false,
+    "mediaCaptured": false
+  }
+}

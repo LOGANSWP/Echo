@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "task": "4.0k",
+  "promptVersion": "creative-forms-production-v10",
+  "regression": {
+    "tests": 39,
+    "suites": 6
+  },
+  "modelFilesChanged": false,
+  "budgetsRelaxed": false,
+  "outputPostprocessing": false,
+  "iOS18GenerationPassed": false,
+  "deviceQualified": false,
+  "fullQualityPassed": false,
+  "english": {
+    "envelope": {
+      "schemaVersion": 1,
+      "paragraphs": [
+        {
+          "text": "A blue circle dances on a white canvas, a silent symphony.",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        },
+        {
+          "text": "It whispers secrets through the light, a language unseen.",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        },
+        {
+          "text": "The edges blur, and the world becomes a dream.",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        },
+        {
+          "text": "A blue circle, a silent testament to the unseen.",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        }
+      ]
+    },
+    "formLanguageCitationsPassed": true,
+    "samplePoeticFormObserved": true
+  },
+  "chinese": {
+    "envelope": {
+      "schemaVersion": 1,
+      "paragraphs": [
+        {
+          "text": "蓝圆测试",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        },
+        {
+          "text": "白背景中",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        },
+        {
+          "text": "合成图像",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        },
+        {
+          "text": "无真实记忆",
+          "sourceMemoryIDs": [
+            "aa8ff0cc-2736-573d-a190-fc7ffb943844"
+          ]
+        }
+      ]
+    },
+    "formLanguageCitationsPassed": true,
+    "humanQualityPassed": false,
+    "reason": "Noun-list output and unsupported no-real-memory statement; quality remains open."
+  },
+  "normalApp": {
+    "status": "passed-for-English-sample",
+    "simulator": "iPhone 17 Pro iOS 26.5",
+    "source": "PhotoKit ingestion -> persisted description -> Search -> Poem",
+    "fixture": false,
+    "displayedVerseParagraphs": 4,
+    "availableCitationCount": 1,
+    "leftOnResult": true,
+    "screenHash": "04ktwzm",
+    "modelCitationCount": 4
+  },
+  "logs": {
+    "red": {
+      "path": "/tmp/echo-4.0k-poem-red.log",
+      "sha256": "3410c3d61ad550f54b6ccb3aee6fa3edb88331e64337bd69e5a852c057eea0a9"
+    },
+    "regression": {
+      "path": "/tmp/echo-4.0k-poem-final.log",
+      "sha256": "76af2b19ac02c74a0a5c63a3e85f8c0b5b08a1eb81f5caf416ec42334aec7c58"
+    },
+    "finalRuntime": {
+      "path": "/tmp/echo-4.0k-poem-v10.log",
+      "sha256": "5365c45f72391b6a2cce91aa6d90990e4b0de9ad71529b97bf60e10c378f8ac5"
+    },
+    "swiftlint": {
+      "path": "/tmp/echo-4.0k-poem-project-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "manifest": {
+      "path": "/tmp/echo-4.0k-poem-manifest.log",
+      "sha256": "939abea3ccb579d24ba1a3f2a7da7cc5fc94a99f74354bfef6af62a305349d30"
+    },
+    "citationRegression": {
+      "path": "/tmp/echo-4.0k-citation-green.log",
+      "sha256": "61aabf12714c7c19cde24d04cee5c3824e710a445eb87a04fb2bf7401cbfdbb4"
+    },
+    "citationLint": {
+      "path": "/tmp/echo-4.0k-citation-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "citationBuild": {
+      "path": "/tmp/echo-4.0k-citation-build.log",
+      "sha256": "3eef5c7e18031aac1ebadf8bf5ae4ced333d2c54ec583fd92c8379d73068dd35"
+    }
+  },
+  "citationPresentation": {
+    "regressionTests": 33,
+    "suites": 3,
+    "displayedDistinctLinks": 1,
+    "originalModelCitations": 4,
+    "technicalIDsVisible": false,
+    "sourceNavigationPassed": true,
+    "perLineProvenanceRetained": true,
+    "noSourceWarningsRetained": true,
+    "copyExportChanged": false,
+    "finalScreenHash": "04ktwzm",
+    "stableSourceButtonIdentifier": "creation-citation-anchor-AA8FF0CC"
+  }
+}

@@ -4,9 +4,11 @@
 //            docs/01-spec/用户故事与验收标准规格书.md §US-FBK-001~003, US-DIS-003 (错误文案本地化)
 // 任务: 1.4 - 集成 SQLite，创建 ExcludedAssets, Feedback, TaskProgress, PendingOperations 表
 //       3F.10 - L1~L4 错误分级映射 + 本地化用户文案 (US-DIS-003 AC-2/AC-4, DEF-39-1)
-// 架构约束: 遵循 AGENTS.md §4.4 (L1~L4 错误分级), R-007 (禁止 @unchecked Sendable)
+// 架构约束: 遵循 AGENTS.md §4.4 (L1~L4 错误分级), R-007 (compiler-checked Sendable only)
 // 重要: 所有 struct stored/computed properties 必须 nonisolated（项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor）
 // 生成时间: 2026-07-04 | 更新: 2026-08-12 (3F.10 ErrorSeverity/ErrorClassifier/localized messages)
+// Task 4.0k (2026-09-08): typed generation failure severity without fallback masking.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
@@ -25,14 +27,19 @@ public enum DatabaseError: Error, LocalizedError, Sendable {
         switch self {
         case .connectionFailed(let error):
             return "Database connection failed: \(error.localizedDescription)"
+
         case .tableCreationFailed(let table, let error):
             return "Failed to create table '\(table)': \(error.localizedDescription)"
+
         case .writeFailed(let op, let error):
             return "Write operation '\(op)' failed: \(error.localizedDescription)"
+
         case .readFailed(let op, let error):
             return "Read operation '\(op)' failed: \(error.localizedDescription)"
+
         case .notFound(let id):
             return "Record not found: \(id)"
+
         case .rowMappingFailed:
             return "Failed to map SQLite row to domain model"
         }
@@ -44,7 +51,7 @@ public enum DatabaseError: Error, LocalizedError, Sendable {
 /// Locale-explicit catalog lookup. String(localized:locale:) only affects formatting,
 /// not localization choice, so the locale-specific .lproj sub-bundle is loaded directly.
 public enum EchoLocalization {
-    public nonisolated static func localized(_ key: String, locale: Locale) -> String {
+    nonisolated public static func localized(_ key: String, locale: Locale) -> String {
         guard let bundle = localizationBundle(for: locale) else { return key }
         return bundle.localizedString(forKey: key, value: key, table: nil)
     }
@@ -60,7 +67,7 @@ public enum EchoLocalization {
         }
         for candidate in candidates {
             if let path = main.path(forResource: candidate, ofType: "lproj"),
-               let bundle = Bundle(path: path) {
+                let bundle = Bundle(path: path) {
                 return bundle
             }
         }
@@ -76,20 +83,23 @@ public enum ErrorSeverity: String, Sendable, CaseIterable, Equatable {
     case l3Blocking
     case l4Conflict
 
-    public nonisolated var userFacingMessageKey: String {
+    nonisolated public var userFacingMessageKey: String {
         switch self {
         case .l1Transient:
             return "Something went wrong briefly. Echo is retrying automatically."
+
         case .l2Recoverable:
             return "This action could not be completed. You can retry it when ready."
+
         case .l3Blocking:
             return "This feature is unavailable until the issue is fixed. Open Settings for repair options."
+
         case .l4Conflict:
             return "Two versions of this memory conflict. Choose which one to keep."
         }
     }
 
-    public nonisolated func userFacingMessage(locale: Locale) -> String {
+    nonisolated public func userFacingMessage(locale: Locale) -> String {
         EchoLocalization.localized(userFacingMessageKey, locale: locale)
     }
 }
@@ -99,7 +109,7 @@ public enum ErrorSeverity: String, Sendable, CaseIterable, Equatable {
 public enum SyncConflictError: Error, LocalizedError, Sendable, Equatable {
     case conflict(memoryId: UUID)
 
-    public nonisolated var errorDescription: String? {
+    nonisolated public var errorDescription: String? {
         switch self {
         case .conflict(let id):
             return "Sync conflict for memory \(id.uuidString)"
@@ -110,7 +120,10 @@ public enum SyncConflictError: Error, LocalizedError, Sendable, Equatable {
 // MARK: - Error Classifier (DEF-39-1: L1/L2/L3/L4 production mapping)
 
 public enum ErrorClassifier {
-    public nonisolated static func classify(_ error: Error) -> ErrorSeverity {
+    nonisolated public static func classify(_ error: Error) -> ErrorSeverity {
+        if let generationError = error as? GenerationRuntimeError {
+            return generationError.severity
+        }
         if error is SyncConflictError {
             return .l4Conflict
         }
@@ -121,10 +134,13 @@ public enum ErrorClassifier {
             switch dbError {
             case .connectionFailed:
                 return .l1Transient
+
             case .tableCreationFailed:
                 return .l3Blocking
+
             case .writeFailed, .readFailed, .rowMappingFailed:
                 return .l2Recoverable
+
             case .notFound:
                 return .l2Recoverable
             }
@@ -143,7 +159,7 @@ public protocol UserFacingError {
 }
 
 extension DatabaseError: UserFacingError {
-    public nonisolated func userFacingMessage(locale: Locale) -> String {
+    nonisolated public func userFacingMessage(locale: Locale) -> String {
         ErrorClassifier.classify(self).userFacingMessage(locale: locale)
     }
 }
@@ -168,16 +184,16 @@ public enum FeedbackSentiment: String, Sendable, Codable {
 }
 
 public struct FeedbackEntry: Sendable, Codable {
-    public nonisolated let id: UUID
-    public nonisolated let memoryId: UUID
-    public nonisolated let queryText: String
-    public nonisolated let sentiment: FeedbackSentiment
-    public nonisolated let cosineSimilarity: Double
-    public nonisolated let createdAt: Date
-    public nonisolated let isBadCase: Bool
-    public nonisolated let badCaseReason: String?
+    nonisolated public let id: UUID
+    nonisolated public let memoryId: UUID
+    nonisolated public let queryText: String
+    nonisolated public let sentiment: FeedbackSentiment
+    nonisolated public let cosineSimilarity: Double
+    nonisolated public let createdAt: Date
+    nonisolated public let isBadCase: Bool
+    nonisolated public let badCaseReason: String?
 
-    public nonisolated init(
+    nonisolated public init(
         id: UUID = UUID(),
         memoryId: UUID,
         queryText: String,
@@ -199,10 +215,10 @@ public struct FeedbackEntry: Sendable, Codable {
 }
 
 public struct FeedbackAdjustment: Sendable {
-    public nonisolated let adjustment: Double
-    public nonisolated let feedbackCount: Int
+    nonisolated public let adjustment: Double
+    nonisolated public let feedbackCount: Int
 
-    public nonisolated init(adjustment: Double, feedbackCount: Int) {
+    nonisolated public init(adjustment: Double, feedbackCount: Int) {
         self.adjustment = adjustment
         self.feedbackCount = feedbackCount
     }
@@ -211,17 +227,17 @@ public struct FeedbackAdjustment: Sendable {
 // MARK: - Task Progress Model
 
 public struct TaskProgress: Sendable, Codable {
-    public nonisolated let taskId: String
-    public nonisolated let taskType: TaskType
-    public nonisolated let rawTaskType: String
-    public nonisolated var lastProcessedIndex: Int
-    public nonisolated var totalCount: Int
-    public nonisolated var lastProcessedId: String?
-    public nonisolated var resumeData: Data?
-    public nonisolated var updatedAt: Date
-    public nonisolated let createdAt: Date
+    nonisolated public let taskId: String
+    nonisolated public let taskType: TaskType
+    nonisolated public let rawTaskType: String
+    nonisolated public var lastProcessedIndex: Int
+    nonisolated public var totalCount: Int
+    nonisolated public var lastProcessedId: String?
+    nonisolated public var resumeData: Data?
+    nonisolated public var updatedAt: Date
+    nonisolated public let createdAt: Date
 
-    public nonisolated init(
+    nonisolated public init(
         taskId: String = UUID().uuidString,
         taskType: TaskType,
         lastProcessedIndex: Int = 0,
@@ -242,7 +258,7 @@ public struct TaskProgress: Sendable, Codable {
         self.createdAt = createdAt
     }
 
-    public nonisolated init(
+    nonisolated public init(
         taskId: String,
         rawTaskType: String,
         lastProcessedIndex: Int = 0,
@@ -267,14 +283,14 @@ public struct TaskProgress: Sendable, Codable {
 // MARK: - Pending Operation Model
 
 public struct PendingOperation: Sendable, Codable {
-    public nonisolated let operationId: String
-    public nonisolated let operationType: String
-    public nonisolated var retryCount: Int
-    public nonisolated let parameters: Data
-    public nonisolated let createdAt: Date
-    public nonisolated var lastError: String?
+    nonisolated public let operationId: String
+    nonisolated public let operationType: String
+    nonisolated public var retryCount: Int
+    nonisolated public let parameters: Data
+    nonisolated public let createdAt: Date
+    nonisolated public var lastError: String?
 
-    public nonisolated init(
+    nonisolated public init(
         operationId: String = UUID().uuidString,
         operationType: String,
         retryCount: Int = 0,

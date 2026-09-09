@@ -8,6 +8,8 @@
 //          §决策-3 (撤回 → 事务清除 → blocked), §决策-5 (model/route/index-unavailable/bootstrap-failed)
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), §8.1 (@MainActor @Observable), R-007 (禁止 unchecked Sendable)
 // Generated: 2026-08-04 | Updated: 2026-09-07 (narrative report scheduler)
+// Task 4.0k (2026-09-08): one approved provider for creation and persistent reports in the production graph.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
@@ -47,8 +49,9 @@ public enum AppStartupState: Sendable, Equatable {
 @MainActor
 @Observable
 public final class AppComposition {
-
     public static let shared = AppComposition()
+
+    deinit {}
 
     // MARK: - Dependency Graph
 
@@ -65,6 +68,8 @@ public final class AppComposition {
     public let focusSourceLifecycleActor: FocusSourceLifecycleActor
     public let creationExportCoordinator: CreationExportCoordinator
     public let narrativeReportActor: NarrativeReportActor
+    public let generationProvider: BundledGenerationActor
+    public let creativePipeline: CreativePipeline
     public let taskRecoveryRegistry: TaskRecoveryRegistry
     public let taskRecoveryCoordinator: TaskRecoveryCoordinator
     /// 文本嵌入器（E5）— 生产摄入/检索文本路径（CR-10）
@@ -107,6 +112,8 @@ public final class AppComposition {
         awakeningPreferenceStore: AwakeningPreferenceActor? = nil,
         modelLoader: ModelLoaderActor = .shared,
         generationRegistry: GenerationRegistryActor = .shared,
+        taskQueue: TaskQueueActor = .shared,
+        progressActor: ProgressActor = .shared,
         textEmbedder: any EmbedderProtocol = E5Embedder(),
         visionEmbedder: any EmbedderProtocol = SigLIP2Embedder(),
         asrEngine: (any ASREngineProtocol)? = WhisperASREngine()
@@ -131,6 +138,19 @@ public final class AppComposition {
         self.excludedAssetsActor = excludedAssetsActor
         self.pendingOpsActor = pendingOpsActor
         self.canonicalRepository = canonicalRepository
+        let generationProvider = BundledGenerationActor(
+            resourceRoot: Bundle.main.url(forResource: GenerationRuntimeArtifact.resourceName, withExtension: "bundle"),
+            privacyActor: privacyActor,
+            manifestActor: ModelManifestActor(db: databaseManager)
+        )
+        self.generationProvider = generationProvider
+        let creativePipeline = CreativePipeline(
+            llmProvider: generationProvider,
+            aligner: LanguageAligner(llmProvider: generationProvider),
+            privacyActor: privacyActor,
+            canonicalRepository: canonicalRepository
+        )
+        self.creativePipeline = creativePipeline
         self.focusSourceLifecycleActor = FocusSourceLifecycleActor(
             repository: canonicalRepository,
             database: databaseManager,
@@ -146,14 +166,18 @@ public final class AppComposition {
         self.narrativeReportActor = NarrativeReportActor(
             database: databaseManager,
             privacyActor: privacyActor,
-            taskQueue: .shared,
-            pendingOps: pendingOpsActor
+            taskQueue: taskQueue,
+            pendingOps: pendingOpsActor,
+            generator: CreativeNarrativeReportGenerator(pipeline: creativePipeline)
         )
         let taskRecoveryRegistry = TaskRecoveryRegistry()
         self.taskRecoveryRegistry = taskRecoveryRegistry
         self.taskRecoveryCoordinator = TaskRecoveryCoordinator(
+            progressActor: progressActor,
+            taskQueue: taskQueue,
             registry: taskRecoveryRegistry,
             privacyActor: privacyActor,
+            pendingOpsActor: pendingOpsActor,
             auditWriter: privacyActor
         )
         self.textEmbedder = textEmbedder
@@ -184,17 +208,16 @@ public final class AppComposition {
             try await databaseManager.open()
             try await consentStore.loadState()
             try await privacyActor.loadPolicy()
-            await taskRecoveryRegistry.register(taskType: .narrativeReport) {
-                [narrativeReportActor] request in
+            await taskRecoveryRegistry.register(taskType: .narrativeReport) { [narrativeReportActor] request in
                 try await narrativeReportActor.makeRecoveryJob(for: request)
             }
             // UI tests/previews (DEBUG only): -ui-skip-consent bypasses the deny-by-default
             // gate and lands in .ready (fixture-driven XCUITest relies on the ungated path)
             #if DEBUG
-            if ProcessInfo.processInfo.arguments.contains("-ui-skip-consent") {
-                startupState = .ready
-                return
-            }
+                if ProcessInfo.processInfo.arguments.contains("-ui-skip-consent") {
+                    startupState = .ready
+                    return
+                }
             #endif
             // Production wiring enables the deny-by-default consent gate
             await privacyActor.enableConsentEnforcement(consentStore: consentStore)

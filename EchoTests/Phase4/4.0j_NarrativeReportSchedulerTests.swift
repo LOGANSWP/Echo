@@ -10,10 +10,11 @@
 
 import Foundation
 import Testing
+
 @testable import Echo
 
 private actor StubNarrativeReportGenerator: NarrativeReportGenerating {
-    enum Mode: Sendable { case success, l2Failure, waitsForCancellation }
+    enum Mode: Sendable { case success, l2Failure, l3Failure, resourceDeferred, waitsForCancellation }
     private let mode: Mode
     private(set) var requests: [NarrativeReportGenerationRequest] = []
 
@@ -32,6 +33,12 @@ private actor StubNarrativeReportGenerator: NarrativeReportGenerating {
 
         case .l2Failure:
             throw NarrativeReportError.generationUnavailable
+
+        case .l3Failure:
+            throw GenerationRuntimeError.modelContract
+
+        case .resourceDeferred:
+            throw NarrativeReportError.resourceDeferred
 
         case .waitsForCancellation:
             try await Task.sleep(for: .seconds(30))
@@ -57,6 +64,127 @@ private actor StubNarrativeReportGenerator: NarrativeReportGenerating {
 
 @Suite("4.0j Narrative Report Scheduler", .serialized)
 struct NarrativeReportSchedulerTests {
+    @Test("4.0k AC-4: authorization precedes the SQL cap and omitted sources remain counted")
+    func test_AC4_authorizationPrecedesBoundedSelection() async throws {
+        let (database, privacy) = try await makeDatabase()
+        try await privacy.updatePolicy(
+            UserPolicy(preferredLanguage: "en-US", authorizedSourceTypes: ["note"], policyVersion: 12)
+        )
+        let progress = ProgressActor(db: database)
+        let generator = StubNarrativeReportGenerator(mode: .success)
+        let actor = NarrativeReportActor(
+            database: database,
+            privacyActor: privacy,
+            taskQueue: TaskQueueActor(progressActor: progress),
+            pendingOps: PendingOpsActor(db: database),
+            generator: generator
+        )
+        let baseline = try #require(ISO8601DateFormatter().date(from: "2025-12-01T06:00:00Z"))
+        let now = try #require(ISO8601DateFormatter().date(from: "2026-01-15T12:00:00Z"))
+        try await database.executeWrite(
+            sql: "UPDATE NarrativeReportSchedule SET monthlyEligibleFrom = ?, yearlyEnabled = 0",
+            bindings: [.double(baseline.timeIntervalSince1970)]
+        )
+        try await database.executeTransaction(
+            (0..<560).map { index in
+                DatabaseManager.DBWrite(
+                    sql:
+                        "INSERT INTO Memory (memoryId, sourceLocator, canonicalText, sourceType, createdAt, updatedAt, recoverability) VALUES (?, '', 'A walk.', ?, ?, ?, 'full')",
+                    bindings: [
+                        .text(UUID().uuidString), .text(index < 260 ? "calendar" : "note"),
+                        .double(baseline.timeIntervalSince1970 + 3_600),
+                        .double(baseline.timeIntervalSince1970 + 3_600),
+                    ]
+                )
+            }
+        )
+        let result = try await actor.scanAndEnqueue(
+            at: now,
+            calendarContext: .init(timeZoneIdentifier: "America/Chicago"),
+            trigger: .foreground
+        )
+        guard case .enqueued = result else {
+            Issue.record("Authorized notes were lost before the SQL cap")
+            return
+        }
+        try await waitUntil { !(await generator.requests).isEmpty }
+        let request = try #require(await generator.requests.first)
+        #expect(request.sources.count == 256)
+        #expect(request.sources.allSatisfy { $0.sourceType == "note" })
+        #expect(request.coverage.truncatedSourceCount == 44)
+    }
+
+    @Test("4.0k AC-1: late model failure blocks automatic replay without an L2 pending operation")
+    func test_AC1_lateModelFailureDoesNotBecomeL2() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let progress = ProgressActor(db: database)
+        let queue = TaskQueueActor(progressActor: progress)
+        let actor = NarrativeReportActor(
+            database: database,
+            privacyActor: privacy,
+            taskQueue: queue,
+            pendingOps: PendingOpsActor(db: database),
+            generator: StubNarrativeReportGenerator(mode: .l3Failure)
+        )
+        let baseline = try #require(ISO8601DateFormatter().date(from: "2025-12-01T06:00:00Z"))
+        let now = try #require(ISO8601DateFormatter().date(from: "2026-01-15T12:00:00Z"))
+        try await database.executeWrite(
+            sql: "UPDATE NarrativeReportSchedule SET monthlyEligibleFrom = ?, yearlyEnabled = 0",
+            bindings: [.double(baseline.timeIntervalSince1970)]
+        )
+        try await insertMemory(UUID(), into: database, at: baseline.addingTimeInterval(3_600))
+        _ = try await actor.scanAndEnqueue(
+            at: now,
+            calendarContext: .init(timeZoneIdentifier: "America/Chicago"),
+            trigger: .foreground
+        )
+        try await waitUntil {
+            let rows = try await database.executeQuery(sql: "SELECT state FROM NarrativeReportPeriod", bindings: [])
+            return rows.first?["state"]?.stringValue == "retryRequired"
+        }
+        #expect(try await count("PendingOperations", in: database) == 0)
+        #expect(try await count("NarrativeReport", in: database) == 0)
+        #expect(
+            try await actor.scanAndEnqueue(
+                at: now,
+                calendarContext: .init(timeZoneIdentifier: "America/Chicago"),
+                trigger: .foreground
+            ) == .none
+        )
+    }
+
+    @Test("4.0k AC-4: resource deferral releases the claim without an L2 pending operation")
+    func test_AC4_resourceDeferralReleasesClaim() async throws {
+        let (database, privacy) = try await makeDatabase()
+        let progress = ProgressActor(db: database)
+        let queue = TaskQueueActor(progressActor: progress)
+        let actor = NarrativeReportActor(
+            database: database,
+            privacyActor: privacy,
+            taskQueue: queue,
+            pendingOps: PendingOpsActor(db: database),
+            generator: StubNarrativeReportGenerator(mode: .resourceDeferred)
+        )
+        let baseline = try #require(ISO8601DateFormatter().date(from: "2025-12-01T06:00:00Z"))
+        let now = try #require(ISO8601DateFormatter().date(from: "2026-01-15T12:00:00Z"))
+        try await database.executeWrite(
+            sql: "UPDATE NarrativeReportSchedule SET monthlyEligibleFrom = ?, yearlyEnabled = 0",
+            bindings: [.double(baseline.timeIntervalSince1970)]
+        )
+        try await insertMemory(UUID(), into: database, at: baseline.addingTimeInterval(3_600))
+        _ = try await actor.scanAndEnqueue(
+            at: now,
+            calendarContext: .init(timeZoneIdentifier: "America/Chicago"),
+            trigger: .foreground
+        )
+        try await waitUntil {
+            let rows = try await database.executeQuery(sql: "SELECT state FROM NarrativeReportPeriod", bindings: [])
+            return rows.first?["state"]?.stringValue == "eligible"
+        }
+        #expect(try await count("PendingOperations", in: database) == 0)
+        #expect(try await count("NarrativeReport", in: database) == 0)
+    }
+
     private func makeDatabase() async throws -> (DatabaseManager, PrivacyActor) {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("echo-4-0j-\(UUID().uuidString)")

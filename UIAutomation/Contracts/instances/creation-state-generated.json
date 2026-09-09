@@ -12,9 +12,9 @@
   "expectedSemantics": {
     "generatedBody": "AI-generated content rendered",
     "citationAnchors": "zero or more valid Source memory anchors per paragraph plus explicit noSource/partialNoSource status; no Verified fact claim",
-    "copyButton": "Revalidate current policy, then copy citation-preserving content or show a recoverable authorization error",
-    "exportButton": "Revalidate current policy, then export citation-preserving PDF/Markdown; PDF supports multiple pages without truncation",
-    "saveToNotesButton": "Revalidate current policy, prepare a citation-preserving local export, and present the user-mediated system share controller without claiming the content was saved to Notes",
+    "copyButton": "Revalidate current policy, then copy title and body without appended source metadata or show a recoverable authorization error",
+    "exportButton": "Revalidate current policy, then export title/body-only PDF/Markdown without appended source identifiers; PDF supports multiple pages without truncation",
+    "saveToNotesButton": "Revalidate current policy, prepare a title/body-only local export, and present the user-mediated system share controller without claiming the content was saved to Notes",
     "shareButton": "Share/export/print a persisted narrative report under current-policy revalidation (US-SYN-004 AC-6/7)"
   },
   "version": "1.1.2"

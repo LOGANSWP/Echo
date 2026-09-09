@@ -7,6 +7,8 @@
 //              L2 persistence, structured audit with outcome
 // Architecture: AGENTS.md §4.2, §4.3, §4.5, §7.3
 // Generated: 2026-09-04
+// Task 4.0k (2026-09-08): generation L3/denial and explicit Restart error propagation.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
@@ -97,6 +99,7 @@ public actor TaskRecoveryCoordinator {
             await recordAudit(progress: current, choice: "continue", outcome: "resumed", success: true)
             return .resumed
         } catch {
+            try await propagateBlockingFailure(error, progress: snapshot, choice: "continue")
             let mapped = Self.map(error)
             await recordFailure(snapshot, choice: "continue", error: mapped)
             throw mapped
@@ -114,8 +117,11 @@ public actor TaskRecoveryCoordinator {
                 let request = try makeRequest(progress: current, choice: .restart)
                 try await validatePrivacy(request.descriptor)
                 let job = try await registry.makeJob(for: request)
-                try validate(job: job, progress: current)
-                reset = try await progressActor.resetForRestart(current)
+                try validate(job: job, progress: current, allowsNewDescriptor: true)
+                if let data = job.resumeData {
+                    try await validatePrivacy(TaskResumeDescriptor.decode(data))
+                }
+                reset = try await progressActor.resetForRestart(current, resumeData: job.resumeData, totalCount: job.totalCount)
                 try await taskQueue.enqueue(
                     job,
                     progressPolicy: .preserveExisting,
@@ -128,6 +134,7 @@ public actor TaskRecoveryCoordinator {
             await recordAudit(progress: reset, choice: "restart", outcome: "restarted", success: true)
             return .restarted
         } catch {
+            try await propagateBlockingFailure(error, progress: snapshot, choice: "restart")
             let mapped = Self.map(error)
             await recordFailure(snapshot, choice: "restart", error: mapped)
             throw mapped
@@ -138,6 +145,20 @@ public actor TaskRecoveryCoordinator {
         guard recoveringTaskIDs.insert(taskId).inserted else {
             throw TaskRecoveryError.recoveryAlreadyInProgress
         }
+    }
+
+    /// Preserve typed recovery actions; only identity changes create a manual L2 record.
+    private func propagateBlockingFailure(_ error: Error, progress: TaskProgress, choice: String) async throws {
+        guard let runtimeError = error as? GenerationRuntimeError,
+              runtimeError.severity == .l3Blocking || runtimeError == .privacyDenied || runtimeError == .restartRequired else {
+            return
+        }
+        if runtimeError == .restartRequired {
+            await recordFailure(progress, choice: choice, error: runtimeError)
+            throw runtimeError
+        }
+        await recordAudit(progress: progress, choice: choice, outcome: String(describing: runtimeError), success: false)
+        throw runtimeError
     }
 
     private func currentProgress(matching snapshot: TaskProgress) async throws -> TaskProgress {
@@ -195,11 +216,11 @@ public actor TaskRecoveryCoordinator {
         guard checkpoint.isAllowed else { throw TaskRecoveryError.privacyDenied }
     }
 
-    private func validate(job: TaskQueueActor.QueuedJob, progress: TaskProgress) throws {
+    private func validate(job: TaskQueueActor.QueuedJob, progress: TaskProgress, allowsNewDescriptor: Bool = false) throws {
         guard job.taskId == progress.taskId,
               job.taskType.rawValue == progress.rawTaskType,
-              job.totalCount == progress.totalCount,
-              job.resumeData == progress.resumeData else {
+              allowsNewDescriptor || job.totalCount == progress.totalCount,
+              allowsNewDescriptor || job.resumeData == progress.resumeData else {
             throw TaskRecoveryError.launcherMismatch
         }
     }
@@ -207,7 +228,7 @@ public actor TaskRecoveryCoordinator {
     private func recordFailure(
         _ progress: TaskProgress,
         choice: String,
-        error: TaskRecoveryError
+        error: any Error
     ) async {
         if let pendingOpsActor {
             let digest = AuditContentHasher.sha256Hex(progress.taskId)
@@ -248,7 +269,7 @@ public actor TaskRecoveryCoordinator {
         )
     }
 
-    private nonisolated static func map(_ error: Error) -> TaskRecoveryError {
+    nonisolated private static func map(_ error: Error) -> TaskRecoveryError {
         if let recoveryError = error as? TaskRecoveryError { return recoveryError }
         if error is TaskResumeDescriptorError { return .descriptorInvalid }
         return .enqueueFailed
