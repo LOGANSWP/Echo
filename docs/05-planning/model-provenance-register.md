@@ -224,3 +224,7 @@
 ### Debug simulator derivative (2026-09-08)
 
 The simulator-first engineering artifact uses the same approved INT8 weights and tokenizer, with 113 RMS operations promoted to FP32. Its separate closed inventory is `4.0k-simulator-artifact-manifest.json`; identity `5a605e013f9bd0e2cfed9d7c44b99bc396628f82088c4aadd61865b1005a7a7f`, model ID `qwen3-0.6b-simulator-rms-fp32-v1`. This is not a second device/release-approved artifact. Debug simulator selects it; device and Release exclude it. Prompt v4 gives explicit Simplified Chinese instructions instead of relying on the locale code alone. Prompt version remains part of the recovery identity.
+
+## 4.0l 视觉理解候选状态（ADR-025，2026-09-08）
+
+照片自动画面描述所需的视觉生成模型/运行时尚未选定、未登记为获批工件。4.0k 的文本生成批准及 SigLIP2 检索编码器登记都不能代替该批准。本轮仅新增产品合同和任务，无新下载、无模型替换、无 App bundle 变更；候选材料须按 ADR-009/023 冻结来源、完整文件身份/许可证和实际预算，再取得确切工件审批。

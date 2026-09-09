@@ -171,3 +171,7 @@
 - **双设备 Live Simulator Review 要求**：Phase 3F UI 交付的视觉批准仍只通过双设备 Live Simulator Review——iPhone 17 Pro (iOS 26.5) 主审查 + iPhone 16 Pro (iOS 18.x) 最低版本审查，同一产物安装到两台设备；Agent 不能自行批准界面
 - **无媒体 manifest**：每次运行的 manifest 必须记录 `visualMediaCaptured: false`（§3 第 8 项），Phase 3F 同样不创建、不持久化 screenshot、video、reference/actual/diff，不维护图像 baseline
 - **生产集成专项**：Phase 3F 的测试强调「默认 App 无 `-ui-fixture` 参数」的生产路径证据（如 3F.7 默认 live adapter、3F.11 no-fixture E2E），fixtures 仅用于测试或 Preview，不作为生产完成证据
+
+## 4.0l 照片自动理解验收（ADR-025，待实现）
+
+双设备真实 PhotoKit 摄入无 PII 无字照片 → 不编辑描述 → 本地自动理解 → 选模板生成 → 原照片来源跳转 → 正文复制/PDF/系统分享。含文字截图另验证 OCR，不能用其替代无字场景；描述必须来自当前真实图片和获批本地模型。覆盖旧照片补处理、可选用户校正、中英、真实进度/失败、重启/取消、来源变更/撤权/删除及报告未准备 coverage。Fixture/手写照片描述只算合同或文本路径证据。继续使用无截图/视频的 Live Simulator Review；模型工件与实机资源单独验收。

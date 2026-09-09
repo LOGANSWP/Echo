@@ -227,3 +227,7 @@ enum State {
 - **UI-adjacent Core 接线的受控例外**：§4 的「受保护内容（只读）」保持 Core 只读基线；`3F.0` 人类合并后，standing authority 允许在**任务穷尽式 Files 清单内**修改 UI-adjacent Core 接线文件（如 3F.7 的默认 live adapter 接线），超出任务明示范围仍须停止升级为独立决策
 - **测试**：每个 Phase 3F UI 任务的单元/集成测试位于 `EchoTests/Phase3F/`（如 `3F.7_UIToCoreIntegrationTests.swift`），UI 旅程测试在 `EchoUITests` 套件；阶段集成测试为 `EchoTests/Phase3F/Phase3FIntegrationTests.swift`
 - **验证**：Phase 3F UI 交付仍需**双设备 Live Simulator Review**（iPhone 17 Pro iOS 26.5 主审查 + iPhone 16 Pro iOS 18.x 最低版本审查），并生成**无媒体 manifest**（`visualMediaCaptured: false`），不创建或持久化 screenshot/video
+
+### 照片自动理解状态投影（4.0l / ADR-025，待实现）
+
+Detail 显示独立的 AI 画面描述、OCR 和可选用户校正；Creation 读取真实准备进度/可用/失败状态，正常路径无需先填写描述，准备中可等待/继续。ViewModel 不自行生成描述、拼接占位事实或保存第二份素材真相。4.0k 当前无文本提示是能力缺失时的临时诚实反馈，不是最终产品流程；Core 持久化/队列/模型能力由 4.0l 单独交付，Focus/Task no-masonry 和系统分享边界保持不变。

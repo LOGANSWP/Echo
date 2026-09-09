@@ -1504,7 +1504,35 @@
       "recheck_trigger": "4.0k review or Phase 4 integration scan",
       "research_evidence": "docs/05-planning/4.0k-generation-evaluation.md; docs/05-planning/4.0k-approval-packet/README.md; docs/05-planning/4.0k-acceptance-corpus-review.json; docs/05-planning/4.0k-production-implementation-map.md; docs/05-planning/4.0k-approval-packet/approval.json",
       "research_status": "Original exact artifact integration approved and default provider/hierarchical reports now pass simulator engineering E2E. Current v12 Chinese poetry still fails precise factual-grounding regressions; 110 development outputs on seven scenarios did not establish a safe replacement. Larger cached model also remains unqualified. New Qwen3.5-0.8B source download is awaiting explicit authorization after automatic approval review rejected its disk/scope impact; no download or App replacement occurred. Full human quality, device/Release resource and coverage gates remain unpassed. Original artifact approval is valid; physical-device work remains deferred per user. See 4.0k-poem-grounding-followup.md and 4.0k-next-candidate-research-request.md. User priority update: “先不需要关心模型生成内容的质量问题，现在要紧的是功能流程的打通”. Active work is simulator functional verification; content-quality tuning, new-model download research and physical-device work are deferred. Existing quality assertions and final acceptance gates remain unchanged, with their failures explicitly outstanding. Functional-only regression passed 58 tests / 9 suites / 1.768 seconds; both normal simulators verified clipboard and four system-share handoffs (PDF, Markdown, Notes entry, Share/Print), with real presentation audits and result retention on dismissal. No production code or model changes in this follow-up. See 4.0k-functional-flow-review.md. Draft PR #79 provides the simulator functional checkpoint and clean-export fix; full quality/device/coverage acceptance remains outstanding, so this finding remains open."
+    },
+    {
+      "id": "DEF-79-001",
+      "pr": 79,
+      "title": "Imported photos require manually authored descriptions before AI Creation",
+      "severity": "🔴",
+      "location": "Echo/Core/Pipelines/IngestPipeline.swift:1223; Echo/Core/Actors/CanonicalMemoryRepositoryActor.swift:229",
+      "reason": "User Live Review identified a missing functional input boundary: images have no canonical text, OCR is indexed without a creation-text path, and the approved runtime accepts text only. Manual descriptions and successful text generation do not prove automatic photo understanding.",
+      "defer_to": "4.0l on-device photo understanding and direct creation/report inputs before Phase 4 validation/RC",
+      "deferred_at": "2026-09-09T01:59:43.986313+00:00",
+      "last_checked_at": "2026-09-09T01:59:43.986313+00:00",
+      "tracking_status": "open",
+      "owners": [
+        "On-device ML Lead"
+      ],
+      "target_tasks": [
+        "4.0l"
+      ],
+      "acceptance_evidence": [
+        "US-ING-004 AC-6~9 / US-SYN-003 AC-7：双模拟器真实 PhotoKit 无字照片摄入，不编辑、不注入描述，完成实际本地图像理解、创作、来源跳转、正文复制/PDF/系统分享。",
+        "含字截图与无字场景分开验证，输出来自当前图片的真实模型；原图引用、机器/OCR/用户文字类型隔离，用户校正优先与仅标题/标签组合。",
+        "新旧照片、有界补处理、并发去重、source/model版本失效、重启/取消/恢复/资源延后及缺失/损坏/未批准模型矩阵。",
+        "授权/来源每阶段竞态、排除/确认删除/全量撤权的 D-005、审计无正文、checkpoint无原图/原文、零网络。",
+        "真实图像派生素材进入月/年分层报告；部分/全部未准备、L2、noData、coverage、原照片时间戳、完成/invalidated不自动重开。",
+        "中英输出与 UI 状态/可访问等价动作；模型预算和最终实机资源/质量/覆盖率资格单独记录，模拟器功能通过不替代发布门禁。"
+      ],
+      "recheck_trigger": "4.0l review and Phase 4 integration; preserve existing 4.0k quality/device gates",
+      "decision_reference": "docs/decisions/ADR-025-photo-understanding-creation.md"
     }
   ],
-  "last_updated": "2026-09-09T01:47:13.401043+00:00"
+  "last_updated": "2026-09-09T01:59:43.986313+00:00"
 }
