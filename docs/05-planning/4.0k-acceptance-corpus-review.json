@@ -1,0 +1,2824 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "scope": "400 unexecuted semantic quality rows; native tokenizer only, no model calls or App/quality approval",
+  "caseCount": 400,
+  "semanticScenarioCount": 20,
+  "independentTrials": false,
+  "fileIdentities": {
+    "PinnedModels/offline-generation-evaluation/generation-tokenizer-probe": "c7810747db1478e78643eb076701ec17bc1059872f76cb048fcc62c19df6983b",
+    "PinnedModels/offline-generation-evaluation/qwen3-0.6b/source/tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "EchoTests/TestData/Generation/4.0k-acceptance-v1.json": "566cfe493ad96a6b48a78a4d29c8a79ec51277a6b3bbdd8ad200500d63f55d39",
+    "Scripts/generate_generation_acceptance_cases.py": "c9b432012c02499e293e5f207f90be6c87069d12616ab86d8e78034db4a20934",
+    "Scripts/evaluate_generation_candidate.py": "94a2913bdc6f2737861d881c7529cef8f7994f50cf93838942b8ba6ae938ec9d",
+    "Scripts/Research/GenerationTokenizer.swift": "c3998d7b4aba2d101841725388b20fe2b4f717ce0a653379b7a4ef8c8bb4d77d",
+    "Scripts/Research/GenerationTokenizerProbe.swift": "fae2ddca28c7a41aecc19dce01f92daeb9f9873f060afd59036a4489b3c0ba22"
+  },
+  "promptProfile": "observations-v1",
+  "contextTokens": 1024,
+  "minimumInputTokens": 239,
+  "maximumInputTokens": 364,
+  "checksPassed": true,
+  "cases": [
+    {
+      "caseID": "acceptance-v1-cotton_bag-00-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-00-zh-Hans",
+      "inputTokens": 326,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-01-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-01-zh-Hans",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-02-en-US",
+      "inputTokens": 302,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-02-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-03-en-US",
+      "inputTokens": 239,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-03-zh-Hans",
+      "inputTokens": 250,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-04-en-US",
+      "inputTokens": 336,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-04-zh-Hans",
+      "inputTokens": 350,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-05-en-US",
+      "inputTokens": 352,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-05-zh-Hans",
+      "inputTokens": 360,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-06-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-06-zh-Hans",
+      "inputTokens": 334,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-07-en-US",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-07-zh-Hans",
+      "inputTokens": 334,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-08-en-US",
+      "inputTokens": 306,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-08-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-09-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cotton_bag-09-zh-Hans",
+      "inputTokens": 327,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-00-en-US",
+      "inputTokens": 304,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-00-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-01-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-01-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-02-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-02-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-03-en-US",
+      "inputTokens": 241,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-03-zh-Hans",
+      "inputTokens": 244,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-04-en-US",
+      "inputTokens": 342,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-04-zh-Hans",
+      "inputTokens": 343,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-05-en-US",
+      "inputTokens": 349,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-05-zh-Hans",
+      "inputTokens": 351,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-06-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-06-zh-Hans",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-07-en-US",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-07-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-08-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-08-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-09-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-reading_bookmark-09-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-00-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-00-zh-Hans",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-01-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-01-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-02-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-02-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-03-en-US",
+      "inputTokens": 245,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-03-zh-Hans",
+      "inputTokens": 246,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-04-en-US",
+      "inputTokens": 345,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-04-zh-Hans",
+      "inputTokens": 351,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-05-en-US",
+      "inputTokens": 356,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-05-zh-Hans",
+      "inputTokens": 357,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-06-en-US",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-06-zh-Hans",
+      "inputTokens": 331,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-07-en-US",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-07-zh-Hans",
+      "inputTokens": 329,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-08-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-08-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-09-en-US",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-magnet_board-09-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-00-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-00-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-01-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-01-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-02-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-02-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-03-en-US",
+      "inputTokens": 247,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-03-zh-Hans",
+      "inputTokens": 252,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-04-en-US",
+      "inputTokens": 339,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-04-zh-Hans",
+      "inputTokens": 351,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-05-en-US",
+      "inputTokens": 354,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-05-zh-Hans",
+      "inputTokens": 357,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-06-en-US",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-06-zh-Hans",
+      "inputTokens": 331,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-07-en-US",
+      "inputTokens": 323,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-07-zh-Hans",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-08-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-08-zh-Hans",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-09-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-ribbon_spool-09-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-00-en-US",
+      "inputTokens": 307,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-00-zh-Hans",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-01-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-01-zh-Hans",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-02-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-02-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-03-en-US",
+      "inputTokens": 241,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-03-zh-Hans",
+      "inputTokens": 248,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-04-en-US",
+      "inputTokens": 332,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-04-zh-Hans",
+      "inputTokens": 343,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-05-en-US",
+      "inputTokens": 348,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-05-zh-Hans",
+      "inputTokens": 355,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-06-en-US",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-06-zh-Hans",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-07-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-07-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-08-en-US",
+      "inputTokens": 307,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-08-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-09-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-clay_impression-09-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-00-en-US",
+      "inputTokens": 308,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-00-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-01-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-01-zh-Hans",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-02-en-US",
+      "inputTokens": 308,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-02-zh-Hans",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-03-en-US",
+      "inputTokens": 243,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-03-zh-Hans",
+      "inputTokens": 250,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-04-en-US",
+      "inputTokens": 345,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-04-zh-Hans",
+      "inputTokens": 345,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-05-en-US",
+      "inputTokens": 348,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-05-zh-Hans",
+      "inputTokens": 360,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-06-en-US",
+      "inputTokens": 324,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-06-zh-Hans",
+      "inputTokens": 325,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-07-en-US",
+      "inputTokens": 325,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-07-zh-Hans",
+      "inputTokens": 329,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-08-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-08-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-09-en-US",
+      "inputTokens": 307,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-window_card-09-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-00-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-00-zh-Hans",
+      "inputTokens": 323,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-01-en-US",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-01-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-02-en-US",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-02-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-03-en-US",
+      "inputTokens": 244,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-03-zh-Hans",
+      "inputTokens": 249,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-04-en-US",
+      "inputTokens": 339,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-04-zh-Hans",
+      "inputTokens": 352,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-05-en-US",
+      "inputTokens": 352,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-05-zh-Hans",
+      "inputTokens": 361,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-06-en-US",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-06-zh-Hans",
+      "inputTokens": 331,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-07-en-US",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-07-zh-Hans",
+      "inputTokens": 328,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-08-en-US",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-08-zh-Hans",
+      "inputTokens": 326,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-09-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-wooden_puzzle-09-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-00-en-US",
+      "inputTokens": 306,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-00-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-01-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-01-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-02-en-US",
+      "inputTokens": 308,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-02-zh-Hans",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-03-en-US",
+      "inputTokens": 239,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-03-zh-Hans",
+      "inputTokens": 244,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-04-en-US",
+      "inputTokens": 338,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-04-zh-Hans",
+      "inputTokens": 348,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-05-en-US",
+      "inputTokens": 348,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-05-zh-Hans",
+      "inputTokens": 360,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-06-en-US",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-06-zh-Hans",
+      "inputTokens": 324,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-07-en-US",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-07-zh-Hans",
+      "inputTokens": 329,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-08-en-US",
+      "inputTokens": 306,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-08-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-09-en-US",
+      "inputTokens": 301,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-folded_envelope-09-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-00-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-00-zh-Hans",
+      "inputTokens": 305,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-01-en-US",
+      "inputTokens": 307,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-01-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-02-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-02-zh-Hans",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-03-en-US",
+      "inputTokens": 245,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-03-zh-Hans",
+      "inputTokens": 244,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-04-en-US",
+      "inputTokens": 346,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-04-zh-Hans",
+      "inputTokens": 343,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-05-en-US",
+      "inputTokens": 352,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-05-zh-Hans",
+      "inputTokens": 347,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-06-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-06-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-07-en-US",
+      "inputTokens": 323,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-07-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-08-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-08-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-09-en-US",
+      "inputTokens": 306,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-yarn_loop-09-zh-Hans",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-00-en-US",
+      "inputTokens": 302,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-00-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-01-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-01-zh-Hans",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-02-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-02-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-03-en-US",
+      "inputTokens": 243,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-03-zh-Hans",
+      "inputTokens": 246,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-04-en-US",
+      "inputTokens": 330,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-04-zh-Hans",
+      "inputTokens": 347,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-05-en-US",
+      "inputTokens": 351,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-05-zh-Hans",
+      "inputTokens": 354,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-06-en-US",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-06-zh-Hans",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-07-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-07-zh-Hans",
+      "inputTokens": 323,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-08-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-08-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-09-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-cardboard_drawer-09-zh-Hans",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-00-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-00-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-01-en-US",
+      "inputTokens": 307,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-01-zh-Hans",
+      "inputTokens": 326,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-02-en-US",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-02-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-03-en-US",
+      "inputTokens": 247,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-03-zh-Hans",
+      "inputTokens": 247,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-04-en-US",
+      "inputTokens": 348,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-04-zh-Hans",
+      "inputTokens": 343,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-05-en-US",
+      "inputTokens": 358,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-05-zh-Hans",
+      "inputTokens": 359,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-06-en-US",
+      "inputTokens": 331,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-06-zh-Hans",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-07-en-US",
+      "inputTokens": 325,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-07-zh-Hans",
+      "inputTokens": 326,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-08-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-08-zh-Hans",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-09-en-US",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-pebble_path-09-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-00-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-00-zh-Hans",
+      "inputTokens": 320,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-01-en-US",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-01-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-02-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-02-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-03-en-US",
+      "inputTokens": 245,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-03-zh-Hans",
+      "inputTokens": 254,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-04-en-US",
+      "inputTokens": 343,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-04-zh-Hans",
+      "inputTokens": 352,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-05-en-US",
+      "inputTokens": 354,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-05-zh-Hans",
+      "inputTokens": 364,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-06-en-US",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-06-zh-Hans",
+      "inputTokens": 331,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-07-en-US",
+      "inputTokens": 320,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-07-zh-Hans",
+      "inputTokens": 332,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-08-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-08-zh-Hans",
+      "inputTokens": 328,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-09-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_fan-09-zh-Hans",
+      "inputTokens": 324,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-00-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-00-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-01-en-US",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-01-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-02-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-02-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-03-en-US",
+      "inputTokens": 241,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-03-zh-Hans",
+      "inputTokens": 247,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-04-en-US",
+      "inputTokens": 341,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-04-zh-Hans",
+      "inputTokens": 347,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-05-en-US",
+      "inputTokens": 350,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-05-zh-Hans",
+      "inputTokens": 364,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-06-en-US",
+      "inputTokens": 320,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-06-zh-Hans",
+      "inputTokens": 325,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-07-en-US",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-07-zh-Hans",
+      "inputTokens": 325,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-08-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-08-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-09-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-rubber_stamp-09-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-00-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-00-zh-Hans",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-01-en-US",
+      "inputTokens": 307,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-01-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-02-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-02-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-03-en-US",
+      "inputTokens": 240,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-03-zh-Hans",
+      "inputTokens": 243,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-04-en-US",
+      "inputTokens": 343,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-04-zh-Hans",
+      "inputTokens": 344,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-05-en-US",
+      "inputTokens": 356,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-05-zh-Hans",
+      "inputTokens": 355,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-06-en-US",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-06-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-07-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-07-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-08-en-US",
+      "inputTokens": 306,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-08-zh-Hans",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-09-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sponge_tray-09-zh-Hans",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-00-en-US",
+      "inputTokens": 305,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-00-zh-Hans",
+      "inputTokens": 308,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-01-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-01-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-02-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-02-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-03-en-US",
+      "inputTokens": 241,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-03-zh-Hans",
+      "inputTokens": 245,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-04-en-US",
+      "inputTokens": 336,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-04-zh-Hans",
+      "inputTokens": 350,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-05-en-US",
+      "inputTokens": 352,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-05-zh-Hans",
+      "inputTokens": 357,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-06-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-06-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-07-en-US",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-07-zh-Hans",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-08-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-08-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-09-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-bead_string-09-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-00-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-00-zh-Hans",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-01-en-US",
+      "inputTokens": 303,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-01-zh-Hans",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-02-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-02-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-03-en-US",
+      "inputTokens": 243,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-03-zh-Hans",
+      "inputTokens": 247,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-04-en-US",
+      "inputTokens": 338,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-04-zh-Hans",
+      "inputTokens": 341,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-05-en-US",
+      "inputTokens": 354,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-05-zh-Hans",
+      "inputTokens": 356,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-06-en-US",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-06-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-07-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-07-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-08-en-US",
+      "inputTokens": 308,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-08-zh-Hans",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-09-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-paper_tube-09-zh-Hans",
+      "inputTokens": 318,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-00-en-US",
+      "inputTokens": 302,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-00-zh-Hans",
+      "inputTokens": 313,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-01-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-01-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-02-en-US",
+      "inputTokens": 305,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-02-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-03-en-US",
+      "inputTokens": 240,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-03-zh-Hans",
+      "inputTokens": 244,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-04-en-US",
+      "inputTokens": 342,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-04-zh-Hans",
+      "inputTokens": 341,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-05-en-US",
+      "inputTokens": 349,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-05-zh-Hans",
+      "inputTokens": 352,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-06-en-US",
+      "inputTokens": 323,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-06-zh-Hans",
+      "inputTokens": 320,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-07-en-US",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-07-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-08-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-08-zh-Hans",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-09-en-US",
+      "inputTokens": 307,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-sorting_basket-09-zh-Hans",
+      "inputTokens": 316,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-00-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-00-zh-Hans",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-01-en-US",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-01-zh-Hans",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-02-en-US",
+      "inputTokens": 311,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-02-zh-Hans",
+      "inputTokens": 325,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-03-en-US",
+      "inputTokens": 242,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-03-zh-Hans",
+      "inputTokens": 251,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-04-en-US",
+      "inputTokens": 345,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-04-zh-Hans",
+      "inputTokens": 354,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-05-en-US",
+      "inputTokens": 356,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-05-zh-Hans",
+      "inputTokens": 362,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-06-en-US",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-06-zh-Hans",
+      "inputTokens": 333,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-07-en-US",
+      "inputTokens": 322,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-07-zh-Hans",
+      "inputTokens": 333,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-08-en-US",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-08-zh-Hans",
+      "inputTokens": 320,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-09-en-US",
+      "inputTokens": 308,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-hinged_card-09-zh-Hans",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-00-en-US",
+      "inputTokens": 305,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-00-zh-Hans",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-01-en-US",
+      "inputTokens": 306,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-01-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-02-en-US",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-02-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-03-en-US",
+      "inputTokens": 245,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-03-zh-Hans",
+      "inputTokens": 244,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-04-en-US",
+      "inputTokens": 340,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-04-zh-Hans",
+      "inputTokens": 339,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-05-en-US",
+      "inputTokens": 353,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-05-zh-Hans",
+      "inputTokens": 351,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-06-en-US",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-06-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-07-en-US",
+      "inputTokens": 317,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-07-zh-Hans",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-08-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-08-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-09-en-US",
+      "inputTokens": 305,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-button_thread-09-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-00-en-US",
+      "inputTokens": 305,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-00-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-01-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-01-zh-Hans",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-02-en-US",
+      "inputTokens": 306,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-02-zh-Hans",
+      "inputTokens": 315,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-03-en-US",
+      "inputTokens": 240,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-03-zh-Hans",
+      "inputTokens": 245,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-04-en-US",
+      "inputTokens": 335,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-04-zh-Hans",
+      "inputTokens": 337,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-05-en-US",
+      "inputTokens": 351,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-05-zh-Hans",
+      "inputTokens": 349,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-06-en-US",
+      "inputTokens": 320,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-06-zh-Hans",
+      "inputTokens": 321,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-07-en-US",
+      "inputTokens": 319,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-07-zh-Hans",
+      "inputTokens": 324,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-08-en-US",
+      "inputTokens": 309,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-08-zh-Hans",
+      "inputTokens": 314,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-09-en-US",
+      "inputTokens": 310,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    },
+    {
+      "caseID": "acceptance-v1-index_cards-09-zh-Hans",
+      "inputTokens": 312,
+      "reservedOutputTokens": 256,
+      "fitsContext": true,
+      "roleBoundaryValid": true
+    }
+  ]
+}

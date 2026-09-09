@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "status": "approved_for_artifact_use_and_integration",
+  "artifactUseAndIntegrationApproved": true,
+  "productQualityApproved": false,
+  "deviceQualificationApproved": false,
+  "releaseApproved": false,
+  "approvedBy": "Human user in the current task conversation",
+  "approvedAt": "2026-09-08T15:41:59Z",
+  "userDecision": "批准",
+  "scope": "Exact candidate artifact/runtime use and integration plan in README.md; no automatic quality, device, release or PR merge approval.",
+  "packetManifestSHA256": "0e202c15169faf241d6ca77fa905493c7d3e57ba1e27f8df2d67c4fc58f136a7"
+}

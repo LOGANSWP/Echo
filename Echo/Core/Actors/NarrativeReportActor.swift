@@ -8,53 +8,34 @@
 //              production generation and AC-5 close in task 4.0k
 // Architecture: AGENTS.md §4.2, §4.3, §4.5, §7.3
 // Generated: 2026-09-07
+// Task 4.0k (2026-09-08): approved provider gate, snapshot identity, resource deferral and actual contributors.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
 
-public protocol NarrativeReportGenerating: Sendable {
+nonisolated public protocol NarrativeReportGenerating: Sendable {
+    nonisolated var maximumSourceCount: Int { get }
+    func configurationIdentity(traceID: String) async throws -> String
+    func validateAvailability(traceID: String) async throws
+    func generate(request: NarrativeReportGenerationRequest, context: TaskQueueActor.TaskContext?, traceID: String)
+        async throws -> NarrativeReportEnvelope
     func generate(
         request: NarrativeReportGenerationRequest,
         traceID: String
     ) async throws -> NarrativeReportEnvelope
 }
 
-/// Production adapter over the existing offline grounded-generation pipeline.
-public actor CreativeNarrativeReportGenerator: NarrativeReportGenerating {
-    private let pipeline: CreativePipeline
-
-    public init(pipeline: CreativePipeline) {
-        self.pipeline = pipeline
-    }
-
-    public func generate(
+public extension NarrativeReportGenerating {
+    nonisolated var maximumSourceCount: Int { 256 }
+    nonisolated func configurationIdentity(traceID: String) async throws -> String { "injected-generator-v1" }
+    nonisolated func validateAvailability(traceID: String) async throws {}
+    nonisolated func generate(
         request: NarrativeReportGenerationRequest,
+        context: TaskQueueActor.TaskContext?,
         traceID: String
     ) async throws -> NarrativeReportEnvelope {
-        let output = try await pipeline.generate(
-            template: .report,
-            sources: request.sources,
-            traceID: traceID
-        )
-        guard !output.didFallback, !output.paragraphs.isEmpty else {
-            throw NarrativeReportError.generationUnavailable
-        }
-        let envelope = NarrativeReportEnvelope(
-            title: request.period.periodKey,
-            periodType: request.period.periodType,
-            periodKey: request.period.periodKey,
-            paragraphs: output.paragraphs.map {
-                NarrativeReportParagraph(
-                    id: $0.id,
-                    text: $0.text,
-                    sourceMemoryIDs: $0.anchors.map(\.memoryID),
-                    groundingStatus: $0.groundingStatus
-                )
-            },
-            coverage: request.coverage
-        )
-        _ = try envelope.encoded()
-        return envelope
+        try await generate(request: request, traceID: traceID)
     }
 }
 
@@ -175,6 +156,7 @@ public actor NarrativeReportActor {
         case .month:
             enabledColumn = "monthlyEnabled"
             baselineColumn = "monthlyEligibleFrom"
+
         case .year:
             enabledColumn = "yearlyEnabled"
             baselineColumn = "yearlyEligibleFrom"
@@ -212,48 +194,56 @@ public actor NarrativeReportActor {
         let schedule = try await loadSchedule(traceID: traceID)
         var periods: [NarrativeReportPeriod] = []
         if schedule.monthlyEnabled, let baseline = schedule.monthlyEligibleFrom {
-            periods.append(contentsOf: try NarrativeReportPeriodPlanner.completedPeriods(
-                at: now,
-                eligibleFrom: baseline,
-                calendar: calendar
-            ).filter { $0.periodType == .month })
+            periods.append(
+                contentsOf: try NarrativeReportPeriodPlanner.completedPeriods(
+                    at: now,
+                    eligibleFrom: baseline,
+                    calendar: calendar
+                ).filter { $0.periodType == .month }
+            )
         }
         if schedule.yearlyEnabled, let baseline = schedule.yearlyEligibleFrom {
-            periods.append(contentsOf: try NarrativeReportPeriodPlanner.completedPeriods(
-                at: now,
-                eligibleFrom: baseline,
-                calendar: calendar
-            ).filter { $0.periodType == .year })
+            periods.append(
+                contentsOf: try NarrativeReportPeriodPlanner.completedPeriods(
+                    at: now,
+                    eligibleFrom: baseline,
+                    calendar: calendar
+                ).filter { $0.periodType == .year }
+            )
         }
         if !periods.isEmpty {
             let nowValue = now.timeIntervalSince1970
-            try await database.executeTransaction(periods.map { period in
-                DatabaseManager.DBWrite(
-                    sql: """
-                        INSERT OR IGNORE INTO NarrativeReportPeriod
-                          (periodType, periodKey, calendarIdentifier, timeZoneIdentifier,
-                           startInstant, endInstant, coverageStart, partialBaseline, state,
-                           revision, claimedAt, taskId, updatedAt)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'eligible', 0, NULL, NULL, ?)
-                        """,
-                    bindings: [
-                        .text(period.periodType.rawValue),
-                        .text(period.periodKey),
-                        .text(period.calendarIdentifier),
-                        .text(period.timeZoneIdentifier),
-                        .double(period.startInstant.timeIntervalSince1970),
-                        .double(period.endInstant.timeIntervalSince1970),
-                        .double(period.coverageStart.timeIntervalSince1970),
-                        .int(period.partialBaseline ? 1 : 0),
-                        .double(nowValue),
-                    ]
-                )
-            })
+            try await database.executeTransaction(
+                periods.map { period in
+                    DatabaseManager.DBWrite(
+                        sql: """
+                            INSERT OR IGNORE INTO NarrativeReportPeriod
+                              (periodType, periodKey, calendarIdentifier, timeZoneIdentifier,
+                               startInstant, endInstant, coverageStart, partialBaseline, state,
+                               revision, claimedAt, taskId, updatedAt)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'eligible', 0, NULL, NULL, ?)
+                            """,
+                        bindings: [
+                            .text(period.periodType.rawValue),
+                            .text(period.periodKey),
+                            .text(period.calendarIdentifier),
+                            .text(period.timeZoneIdentifier),
+                            .double(period.startInstant.timeIntervalSince1970),
+                            .double(period.endInstant.timeIntervalSince1970),
+                            .double(period.coverageStart.timeIntervalSince1970),
+                            .int(period.partialBaseline ? 1 : 0),
+                            .double(nowValue),
+                        ]
+                    )
+                }
+            )
         }
-        guard let row = try await database.claimEarliestNarrativeReportPeriod(
-            taskID: taskID,
-            claimedAt: now
-        ) else { return nil }
+        guard
+            let row = try await database.claimEarliestNarrativeReportPeriod(
+                taskID: taskID,
+                claimedAt: now
+            )
+        else { return nil }
         return Self.period(from: row)
     }
 
@@ -268,15 +258,18 @@ public actor NarrativeReportActor {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed else { throw NarrativeReportError.privacyDenied }
         guard resources.canStart else { return .deferredForResources }
-        guard generator != nil else { return .generationUnavailable }
+        guard let generator else { return .generationUnavailable }
+        try await generator.validateAvailability(traceID: traceID)
         let taskID = "narrative-report-\(UUID().uuidString.lowercased())"
-        guard let period = try await materializeAndClaimNext(
-            at: now,
-            calendarContext: calendarContext,
-            trigger: trigger,
-            taskID: taskID,
-            traceID: traceID
-        ) else { return .none }
+        guard
+            let period = try await materializeAndClaimNext(
+                at: now,
+                calendarContext: calendarContext,
+                trigger: trigger,
+                taskID: taskID,
+                traceID: traceID
+            )
+        else { return .none }
 
         do {
             try Task.checkCancellation()
@@ -286,11 +279,9 @@ public actor NarrativeReportActor {
                 try await completeWithoutData(period: period, now: now)
                 return .noData(periodKey: period.periodKey)
             }
-            let job = try makeJob(
+            let job = try await makeJob(
                 period: period,
                 taskID: taskID,
-                sourceTypes: prepared.sources.map(\.sourceType),
-                totalCount: prepared.sources.count,
                 traceID: traceID
             )
             try await taskQueue.enqueue(job)
@@ -312,7 +303,8 @@ public actor NarrativeReportActor {
     ) async throws -> String {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed else { throw NarrativeReportError.privacyDenied }
-        guard generator != nil else { throw NarrativeReportError.generationUnavailable }
+        guard let generator else { throw NarrativeReportError.generationUnavailable }
+        try await generator.validateAvailability(traceID: traceID)
         let taskID = "narrative-report-\(UUID().uuidString.lowercased())"
         let changed = try await database.executeWrite(
             sql: """
@@ -329,7 +321,8 @@ public actor NarrativeReportActor {
             ]
         )
         guard changed == 1,
-              let period = try await loadPeriod(type: periodType, key: periodKey) else {
+            let period = try await loadPeriod(type: periodType, key: periodKey)
+        else {
             throw NarrativeReportError.invalidatedPeriod
         }
         do {
@@ -340,11 +333,9 @@ public actor NarrativeReportActor {
                 try await completeWithoutData(period: period, now: Date())
                 return taskID
             }
-            let job = try makeJob(
+            let job = try await makeJob(
                 period: period,
                 taskID: taskID,
-                sourceTypes: prepared.sources.map(\.sourceType),
-                totalCount: prepared.sources.count,
                 traceID: traceID
             )
             try await taskQueue.enqueue(job)
@@ -386,22 +377,26 @@ public actor NarrativeReportActor {
             sourceTypes: request.descriptor.sourceTypes
         )
         guard checkpoint.isAllowed,
-              request.progress.taskType == .narrativeReport,
-              let resumeData = request.progress.resumeData else {
+            request.progress.taskType == .narrativeReport,
+            let resumeData = request.progress.resumeData
+        else {
             throw TaskRecoveryError.launcherMismatch
         }
+        guard let generator else { throw NarrativeReportError.generationUnavailable }
+        try await generator.validateAvailability(traceID: checkpoint.traceID)
         let payload = try NarrativeReportResumePayload.decodeDescriptor(resumeData)
         guard let period = try await loadPeriod(type: payload.periodType, key: payload.periodKey),
-              period.state == .claimed,
-              period.taskID == request.progress.taskId else {
+            period.state == .claimed,
+            period.taskID == request.progress.taskId
+        else {
             throw TaskRecoveryError.staleProgress
         }
-        return try makeJob(
+        return try await makeJob(
             period: period,
             taskID: request.progress.taskId,
-            sourceTypes: request.descriptor.sourceTypes,
-            totalCount: request.progress.totalCount,
-            traceID: checkpoint.traceID
+            traceID: checkpoint.traceID,
+            preservedResumeData: request.choice == .continue ? resumeData : nil,
+            expectedIdentity: payload.executionIdentity
         )
     }
 
@@ -409,7 +404,8 @@ public actor NarrativeReportActor {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed else { throw NarrativeReportError.privacyDenied }
         let rows = try await database.executeQuery(
-            sql: "SELECT reportId, periodType, periodKey, envelope, createdAt FROM NarrativeReport ORDER BY createdAt DESC",
+            sql:
+                "SELECT reportId, periodType, periodKey, envelope, createdAt FROM NarrativeReport ORDER BY createdAt DESC",
             bindings: []
         )
         let policy = await privacyActor.getPolicy()
@@ -417,14 +413,16 @@ public actor NarrativeReportActor {
         for row in rows {
             guard let reportID = row["reportId"]?.stringValue else { continue }
             let sourceRows = try await database.executeQuery(
-                sql: "SELECT memoryId, sourceType, ordinal FROM NarrativeReportSource WHERE reportId = ? ORDER BY ordinal",
+                sql:
+                    "SELECT memoryId, sourceType, ordinal FROM NarrativeReportSource WHERE reportId = ? ORDER BY ordinal",
                 bindings: [.text(reportID)]
             )
             let sources = sourceRows.compactMap {
                 Self.source(from: $0, authorizedSourceTypes: policy.authorizedSourceTypes)
             }
             guard sources.count == sourceRows.count,
-                  sources.allSatisfy({ $0.availability == .available }) else { continue }
+                sources.allSatisfy({ $0.availability == .available })
+            else { continue }
             if let report = Self.report(from: row, sources: sources) {
                 reports.append(report)
             }
@@ -452,7 +450,8 @@ public actor NarrativeReportActor {
             Self.source(from: $0, authorizedSourceTypes: policy.authorizedSourceTypes)
         }
         guard sources.count == sourceRows.count,
-              sources.allSatisfy({ $0.availability == .available }) else { return nil }
+            sources.allSatisfy({ $0.availability == .available })
+        else { return nil }
         return Self.report(
             from: row,
             sources: sources
@@ -487,12 +486,14 @@ public actor NarrativeReportActor {
             bindings: [.text(reportID.uuidString)]
         )
         guard let row = rows.first,
-              let type = row["periodType"]?.stringValue,
-              let key = row["periodKey"]?.stringValue else { return }
+            let type = row["periodType"]?.stringValue,
+            let key = row["periodKey"]?.stringValue
+        else { return }
         try await database.executeTransaction([
             .init(sql: "DELETE FROM NarrativeReport WHERE reportId = ?", bindings: [.text(reportID.uuidString)]),
             .init(
-                sql: "UPDATE NarrativeReportPeriod SET state = 'invalidated', revision = revision + 1, updatedAt = ? WHERE periodType = ? AND periodKey = ?",
+                sql:
+                    "UPDATE NarrativeReportPeriod SET state = 'invalidated', revision = revision + 1, updatedAt = ? WHERE periodType = ? AND periodKey = ?",
                 bindings: [.double(Date().timeIntervalSince1970), .text(type), .text(key)]
             ),
         ])
@@ -501,47 +502,75 @@ public actor NarrativeReportActor {
     private func makeJob(
         period: NarrativeReportPeriod,
         taskID: String,
-        sourceTypes: [String],
-        totalCount: Int,
-        traceID: String
-    ) throws -> TaskQueueActor.QueuedJob {
-        let resumeData = try NarrativeReportResumePayload(
-            periodType: period.periodType,
-            periodKey: period.periodKey
-        ).encodedDescriptor(sourceTypes: sourceTypes)
+        traceID: String,
+        preservedResumeData: Data? = nil,
+        expectedIdentity: String? = nil
+    ) async throws -> TaskQueueActor.QueuedJob {
+        let prepared = try await prepareInput(for: period)
+        let policy = await privacyActor.getPolicy()
+        let configuration = try await generator?.configurationIdentity(traceID: traceID) ?? "unavailable"
+        let identity = try NarrativeGenerationIdentity.digest(
+            sources: prepared.request.sources,
+            language: policy.preferredLanguage,
+            policyVersion: policy.policyVersion,
+            batches: prepared.request.sourceBatches,
+            configuration: configuration
+        )
+        if preservedResumeData != nil, identity != expectedIdentity { throw GenerationRuntimeError.restartRequired }
+        let resumeData =
+            try preservedResumeData
+            ?? NarrativeReportResumePayload(
+                periodType: period.periodType,
+                periodKey: period.periodKey,
+                executionIdentity: identity
+            ).encodedDescriptor(sourceTypes: prepared.sources.map(\.sourceType))
         return TaskQueueActor.QueuedJob(
             taskId: taskID,
             taskType: .narrativeReport,
-            totalCount: totalCount,
+            totalCount: min(prepared.sources.count, generator?.maximumSourceCount ?? 24),
             resumeData: resumeData
         ) { [self] context in
             try await executeClaimedPeriod(
-                type: period.periodType,
-                key: period.periodKey,
+                periodKey: (type: period.periodType, key: period.periodKey),
                 taskID: taskID,
                 context: context,
-                traceID: traceID
+                traceID: traceID,
+                expectedIdentity: identity
             )
         }
     }
 
     private func executeClaimedPeriod(
-        type: NarrativeReportPeriodType,
-        key: String,
+        periodKey: (type: NarrativeReportPeriodType, key: String),
         taskID: String,
         context: TaskQueueActor.TaskContext,
-        traceID: String
+        traceID: String,
+        expectedIdentity: String
     ) async throws {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed,
-              let period = try await loadPeriod(type: type, key: key),
-              period.state == .claimed, period.taskID == taskID else {
+            let period = try await loadPeriod(type: periodKey.type, key: periodKey.key),
+            period.state == .claimed, period.taskID == taskID
+        else {
             throw NarrativeReportError.publicationConflict
         }
         do {
             try context.checkCancelled()
             try await context.checkPaused()
             let prepared = try await prepareInput(for: period)
+            let policy = await privacyActor.getPolicy()
+            let configuration = try await generator?.configurationIdentity(traceID: traceID) ?? "unavailable"
+            guard
+                try NarrativeGenerationIdentity.digest(
+                    sources: prepared.request.sources,
+                    language: policy.preferredLanguage,
+                    policyVersion: policy.policyVersion,
+                    batches: prepared.request.sourceBatches,
+                    configuration: configuration
+                ) == expectedIdentity
+            else {
+                throw GenerationRuntimeError.restartRequired
+            }
             guard !prepared.sources.isEmpty else {
                 try await completeWithoutData(period: period, now: Date())
                 return
@@ -554,27 +583,59 @@ public actor NarrativeReportActor {
             )
             guard sourceCheckpoint.isAllowed else { throw NarrativeReportError.privacyDenied }
             guard let generator else { throw NarrativeReportError.generationUnavailable }
-            try await context.report(processedIndex: 0, lastProcessedId: period.periodKey)
-            let envelope = try await generator.generate(request: prepared.request, traceID: traceID)
+            let envelope = try await generator.generate(request: prepared.request, context: context, traceID: traceID)
             try context.checkCancelled()
-            let audit = try await privacyActor.prepareNarrativeReportAuditPayload(
-                checkpoint: sourceCheckpoint,
-                period: period,
-                sourceTypes: sourceTypes
+            let contributingIDs = envelope.contributingMemoryIDs.map(Set.init) ?? Set(prepared.sources.map(\.memoryID))
+            let contributingSources = prepared.sources.filter { contributingIDs.contains($0.memoryID) }.enumerated().map { index, source in
+                NarrativeReportSource(
+                    memoryID: source.memoryID,
+                    sourceType: source.sourceType,
+                    ordinal: index,
+                    sourceRevision: source.sourceRevision,
+                    contentDigest: source.contentDigest
+                )
+            }
+            let finalCheckpoint = await privacyActor.validate(
+                operation: .search,
+                traceID: traceID,
+                sourceTypes: Array(Set(contributingSources.map(\.sourceType))).sorted()
             )
-            try await database.publishNarrativeReport(NarrativeReportPublication(
+            guard finalCheckpoint.isAllowed, finalCheckpoint.policyVersion == sourceCheckpoint.policyVersion else {
+                throw GenerationRuntimeError.privacyDenied
+            }
+            let audit = try await privacyActor.prepareNarrativeReportAuditPayload(
+                checkpoint: finalCheckpoint,
                 period: period,
-                envelope: envelope,
-                sources: prepared.sources,
-                audit: audit
-            ))
+                sourceTypes: contributingSources.map(\.sourceType)
+            )
+            try await database.publishNarrativeReport(
+                NarrativeReportPublication(
+                    period: period,
+                    envelope: envelope,
+                    sources: contributingSources,
+                    audit: audit
+                )
+            )
             try await context.report(
-                processedIndex: prepared.sources.count,
+                processedIndex: contributingSources.count,
                 lastProcessedId: period.periodKey
             )
             _ = try? await pendingOps.remove(operationId: Self.pendingID(for: period))
         } catch is CancellationError {
             throw CancellationError()
+        } catch NarrativeReportError.resourceDeferred {
+            // This is already the queue-owned body. Cancelling and awaiting our
+            // own job here would deadlock; release only its exact database claim.
+            try await database.executeWrite(
+                sql: """
+                    UPDATE NarrativeReportPeriod
+                    SET state = 'eligible', revision = revision + 1,
+                        claimedAt = NULL, taskId = NULL, updatedAt = ?
+                    WHERE state = 'claimed' AND taskId = ? AND revision = ?
+                    """,
+                bindings: [.double(Date().timeIntervalSince1970), .text(taskID), .int(Int64(period.revision))]
+            )
+            throw NarrativeReportError.resourceDeferred
         } catch {
             try await markRetryRequired(period: period, error: error)
         }
@@ -582,19 +643,35 @@ public actor NarrativeReportActor {
 
     private func prepareInput(for period: NarrativeReportPeriod) async throws -> NarrativeReportPreparedInput {
         let policy = await privacyActor.getPolicy()
+        let allowedTypes = policy.authorizedSourceTypes.sorted()
+        guard !allowedTypes.isEmpty else {
+            return NarrativeReportAggregator.prepare(
+                period: period,
+                rows: [],
+                authorizedSourceTypes: [],
+                omittedPartitions: omittedPartitions
+            )
+        }
+        let placeholders = Array(repeating: "?", count: allowedTypes.count).joined(separator: ",")
         let rows = try await database.executeQuery(
             sql: """
-                SELECT memoryId, canonicalText, sourceType,
-                       COALESCE(originalTimestamp, createdAt) AS memoryTimestamp
+                SELECT memoryId, substr(canonicalText, 1, 512) AS canonicalText, sourceType, updatedAt,
+                       COALESCE(originalTimestamp, createdAt) AS memoryTimestamp,
+                       COUNT(*) OVER () AS eligibleSourceCount
                 FROM Memory
                 WHERE COALESCE(originalTimestamp, createdAt) >= ?
                   AND COALESCE(originalTimestamp, createdAt) < ?
+                  AND CASE sourceType WHEN 'text' THEN 'note'
+                      WHEN 'video_frame' THEN 'video' WHEN 'video_audio' THEN 'video'
+                      ELSE sourceType END IN (\(placeholders))
+                  AND length(trim(COALESCE(canonicalText, ''))) > 0
                 ORDER BY sourceType ASC, memoryTimestamp ASC, memoryId ASC
+                LIMIT 256
                 """,
             bindings: [
                 .double(period.coverageStart.timeIntervalSince1970),
                 .double(period.endInstant.timeIntervalSince1970),
-            ]
+            ] + allowedTypes.map(DBBinding.text)
         )
         return NarrativeReportAggregator.prepare(
             period: period,
@@ -638,6 +715,12 @@ public actor NarrativeReportActor {
             ]
         )
         guard changed == 1 else { return }
+        // The period remains unavailable to lifecycle scans. A model repair or
+        // authorization change must not masquerade as a recoverable L2 operation.
+        if let runtimeError = error as? GenerationRuntimeError,
+            runtimeError.severity == .l3Blocking || runtimeError == .privacyDenied {
+            throw runtimeError
+        }
         let parameters = try NarrativeReportResumePayload(
             periodType: period.periodType,
             periodKey: period.periodKey
@@ -669,22 +752,23 @@ public actor NarrativeReportActor {
         return rows.first.flatMap(Self.period(from:))
     }
 
-    private nonisolated static func pendingID(for period: NarrativeReportPeriod) -> String {
+    nonisolated private static func pendingID(for period: NarrativeReportPeriod) -> String {
         "narrative:\(period.periodType.rawValue):\(period.periodKey)"
     }
 
-    private nonisolated static func report(
+    nonisolated private static func report(
         from row: [String: DBValue],
         sources: [NarrativeReportSource]
     ) -> PersistedNarrativeReport? {
         guard let idRaw = row["reportId"]?.stringValue,
-              let id = UUID(uuidString: idRaw),
-              let typeRaw = row["periodType"]?.stringValue,
-              let type = NarrativeReportPeriodType(rawValue: typeRaw),
-              let key = row["periodKey"]?.stringValue,
-              let data = row["envelope"]?.blobValue,
-              let envelope = try? NarrativeReportEnvelope.decode(data),
-              let created = row["createdAt"]?.doubleValue else { return nil }
+            let id = UUID(uuidString: idRaw),
+            let typeRaw = row["periodType"]?.stringValue,
+            let type = NarrativeReportPeriodType(rawValue: typeRaw),
+            let key = row["periodKey"]?.stringValue,
+            let data = row["envelope"]?.blobValue,
+            let envelope = try? NarrativeReportEnvelope.decode(data),
+            let created = row["createdAt"]?.doubleValue
+        else { return nil }
         return PersistedNarrativeReport(
             id: id,
             periodType: type,
@@ -695,14 +779,15 @@ public actor NarrativeReportActor {
         )
     }
 
-    private nonisolated static func source(
+    nonisolated private static func source(
         from row: [String: DBValue],
         authorizedSourceTypes: Set<String>
     ) -> NarrativeReportSource? {
         guard let memoryRaw = row["memoryId"]?.stringValue,
-              let memoryID = UUID(uuidString: memoryRaw),
-              let sourceType = row["sourceType"]?.stringValue,
-              let ordinal = row["ordinal"]?.intValue else { return nil }
+            let memoryID = UUID(uuidString: memoryRaw),
+            let sourceType = row["sourceType"]?.stringValue,
+            let ordinal = row["ordinal"]?.intValue
+        else { return nil }
         return NarrativeReportSource(
             memoryID: memoryID,
             sourceType: sourceType,
@@ -713,17 +798,18 @@ public actor NarrativeReportActor {
         )
     }
 
-    private nonisolated static func period(from row: [String: DBValue]) -> NarrativeReportPeriod? {
+    nonisolated private static func period(from row: [String: DBValue]) -> NarrativeReportPeriod? {
         guard let rawType = row["periodType"]?.stringValue,
-              let type = NarrativeReportPeriodType(rawValue: rawType),
-              let key = row["periodKey"]?.stringValue,
-              let calendarID = row["calendarIdentifier"]?.stringValue,
-              let timeZoneID = row["timeZoneIdentifier"]?.stringValue,
-              let start = row["startInstant"]?.doubleValue,
-              let end = row["endInstant"]?.doubleValue,
-              let coverage = row["coverageStart"]?.doubleValue,
-              let rawState = row["state"]?.stringValue,
-              let state = NarrativeReportPeriodState(rawValue: rawState) else { return nil }
+            let type = NarrativeReportPeriodType(rawValue: rawType),
+            let key = row["periodKey"]?.stringValue,
+            let calendarID = row["calendarIdentifier"]?.stringValue,
+            let timeZoneID = row["timeZoneIdentifier"]?.stringValue,
+            let start = row["startInstant"]?.doubleValue,
+            let end = row["endInstant"]?.doubleValue,
+            let coverage = row["coverageStart"]?.doubleValue,
+            let rawState = row["state"]?.stringValue,
+            let state = NarrativeReportPeriodState(rawValue: rawState)
+        else { return nil }
         return NarrativeReportPeriod(
             periodType: type,
             periodKey: key,

@@ -94,7 +94,7 @@ final class DegradationBannerViewModel {
         case error(String)
     }
 
-    static let lowPowerAutoPauseKey = "echo.lowPowerAutoPauseEnabled"
+    static let lowPowerAutoPauseKey = GenerationResourcePolicy.lowPowerAutoPauseKey
 
     static var isAutoPauseOnLowPowerEnabled: Bool {
         get {

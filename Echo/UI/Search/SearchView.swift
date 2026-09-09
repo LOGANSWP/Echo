@@ -135,7 +135,7 @@ struct SearchView: View {
         guard !hasHandledLaunchArguments else { return }
         hasHandledLaunchArguments = true
         #if DEBUG
-        handleLaunchArguments()
+            handleLaunchArguments()
         #endif
     }
 
@@ -146,52 +146,52 @@ struct SearchView: View {
     }
 
     #if DEBUG
-    /// 处理 XCUITest / Live Sim Review 启动参数注入确定性 fixture。
-    ///
-    /// 支持 `-ui-fixture search-loaded|search-empty|search-lowconfidence`，
-    /// 通过 SearchFixtureLoader 加载确定性数据到 loaded 状态。
-    /// 仅用于自动化；生产构建（#if DEBUG 排除）无此钩子。
-    private func handleLaunchArguments() {
-        let args = ProcessInfo.processInfo.arguments
-        guard let idx = args.firstIndex(of: "-ui-fixture"), idx + 1 < args.count else { return }
-        let fixtureID = args[idx + 1]
+        /// 处理 XCUITest / Live Sim Review 启动参数注入确定性 fixture。
+        ///
+        /// 支持 `-ui-fixture search-loaded|search-empty|search-lowconfidence`，
+        /// 通过 SearchFixtureLoader 加载确定性数据到 loaded 状态。
+        /// 仅用于自动化；生产构建（#if DEBUG 排除）无此钩子。
+        private func handleLaunchArguments() {
+            let args = ProcessInfo.processInfo.arguments
+            guard let idx = args.firstIndex(of: "-ui-fixture"), idx + 1 < args.count else { return }
+            let fixtureID = args[idx + 1]
 
-        // 支持 `-ui-fixture memory-detail-*` 直接导航到记忆详情 (Live Sim Review)
-        if fixtureID.hasPrefix("memory-detail-") {
-            if let model = MemoryDetailFixtureLoader.load(fixtureID) {
-                let vm = MemoryDetailViewModel()
-                vm.loadPreloaded(model)
-                detailViewModel = vm
-                selectedMemoryID = model.id
+            // 支持 `-ui-fixture memory-detail-*` 直接导航到记忆详情 (Live Sim Review)
+            if fixtureID.hasPrefix("memory-detail-") {
+                if let model = MemoryDetailFixtureLoader.load(fixtureID) {
+                    let vm = MemoryDetailViewModel()
+                    vm.loadPreloaded(model)
+                    detailViewModel = vm
+                    selectedMemoryID = model.id
+                }
+                return
             }
-            return
-        }
 
-        // 支持 `-ui-fixture translation-*` 导航到翻译 surface (Task 3.8)
-        if fixtureID.hasPrefix("translation-") {
-            if let model = TranslationFixtureLoader.load(fixtureID) {
-                let vm = MemoryDetailViewModel()
-                vm.loadPreloaded(model)
-                detailViewModel = vm
-                selectedMemoryID = model.id
+            // 支持 `-ui-fixture translation-*` 导航到翻译 surface (Task 3.8)
+            if fixtureID.hasPrefix("translation-") {
+                if let model = TranslationFixtureLoader.load(fixtureID) {
+                    let vm = MemoryDetailViewModel()
+                    vm.loadPreloaded(model)
+                    detailViewModel = vm
+                    selectedMemoryID = model.id
+                }
+                return
             }
-            return
-        }
 
-        // 支持 `-ui-fixture creation-*` 导航到创作结果 surface (Task 3.9)
-        if fixtureID.hasPrefix("creation-") {
-            if let model = CreationFixtureLoader.load(fixtureID) {
-                let vm = CreationViewModel()
-                vm.loadPreloaded(model)
-                creationViewModel = vm
-                isShowingCreation = true
+            // 支持 `-ui-fixture creation-*` 导航到创作结果 surface (Task 3.9)
+            if fixtureID.hasPrefix("creation-") {
+                if let model = CreationFixtureLoader.load(fixtureID) {
+                    let vm = CreationViewModel()
+                    vm.loadPreloaded(model)
+                    creationViewModel = vm
+                    isShowingCreation = true
+                }
+                return
             }
-            return
-        }
 
-        let items = SearchFixtureLoader.load(fixtureID)
-        viewModel.loadPreloadedResults(items)
-    }
+            let items = SearchFixtureLoader.load(fixtureID)
+            viewModel.loadPreloadedResults(items)
+        }
     #endif
 
     // MARK: - Navigation
@@ -202,7 +202,7 @@ struct SearchView: View {
     /// results always navigate through the live canonical repository.
     private func openDetail(for result: SearchResultModel) {
         if viewModel.isFixtureBacked,
-           let model = MemoryDetailFixtureLoader.load(memoryID: result.id) {
+            let model = MemoryDetailFixtureLoader.load(memoryID: result.id) {
             let vm = MemoryDetailViewModel()
             vm.loadPreloaded(model)
             detailViewModel = vm
@@ -378,7 +378,28 @@ struct SearchView: View {
                 onLike: { viewModel.recordLike(result) },
                 onDislike: { viewModel.recordDislike(result) },
                 onMarkBadCase: { viewModel.markBadCase(result) },
-                onOpen: { openDetail(for: result) }
+                onOpen: { openDetail(for: result) },
+                onCreate: viewModel.isFixtureBacked
+                    ? nil
+                    : {
+                        let composition = AppComposition.shared
+                        let model = CreationViewModel(
+                            creativePipeline: composition.creativePipeline,
+                            exportCoordinator: composition.creationExportCoordinator,
+                            narrativeReportActor: composition.narrativeReportActor
+                        )
+                        model.loadSourceMemories([
+                            CreativeSource(
+                                memoryID: result.id,
+                                assetID: "",
+                                sourceType: result.sourceType,
+                                text: result.originalText,
+                                timestamp: result.timestamp
+                            ),
+                        ])
+                        creationViewModel = model
+                        isShowingCreation = true
+                    }
             )
         }
     }
@@ -455,15 +476,15 @@ struct SearchView: View {
 
     private func errorTitle(for level: SearchViewModel.ErrorLevel) -> String {
         switch level {
-        case .l2Recoverable:   return "Search failed"
-        case .l3Blocking:      return "Unable to continue"
+        case .l2Recoverable: return "Search failed"
+        case .l3Blocking: return "Unable to continue"
         }
     }
 
     private func errorMessage(for level: SearchViewModel.ErrorLevel) -> String {
         switch level {
         case .l2Recoverable(let msg),
-             .l3Blocking(let msg):
+            .l3Blocking(let msg):
             return msg
         }
     }
@@ -471,7 +492,7 @@ struct SearchView: View {
     private func isRecoverable(_ level: SearchViewModel.ErrorLevel) -> Bool {
         switch level {
         case .l2Recoverable: return true
-        case .l3Blocking:    return false
+        case .l3Blocking: return false
         }
     }
 }
@@ -497,6 +518,7 @@ struct SearchResultRow: View {
     let onDislike: () -> Void
     let onMarkBadCase: () -> Void
     let onOpen: () -> Void
+    var onCreate: (() -> Void)?
 
     var body: some View {
         EchoContainer(level: .card) {
@@ -554,6 +576,12 @@ struct SearchResultRow: View {
         }
         .accessibilityElement(children: .contain)
         .contextMenu {
+            if let onCreate {
+                Button(action: onCreate) {
+                    Label("AI Creation", systemImage: "sparkles")
+                }
+                .accessibilityIdentifier("result-create-\(result.id.uuidString)")
+            }
             Button {
                 onMarkBadCase()
             } label: {
@@ -596,41 +624,51 @@ struct SearchResultRow: View {
 
 #Preview("Loading") {
     NavigationStack {
-        SearchView(viewModel: makeSearchViewModel(
-            state: .loading
-        ))
+        SearchView(
+            viewModel: makeSearchViewModel(
+                state: .loading
+            )
+        )
     }
 }
 
 #Preview("Loaded Results") {
     NavigationStack {
-        SearchView(viewModel: makeSearchViewModel(
-            state: .loaded
-        ))
+        SearchView(
+            viewModel: makeSearchViewModel(
+                state: .loaded
+            )
+        )
     }
 }
 
 #Preview("Empty Results") {
     NavigationStack {
-        SearchView(viewModel: makeSearchViewModel(
-            state: .empty
-        ))
+        SearchView(
+            viewModel: makeSearchViewModel(
+                state: .empty
+            )
+        )
     }
 }
 
 #Preview("Low Confidence") {
     NavigationStack {
-        SearchView(viewModel: makeSearchViewModel(
-            state: .lowConfidence
-        ))
+        SearchView(
+            viewModel: makeSearchViewModel(
+                state: .lowConfidence
+            )
+        )
     }
 }
 
 #Preview("Error") {
     NavigationStack {
-        SearchView(viewModel: makeSearchViewModel(
-            state: .error
-        ))
+        SearchView(
+            viewModel: makeSearchViewModel(
+                state: .error
+            )
+        )
     }
 }
 
@@ -647,22 +685,26 @@ private func makeSearchViewModel(state: SearchState) -> SearchViewModel {
 
     case .loaded:
         vm.loadPreloadedResults([
-            makeResultItem(ResultFixtureConfig(
-                id: fixtureID("11111111-1111-1111-1111-111111111111"),
-                assetId: "photo-zh-1",
-                sourceType: "photo",
-                timestamp: 1723507200,
-                originalText: nil,
-                cosineSimilarity: 0.91
-            )),
-            makeResultItem(ResultFixtureConfig(
-                id: fixtureID("22222222-2222-2222-2222-222222222222"),
-                assetId: "note-zh-2",
-                sourceType: "note",
-                timestamp: 1723420800,
-                originalText: "昨晚在公园遇到一只橘猫，很亲人",
-                cosineSimilarity: 0.87
-            )),
+            makeResultItem(
+                ResultFixtureConfig(
+                    id: fixtureID("11111111-1111-1111-1111-111111111111"),
+                    assetId: "photo-zh-1",
+                    sourceType: "photo",
+                    timestamp: 1723507200,
+                    originalText: nil,
+                    cosineSimilarity: 0.91
+                )
+            ),
+            makeResultItem(
+                ResultFixtureConfig(
+                    id: fixtureID("22222222-2222-2222-2222-222222222222"),
+                    assetId: "note-zh-2",
+                    sourceType: "note",
+                    timestamp: 1723420800,
+                    originalText: "昨晚在公园遇到一只橘猫，很亲人",
+                    cosineSimilarity: 0.87
+                )
+            ),
         ])
 
     case .empty:
@@ -670,15 +712,17 @@ private func makeSearchViewModel(state: SearchState) -> SearchViewModel {
 
     case .lowConfidence:
         vm.loadPreloadedResults([
-            makeResultItem(ResultFixtureConfig(
-                id: fixtureID("33333333-3333-3333-3333-333333333333"),
-                assetId: "photo-en-1",
-                sourceType: "photo",
-                timestamp: 1723680000,
-                originalText: nil,
-                cosineSimilarity: 0.82,
-                lowConfidence: true
-            )),
+            makeResultItem(
+                ResultFixtureConfig(
+                    id: fixtureID("33333333-3333-3333-3333-333333333333"),
+                    assetId: "photo-en-1",
+                    sourceType: "photo",
+                    timestamp: 1723680000,
+                    originalText: nil,
+                    cosineSimilarity: 0.82,
+                    lowConfidence: true
+                )
+            ),
         ])
 
     case .error:

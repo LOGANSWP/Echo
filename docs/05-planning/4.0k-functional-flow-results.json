@@ -1,0 +1,70 @@
+{
+  "recordedAt": "2026-09-09T00:02:12.704772+00:00",
+  "scope": "simulator functional flow; quality and device qualification deferred by user",
+  "productionCodeChanged": false,
+  "modelChanged": false,
+  "newModelDownloaded": false,
+  "tests": {
+    "count": 58,
+    "suites": 9,
+    "failed": 0,
+    "seconds": 1.768,
+    "log": "/tmp/echo-4.0k-functional-priority.log",
+    "sha256": "0db3a2ff5f16234a5fd435484078a57229984bf78ed2c2af1aac575aa8de6610",
+    "scope": "Selected functional suites; excludes real-model quality suite, whose known assertions remain unchanged and failing"
+  },
+  "shareAudit": {
+    "iPhone 17 Pro / iOS 26.5": [
+      [
+        "markdown",
+        1,
+        1
+      ],
+      [
+        "pdf",
+        1,
+        1
+      ],
+      [
+        "plainText",
+        1,
+        2
+      ]
+    ],
+    "iPhone 16 Pro / iOS 18.2": [
+      [
+        "markdown",
+        1,
+        1
+      ],
+      [
+        "pdf",
+        1,
+        1
+      ],
+      [
+        "plainText",
+        1,
+        2
+      ]
+    ]
+  },
+  "observations": [
+    "17 Pro normal App regenerated English poem from production-ingested synthetic photo",
+    "16 Pro retained prior normally generated Chinese poem; no new generation on 16 this follow-up",
+    "Both simulator clipboards contain generated body and citation markers",
+    "Both simulators recorded one markdown, one PDF and two plainText actual presentation callbacks",
+    "Escape dismissed each share controller and restored the same poem",
+    "No recipient selected and no external send or Notes-save claim",
+    "Runtime semantic capture cannot inspect remote share-service controls; audit and dismissal are supporting evidence, not target-app completion"
+  ],
+  "priorEvidence": [
+    "4.0k-poem-prompt-repair-results.json",
+    "4.0k-simulator-e2e-results.json"
+  ],
+  "remaining": [
+    "formal content quality, including existing red assertions",
+    "full coverage gate",
+    "physical-device and Release qualification"
+  ]
+}

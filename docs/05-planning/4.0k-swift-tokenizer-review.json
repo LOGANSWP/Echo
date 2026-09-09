@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "evidenceKind": "research_swift_tokenizer_review",
+  "productionApproval": "not_granted",
+  "evidence": {
+    "path": "PinnedModels/offline-generation-evaluation/swift-tokenizer-conformance-v1.json",
+    "sha256": "668a7f4a05f987c8f0dc4696e35e7f01ba618ad56aa9828fb6df92ed9a44f4cf"
+  },
+  "scope": "First-party macOS Swift/Foundation ordinary-text NFC byte-level BPE and exact two-message Qwen3 no-thinking framing; no App integration, no Swift model inference.",
+  "fileIdentities": {
+    "PinnedModels/offline-generation-evaluation/generation-tokenizer-probe": "cdb96eaa4b06dc3a1a5ffcdcda09b874eb207aaffc99f25a403f2d3abd4d4a13",
+    "PinnedModels/offline-generation-evaluation/qwen3-0.6b/source/tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "docs/05-planning/4.0k-qwen3-source-manifest.json": "b50f66af595ecf4573078c3142ec0ed6af98817287018b6e0d6a0c3519c948dd",
+    "Scripts/tests/test_generation_tokenizer_probe.py": "656e142d572b0ea08430dc9b752a93895523e527836a4e1d148ba2cf2401693e",
+    "Scripts/Research/GenerationTokenizerProbe.swift": "4e39b8b35f934db56797833352c1bb2bc1a1df5b947c9c115cb9dd77db6ec0f1",
+    "Scripts/evaluate_generation_candidate.py": "94a2913bdc6f2737861d881c7529cef8f7994f50cf93838942b8ba6ae938ec9d",
+    "Scripts/verify_generation_artifact.py": "3af3ce02cb5525bc6c6f485d21727ddbd1a3314db0f28add91d0ff918b01756d",
+    "PinnedModels/offline-generation-evaluation/qwen3-0.6b/source/tokenizer_config.json": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+    "EchoTests/TestData/Generation/4.0k-screen-v1.json": "6fc7f653839f06f4d1310dad4203fbcacf554b6edcb4958a943d3ff306f8b316"
+  },
+  "checks": {
+    "ordinaryCaseCount": 144,
+    "chatCaseCount": 32,
+    "roleBoundaryCaseCount": 2,
+    "negativeBoundaryCaseCount": 2
+  },
+  "status": "passed",
+  "limitations": [
+    "Current host ICU/Unicode only; iOS 18 parity remains pending.",
+    "Single system/user profile only; no tools, conversation history, or generic Jinja interpreter.",
+    "All 32 chat cases reuse the existing eight source cases across four prompt profiles.",
+    "Initial tokenizer-only scope: later native grammar/generation evidence is tracked separately in 4.0k-native-generation-review.json; production integration remains pending.",
+    "NFC normalizes tokenizer input; no source memory is modified.",
+    "Simple bounded BPE probe is not a production performance claim."
+  ],
+  "sharedLibraryFollowup": {
+    "path": "PinnedModels/offline-generation-evaluation/swift-tokenizer-conformance-v2.json",
+    "sha256": "a9e605d7676acfe27143ded561ed838afb50ac0f60dd7e2cc9a7bfb637078cda",
+    "status": "passed",
+    "caseCount": 180,
+    "fileIdentities": {
+      "PinnedModels/offline-generation-evaluation/generation-tokenizer-probe": "c7810747db1478e78643eb076701ec17bc1059872f76cb048fcc62c19df6983b",
+      "PinnedModels/offline-generation-evaluation/qwen3-0.6b/source/tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "docs/05-planning/4.0k-qwen3-source-manifest.json": "b50f66af595ecf4573078c3142ec0ed6af98817287018b6e0d6a0c3519c948dd",
+      "Scripts/tests/test_generation_tokenizer_probe.py": "6c78b2eb0d1cd59b026d20a9f7526f731b00db1209a26ff04930a794ad4b07f3",
+      "Scripts/Research/GenerationTokenizerProbe.swift": "fae2ddca28c7a41aecc19dce01f92daeb9f9873f060afd59036a4489b3c0ba22",
+      "Scripts/Research/GenerationTokenizer.swift": "c3998d7b4aba2d101841725388b20fe2b4f717ce0a653379b7a4ef8c8bb4d77d",
+      "Scripts/evaluate_generation_candidate.py": "94a2913bdc6f2737861d881c7529cef8f7994f50cf93838942b8ba6ae938ec9d",
+      "Scripts/verify_generation_artifact.py": "3af3ce02cb5525bc6c6f485d21727ddbd1a3314db0f28add91d0ff918b01756d",
+      "PinnedModels/offline-generation-evaluation/qwen3-0.6b/source/tokenizer_config.json": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+      "EchoTests/TestData/Generation/4.0k-screen-v1.json": "6fc7f653839f06f4d1310dad4203fbcacf554b6edcb4958a943d3ff306f8b316"
+    },
+    "fullGenerationReview": "docs/05-planning/4.0k-native-generation-review.json"
+  }
+}

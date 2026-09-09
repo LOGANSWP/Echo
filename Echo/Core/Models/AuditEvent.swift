@@ -17,6 +17,8 @@
 // 架构约束: AGENTS.md R-007 (禁止 unchecked Sendable), 仅记录哈希摘要禁止原文
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
 // Generated: 2026-08-04 | Updated: 2026-09-07 (4.0j narrative report audit)
+// Task 4.0k (2026-09-08): persistent typed generation-language audit fields.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
@@ -106,12 +108,14 @@ public enum AuditEvent: String, Sendable, Codable {
     /// Persisted monthly/yearly report generation (US-SYN-004, delivered by 4.0j).
     case narrativeReportGenerated
     /// 合成失败模板降级 (US-SYN-008 AC-5: 含 failureReason)
+    /// Per-call structured language screening (SYN-001 AC-6); no generated text.
+    case generationLanguageChecked
     case synthesisFallback
     /// 交互式唤醒卡动作（US-AWK-005 AC-5: next/record/jump + hash-only identity）
     case cardInteraction
 }
 
-public nonisolated enum AuditValidationError: Error, Sendable, Equatable {
+nonisolated public enum AuditValidationError: Error, Sendable, Equatable {
     case invalidCreationFields
     case invalidNarrativeReportFields
 }
@@ -124,56 +128,59 @@ public nonisolated enum AuditValidationError: Error, Sendable, Equatable {
 /// 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs
 /// 隐私保护: 仅记录哈希摘要，禁止原文（content 字段在写入时被哈希为 contentHash）
 public struct AuditLogEntry: Sendable, Codable {
-    public nonisolated let id: Int64
-    public nonisolated let eventType: AuditEvent
-    public nonisolated let timestamp: Date
-    public nonisolated let traceID: String
-    public nonisolated let policyVersion: Int
-    public nonisolated let success: Bool
-    public nonisolated let sourceType: String?
-    public nonisolated let affectedCount: Int?
-    public nonisolated let excludedWritten: Bool?
-    public nonisolated let sourceLanguage: String?
-    public nonisolated let elapsedMs: Int?
+    nonisolated public let id: Int64
+    nonisolated public let eventType: AuditEvent
+    nonisolated public let timestamp: Date
+    nonisolated public let traceID: String
+    nonisolated public let policyVersion: Int
+    nonisolated public let success: Bool
+    nonisolated public let sourceType: String?
+    nonisolated public let affectedCount: Int?
+    nonisolated public let excludedWritten: Bool?
+    nonisolated public let sourceLanguage: String?
+    nonisolated public let elapsedMs: Int?
     /// 视频摄入关键帧数（US-ING-005 AC-5）
-    public nonisolated let frameCount: Int?
+    nonisolated public let frameCount: Int?
     /// 视频音频转写字符长度（US-ING-005 AC-5）
-    public nonisolated let audioTranscriptLength: Int?
+    nonisolated public let audioTranscriptLength: Int?
     /// 视频是否含音频轨道（US-ING-005 AC-5）
-    public nonisolated let hasAudio: Bool?
+    nonisolated public let hasAudio: Bool?
     /// 内容字段的 SHA-256 哈希摘要（hash-only，禁止原文）— AGENTS.md §5.4
-    public nonisolated let contentHash: String?
-    public nonisolated let action: String?
-    public nonisolated let resumePoint: Int?
-    public nonisolated let userChoiceOnRestart: String?
-    public nonisolated let outcome: String?
-    public nonisolated let cardIdDigest: String?
-    public nonisolated let memoryIdDigest: String?
-    public nonisolated let feelingAssociatedToSource: Bool?
-    public nonisolated let editedFields: [String]?
-    public nonisolated let reindexed: Bool?
-    public nonisolated let conflictResolvedWith: String?
-    public nonisolated let preservedOriginal: Bool?
-    public nonisolated let sourceDeletionRequested: Bool?
-    public nonisolated let sourceDeletionCompleted: Bool?
-    public nonisolated let sourceDeletionOutcome: String?
-    public nonisolated let excludedAutoCleaned: Bool?
-    public nonisolated let userNotified: Bool?
-    public nonisolated let templateType: String?
-    public nonisolated let sourceMemoryCount: Int?
-    public nonisolated let citationCount: Int?
-    public nonisolated let noSourceCount: Int?
-    public nonisolated let exportFormat: String?
-    public nonisolated let sharePresented: Bool?
-    public nonisolated let periodType: String?
+    nonisolated public let contentHash: String?
+    nonisolated public let action: String?
+    nonisolated public let resumePoint: Int?
+    nonisolated public let userChoiceOnRestart: String?
+    nonisolated public let outcome: String?
+    nonisolated public let cardIdDigest: String?
+    nonisolated public let memoryIdDigest: String?
+    nonisolated public let feelingAssociatedToSource: Bool?
+    nonisolated public let editedFields: [String]?
+    nonisolated public let reindexed: Bool?
+    nonisolated public let conflictResolvedWith: String?
+    nonisolated public let preservedOriginal: Bool?
+    nonisolated public let sourceDeletionRequested: Bool?
+    nonisolated public let sourceDeletionCompleted: Bool?
+    nonisolated public let sourceDeletionOutcome: String?
+    nonisolated public let excludedAutoCleaned: Bool?
+    nonisolated public let userNotified: Bool?
+    nonisolated public let templateType: String?
+    nonisolated public let sourceMemoryCount: Int?
+    nonisolated public let citationCount: Int?
+    nonisolated public let noSourceCount: Int?
+    nonisolated public let exportFormat: String?
+    nonisolated public let sharePresented: Bool?
+    nonisolated public let periodType: String?
     /// Hash-only identity for one system-share handoff; used for durable idempotency.
-    public nonisolated let shareHandoffIdDigest: String?
+    nonisolated public let shareHandoffIdDigest: String?
     /// Canonical JSON array of normalized source-type enums; never contains source identities.
-    public nonisolated let dataSourcesUsed: String?
+    nonisolated public let dataSourcesUsed: String?
     /// Hash-only stable period identity for exactly-once narrative publication.
-    public nonisolated let periodKeyDigest: String?
+    nonisolated public let outputLanguage: String?
+    nonisolated public let uiLanguage: String?
+    nonisolated public let languageRetryCount: Int?
+    nonisolated public let periodKeyDigest: String?
 
-    public nonisolated init(
+    nonisolated public init(
         id: Int64 = 0,
         eventType: AuditEvent,
         timestamp: Date = Date(),
@@ -214,7 +221,10 @@ public struct AuditLogEntry: Sendable, Codable {
         periodType: String? = nil,
         shareHandoffIdDigest: String? = nil,
         dataSourcesUsed: String? = nil,
-        periodKeyDigest: String? = nil
+        periodKeyDigest: String? = nil,
+        outputLanguage: String? = nil,
+        uiLanguage: String? = nil,
+        languageRetryCount: Int? = nil
     ) {
         self.id = id
         self.eventType = eventType
@@ -257,17 +267,20 @@ public struct AuditLogEntry: Sendable, Codable {
         self.shareHandoffIdDigest = shareHandoffIdDigest
         self.dataSourcesUsed = dataSourcesUsed
         self.periodKeyDigest = periodKeyDigest
+        self.outputLanguage = outputLanguage
+        self.uiLanguage = uiLanguage
+        self.languageRetryCount = languageRetryCount
     }
 
     /// 从数据库查询结果行构造 AuditLogEntry（用于 fetchAuditLogs）
-    public nonisolated static func fromRow(_ row: [String: DBValue]) -> AuditLogEntry? {
+    nonisolated public static func fromRow(_ row: [String: DBValue]) -> Self? {
         guard let etStr = row["eventType"]?.stringValue,
               let eventType = AuditEvent(rawValue: etStr),
               let ts = row["timestamp"]?.doubleValue,
               let traceID = row["traceID"]?.stringValue,
               let pv = row["policyVersion"]?.intValue,
               let successInt = row["success"]?.intValue else { return nil }
-        return AuditLogEntry(
+        return Self(
             id: row["id"]?.intValue ?? 0,
             eventType: eventType,
             timestamp: Date(timeIntervalSince1970: ts),
@@ -308,7 +321,10 @@ public struct AuditLogEntry: Sendable, Codable {
             periodType: row["periodType"]?.stringValue,
             shareHandoffIdDigest: row["shareHandoffIdDigest"]?.stringValue,
             dataSourcesUsed: row["dataSourcesUsed"]?.stringValue,
-            periodKeyDigest: row["periodKeyDigest"]?.stringValue
+            periodKeyDigest: row["periodKeyDigest"]?.stringValue,
+            outputLanguage: row["outputLanguage"]?.stringValue,
+            uiLanguage: row["uiLanguage"]?.stringValue,
+            languageRetryCount: row["languageRetryCount"]?.intValue.map(Int.init)
         )
     }
 }
@@ -318,7 +334,7 @@ public struct AuditLogEntry: Sendable, Codable {
 /// 审计内容哈希工具 — 仅记录哈希摘要，禁止原文 (AGENTS.md §5.4)
 public enum AuditContentHasher {
     /// 计算内容的 SHA-256 十六进制摘要
-    public nonisolated static func sha256Hex(_ content: String) -> String {
+    nonisolated public static func sha256Hex(_ content: String) -> String {
         let data = Data(content.utf8)
         let digest = SHA256.hash(data: data)
         return digest.map { String(format: "%02x", $0) }.joined()
@@ -330,18 +346,18 @@ public enum AuditContentHasher {
 /// memory 主体的确定性审计身份——同一 memory 的 ingest、search-result selection、
 /// feedback、delete、migration 与 compensation 记录可按 subjectHash 确定性识别。
 /// 不落明文；不与 payload contentHash 混淆。
-public nonisolated struct AuditSubject: Sendable, Codable, Equatable {
-    public nonisolated let kind: String
-    public nonisolated let subjectHash: String
+nonisolated public struct AuditSubject: Sendable, Codable, Equatable {
+    nonisolated public let kind: String
+    nonisolated public let subjectHash: String
 
-    public nonisolated init(kind: String, subjectHash: String) {
+    nonisolated public init(kind: String, subjectHash: String) {
         self.kind = kind
         self.subjectHash = subjectHash
     }
 
     /// 固定输入 "memory:" + lowercase UUID，经 AuditContentHasher.sha256Hex。
-    public nonisolated static func memory(_ memoryID: UUID) -> AuditSubject {
-        AuditSubject(
+    nonisolated public static func memory(_ memoryID: UUID) -> Self {
+        Self(
             kind: "memory",
             subjectHash: AuditContentHasher.sha256Hex("memory:" + memoryID.uuidString.lowercased())
         )

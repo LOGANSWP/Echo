@@ -93,7 +93,7 @@ struct FocusBalancedCanvasTests {
         let viewModel = try loadSource("Echo/UI/Creation/CreationViewModel.swift")
         let fixtures = try loadSource("Echo/UI/Creation/CreationFixtureLoader.swift")
 
-        #expect(view.contains(".sheet(item:"))
+        #expect(view.range(of: #"\.sheet\s*\(\s*item:"#, options: .regularExpression) != nil)
         #expect(view.contains("SystemShareSheet(payload: payload, reporter: viewModel)"))
         #expect(view.contains("super.init(activityItems: activityItems"))
         #expect(!view.contains("ShareLink("))
@@ -140,7 +140,7 @@ struct FocusBalancedCanvasTests {
         )))
     }
 
-    @Test("AC-4: Markdown export distinguishes unavailable provenance from a source anchor")
+    @Test("AC-4: Markdown exports body while unavailable provenance remains in the App")
     func test_AC4_markdownExportPreservesNoSourceTruth() throws {
         let viewModel = CreationViewModel()
         viewModel.loadPreloaded(CreationModel(
@@ -163,7 +163,9 @@ struct FocusBalancedCanvasTests {
 
         let payload = try #require(viewModel.sharePayload)
         #expect(payload.kind == .markdown)
-        #expect(payload.text.contains("NoSource"))
+        #expect(!payload.text.contains("NoSource"))
+        #expect(payload.text.contains("A paragraph without resolvable provenance."))
+        #expect(viewModel.creation?.paragraphs.first?.groundingStatus == .noSource)
         #expect(!payload.text.contains("MemoryID:"))
         #expect(payload.attachmentURL == nil)
     }

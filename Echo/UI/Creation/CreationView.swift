@@ -47,13 +47,19 @@ struct CreationView: View {
 
     @State private var viewModel: CreationViewModel
     @State private var reportPendingDeletion: UUID?
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     @Environment(\.echoDesignProfile) private var designProfile
 
     init(viewModel: CreationViewModel? = nil) {
-        _viewModel = State(initialValue: viewModel ?? CreationViewModel(
-            exportCoordinator: LiveAppAdapters.makeCreationExportCoordinator(),
-            narrativeReportActor: AppComposition.shared.narrativeReportActor
-        ))
+        _viewModel = State(
+            initialValue: viewModel
+                ?? CreationViewModel(
+                    creativePipeline: AppComposition.shared.creativePipeline,
+                    exportCoordinator: LiveAppAdapters.makeCreationExportCoordinator(),
+                    narrativeReportActor: AppComposition.shared.narrativeReportActor
+                )
+        )
     }
 
     // MARK: - Body
@@ -119,9 +125,12 @@ struct CreationView: View {
             Text(EchoStrings.tr("This report cannot be regenerated in this version."))
         }
         // 分享/导出/打印 Sheet (US-SYN-003 AC-3, US-SYN-004 AC-4)
-        .sheet(item: $viewModel.sharePayload, onDismiss: {
-            viewModel.shareSheetDidDismiss()
-        }) { payload in
+        .sheet(
+            item: $viewModel.sharePayload,
+            onDismiss: {
+                viewModel.shareSheetDidDismiss()
+            }
+        ) { payload in
             SystemShareSheet(payload: payload, reporter: viewModel)
         }
         .navigationDestination(item: $viewModel.navigationMemoryID) { memoryID in
@@ -130,7 +139,7 @@ struct CreationView: View {
         .onAppear {
             viewModel.loadReportLibrary()
             #if DEBUG
-            handleLaunchArguments()
+                handleLaunchArguments()
             #endif
         }
         .onDisappear { viewModel.onDisappear() }
@@ -141,21 +150,23 @@ struct CreationView: View {
     // MARK: - Launch Argument Fixture Injection
 
     #if DEBUG
-    /// 处理 XCUITest / Live Sim Review 启动参数注入确定性 fixture。
-    ///
-    /// Supports `-ui-fixture creation-generated-letter|creation-generated-report|creation-empty`.
-    /// 及 `-creation-error`，通过 CreationFixtureLoader 加载确定性数据。
-    /// 仅用于自动化；生产构建（#if DEBUG 排除）无此钩子。
-    private func handleLaunchArguments() {
-        let args = ProcessInfo.processInfo.arguments
-        guard let idx = args.firstIndex(of: "-ui-fixture"), idx + 1 < args.count else { return }
-        let fixtureID = args[idx + 1]
-        if let model = CreationFixtureLoader.load(fixtureID) {
-            viewModel.loadPreloaded(model)
-        } else if fixtureID == "creation-error" {
-            viewModel.simulateError(.l2Recoverable(message: "Generation is currently unavailable. Please try again."))
+        /// 处理 XCUITest / Live Sim Review 启动参数注入确定性 fixture。
+        ///
+        /// Supports `-ui-fixture creation-generated-letter|creation-generated-report|creation-empty`.
+        /// 及 `-creation-error`，通过 CreationFixtureLoader 加载确定性数据。
+        /// 仅用于自动化；生产构建（#if DEBUG 排除）无此钩子。
+        private func handleLaunchArguments() {
+            let args = ProcessInfo.processInfo.arguments
+            guard let idx = args.firstIndex(of: "-ui-fixture"), idx + 1 < args.count else { return }
+            let fixtureID = args[idx + 1]
+            if let model = CreationFixtureLoader.load(fixtureID) {
+                viewModel.loadPreloaded(model)
+            } else if fixtureID == "creation-error" {
+                viewModel.simulateError(
+                    .l2Recoverable(message: "Generation is currently unavailable. Please try again.")
+                )
+            }
         }
-    }
     #endif
 
     // MARK: - Content Views
@@ -254,6 +265,24 @@ struct CreationView: View {
             case .loading:
                 ProgressView(EchoStrings.tr("Loading narrative reports…"))
                     .accessibilityIdentifier("creation-report-library-loading")
+
+            case .modelBlocked:
+                EchoContainer(level: .emphasized) {
+                    VStack(alignment: .leading, spacing: EchoSpacingToken.normal.points) {
+                        EchoStatusPresentation(
+                            role: .warning,
+                            systemImage: "exclamationmark.triangle.fill",
+                            title: EchoStrings.tr("Reports unavailable"),
+                            message: EchoStrings.tr(ErrorSeverity.l3Blocking.userFacingMessageKey)
+                        )
+                        Button(EchoStrings.tr("Retry model load")) { viewModel.repairReportRuntime() }
+                            .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            Link("Open Settings", destination: url)
+                        }
+                    }
+                }
+
             case .error(let message):
                 EchoContainer(level: .emphasized) {
                     VStack(alignment: .leading, spacing: EchoSpacingToken.normal.points) {
@@ -270,6 +299,7 @@ struct CreationView: View {
                         .accessibilityIdentifier("creation-report-library-retry")
                     }
                 }
+
             case .idle, .loaded:
                 EmptyView()
             }
@@ -410,13 +440,11 @@ struct CreationView: View {
     private func generatedContent(_ creation: CreationModel) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: EchoSpacingToken.section.points) {
-                // 标题（叙事报告含周期, US-SYN-004 AC-5）
-                if let title = creation.title {
-                    Text(title)
-                        .font(EchoTypographyToken.title.font)
-                        .foregroundStyle(EchoColorToken.primaryText.color)
-                        .accessibilityAddTraits(.isHeader)
-                }
+                // Keep the selected form visible after generation; reports retain their period title.
+                Text(creation.title ?? EchoStrings.tr(creation.selectedTemplate.displayName))
+                    .font(EchoTypographyToken.title.font)
+                    .foregroundStyle(EchoColorToken.primaryText.color)
+                    .accessibilityAddTraits(.isHeader)
 
                 // 来源计数 metadata
                 EchoMetadataGroup {
@@ -427,11 +455,35 @@ struct CreationView: View {
                         ),
                         systemImage: "link"
                     )
+                    if let coverage = creation.reportCoverage {
+                        Text(coverage.coverageStart..<coverage.coverageEnd, format: .interval.day().month().year())
+                        if coverage.partialBaseline {
+                            Text(EchoStrings.tr("This report covers part of the period."))
+                        }
+                        if coverage.truncatedSourceCount > 0 {
+                            Text(
+                                String(
+                                    format: EchoStrings.tr("%lld source memories omitted by generation limits"),
+                                    coverage.truncatedSourceCount
+                                )
+                            )
+                        }
+                        if !coverage.omittedPartitions.isEmpty {
+                            Text(EchoStrings.tr("Some source categories are not included."))
+                        }
+                        if let omitted = creation.omittedParagraphCount, omitted > 0 {
+                            Text(String(format: EchoStrings.tr("%lld intermediate paragraphs omitted"), omitted))
+                        }
+                    }
                 }
 
                 // 生成内容 + 溯源锚点
                 EchoContainer(level: .section) {
-                    VStack(alignment: .leading, spacing: EchoSpacingToken.grouped.points) {
+                    VStack(
+                        alignment: .leading,
+                        spacing: creation.selectedTemplate == .poem
+                            ? EchoSpacingToken.compact.points : EchoSpacingToken.grouped.points
+                    ) {
                         ForEach(creation.paragraphs) { paragraph in
                             VStack(alignment: .leading, spacing: EchoSpacingToken.compact.points) {
                                 Text(paragraph.text)
@@ -439,8 +491,10 @@ struct CreationView: View {
                                     .foregroundStyle(EchoColorToken.primaryText.color)
                                     .textSelection(.enabled)
 
-                                ForEach(paragraph.citations, id: \.memoryId) { citation in
-                                    citationAnchor(citation)
+                                if creation.selectedTemplate != .poem {
+                                    ForEach(paragraph.citations, id: \.memoryId) { citation in
+                                        citationAnchor(citation)
+                                    }
                                 }
 
                                 if paragraph.groundingStatus != .cited {
@@ -448,36 +502,46 @@ struct CreationView: View {
                                         EchoStrings.tr("No source for part or all of this paragraph"),
                                         systemImage: "exclamationmark.triangle"
                                     )
-                                        .font(EchoTypographyToken.caption.font)
-                                        .foregroundStyle(EchoColorToken.secondaryText.color)
-                                        .accessibilityIdentifier("creation-citation-no-source")
+                                    .font(EchoTypographyToken.caption.font)
+                                    .foregroundStyle(EchoColorToken.secondaryText.color)
+                                    .accessibilityIdentifier("creation-citation-no-source")
                                 }
                             }
                         }
                     }
                 }
 
+                if creation.selectedTemplate == .poem {
+                    let citations = creation.distinctSourceCitations
+                    EchoMetadataGroup {
+                        ForEach(Array(citations.enumerated()), id: \.element.memoryId) { index, citation in
+                            citationAnchor(
+                                citation,
+                                title: citations.count == 1
+                                    ? EchoStrings.tr("Source memory")
+                                    : String(format: EchoStrings.tr("Source memory %lld"), index + 1)
+                            )
+                        }
+                    }
+                }
+
                 // 操作按钮 (US-SYN-003 AC-3/AC-4, US-SYN-004 AC-4)
                 actionButtons
-
             }
             .padding(EchoSpacingToken.grouped.points)
         }
         .scrollContentBackground(.hidden)
     }
 
-    /// 溯源锚点 — [🔗 MemoryID:xxx] (US-SYN-002 AC-1, US-SYN-003 AC-2)。
-    private func citationAnchor(_ citation: CreationCitation) -> some View {
+    /// Human-readable source navigation; opaque identities stay in the route and accessibility identifier.
+    private func citationAnchor(_ citation: CreationCitation, title: String? = nil) -> some View {
         Button {
             viewModel.openCitation(citation)
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: citation.availability == .available ? "link" : "link.badge.plus")
                     .font(EchoTypographyToken.caption.font)
-                Text(String(
-                    format: EchoStrings.tr("MemoryID: %@"),
-                    String(citation.memoryId.uuidString.prefix(8)) + "…"
-                ))
+                Text(title ?? EchoStrings.tr("Source memory"))
                     .font(EchoTypographyToken.caption.font)
             }
             .foregroundStyle(
@@ -488,12 +552,14 @@ struct CreationView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("creation-citation-anchor-\(citation.memoryId.uuidString.prefix(8))")
-        .accessibilityLabel(Text(EchoStrings.tr("Open source memory citation")))
-        .accessibilityValue(Text(
-            citation.availability == .available
-                ? EchoStrings.tr("Source available")
-                : EchoStrings.tr("Source currently unavailable")
-        ))
+        .accessibilityLabel(Text(title ?? EchoStrings.tr("Open source memory citation")))
+        .accessibilityValue(
+            Text(
+                citation.availability == .available
+                    ? EchoStrings.tr("Source available")
+                    : EchoStrings.tr("Source currently unavailable")
+            )
+        )
     }
 
     /// 操作按钮行 — 复制 / 导出 / 保存 / 分享。
@@ -556,25 +622,32 @@ struct CreationView: View {
                 EchoStatusPresentation(
                     role: .informational,
                     systemImage: "tray",
-                    title: "No source memories found",
-                    message: "Try a different template or add more memories."
+                    title: EchoLocalization.localized(
+                        viewModel.requiresSourceText
+                            ? "This memory needs text for creation" : "No source memories found",
+                        locale: locale
+                    ),
+                    message: EchoLocalization.localized(
+                        viewModel.requiresSourceText
+                            ? "AI Creation uses saved text, not photo pixels. Return to the memory details and add a description, or choose a memory with text."
+                            : "Try a different template or add more memories.",
+                        locale: locale
+                    )
                 )
             }
 
             Button {
-                viewModel.retry()
+                dismiss()
             } label: {
-                Label("Retry", systemImage: "arrow.clockwise")
-                    .font(.callout)
+                Label("Back to memories", systemImage: "arrow.backward").font(.callout)
             }
             .buttonStyle(EchoActionButtonStyle(role: .recovery))
-            .accessibilityIdentifier("creation-retry-button")
+            .accessibilityIdentifier("creation-back-to-memories")
 
             Spacer().frame(height: 80)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("No source memories found for this template")
     }
 
     // MARK: - Error State
@@ -593,14 +666,29 @@ struct CreationView: View {
                 )
             }
 
-            Button {
-                viewModel.retry()
-            } label: {
-                Label("Retry", systemImage: "arrow.clockwise")
-                    .font(EchoTypographyToken.action.font)
+            if case .l3Blocking = level {
+                Button {
+                    viewModel.retryModelLoad()
+                } label: {
+                    Label("Retry model load", systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                .accessibilityIdentifier("creation-retry-model")
+                if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                    Link(destination: settingsURL) {
+                        Label("Open Settings", systemImage: "gearshape")
+                    }
+                    .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                }
+            } else {
+                Button {
+                    viewModel.retry()
+                } label: {
+                    Label("Retry", systemImage: "arrow.clockwise").font(EchoTypographyToken.action.font)
+                }
+                .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                .accessibilityIdentifier("creation-retry-button")
             }
-            .buttonStyle(EchoActionButtonStyle(role: .recovery))
-            .accessibilityIdentifier("creation-retry-button")
 
             Spacer().frame(height: 80)
         }
@@ -610,7 +698,7 @@ struct CreationView: View {
 
     private func errorMessage(for level: CreationViewModel.ErrorLevel) -> String {
         switch level {
-        case .l2Recoverable(let msg):
+        case .l2Recoverable(let msg), .l3Blocking(let msg):
             return msg
         }
     }
@@ -708,6 +796,8 @@ private final class ReportingActivityViewController: UIActivityViewController {
     private weak var presentationReporter: (any CreationSharePresentationReporting)?
     private var didReportPresentation = false
 
+    deinit {}
+
     init(
         activityItems: [Any],
         payloadID: UUID,
@@ -720,7 +810,7 @@ private final class ReportingActivityViewController: UIActivityViewController {
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
-        return nil
+        nil
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -801,7 +891,6 @@ private func makeCreationViewModel(state: CreationPreviewState) -> CreationViewM
 
     case .error:
         vm.simulateError(.l2Recoverable(message: "Generation is currently unavailable. Please try again."))
-
     }
 
     return vm

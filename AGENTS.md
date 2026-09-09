@@ -1,14 +1,14 @@
 # Echo · 回响：Codex 协作开发规约
 
-**版本**：v5.52
-**生效日期**：2026-09-07
+**版本**：v5.55
+**生效日期**：2026-09-08
 **适用对象**：所有参与 Echo 项目开发的 AI Agent（Codex / OpenCode / Cursor / Claude）及人类开发者
-**优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。  
-**加载方式**：Agent 启动时自动加载根目录 `AGENTS.md`；子目录 `AGENTS.md` 叠加补充。  
-**对应规格**：Echo v4.6 全量用户故事与验收标准规格书  
-**架构基准**：Cognitive Pipeline + Observable ViewModel + Actor Isolation  
-**任务追踪**：`docs/05-planning/task-status.json` 记录所有任务执行状态  
-**文档索引**：`docs/INDEX.md` 提供文档摘要与模块速查  
+**优先级**：本规约优先于任何 Agent 的默认行为。当本规约与 Agent 默认行为冲突时，以本规约为准。
+**加载方式**：Agent 启动时自动加载根目录 `AGENTS.md`；子目录 `AGENTS.md` 叠加补充。
+**对应规格**：Echo v4.6 全量用户故事与验收标准规格书
+**架构基准**：Cognitive Pipeline + Observable ViewModel + Actor Isolation
+**任务追踪**：`docs/05-planning/task-status.json` 记录所有任务执行状态
+**文档索引**：`docs/INDEX.md` 提供文档摘要与模块速查
 **GitHub 自动化**：Codex 通过已认证的 `gh` CLI 创建 PR、添加评论、管理标签；合并操作需人类审批
 
 ---
@@ -354,6 +354,8 @@ Pipeline 契约:
 
 > **Pipeline 类型声明说明（v5.12 澄清）**：当 Pipeline 仅持有不可变的 actor 引用（`let embedder`, `let privacyActor` 等，无 `var` 可变状态），使用 `actor` 关键字声明是合法模式。`actor` 在此场景下仅提供串行执行上下文以安全地 `await` 其他 Actor，不违反「无状态」契约。相比 `struct` + 参数传递 actor 引用，`actor` Pipeline 可避免非 Sendable 引用的编译错误，是更务实的 Swift 6 并发模式选择。
 
+> **生成运行时澄清（v5.53 / ADR-023）**：生成计划、排序、分批、请求和限额在相同输入/配置下可复现；不要求真实模型跨 OS/硬件逐 token 输出相同。模型会话、KV cache 和采样状态由运行时 Actor 按请求隔离并负责释放，Pipeline 不保存跨请求可变会话，不放宽隐私、队列或 Sendable 契约。
+
 ### 4.2 Actor 隔离契约
 
 ```yaml
@@ -452,7 +454,7 @@ ExcludedAssets 禁止写入条件:
 ```yaml
 反馈重排契约:
   - 阈值: 仅当余弦相似度 ≥ 0.80 时应用反馈权重
-  - 时间衰减: 
+  - 时间衰减:
       - 年龄 ≤ 90 天: decayFactor = 1.0
       - 90天 < 年龄 ≤ 180天: decayFactor = 0.5
       - 年龄 > 180天: 归档，不参与重排
@@ -466,7 +468,7 @@ ExcludedAssets 禁止写入条件:
 ```yaml
 审计日志契约:
   - 强制字段: eventType, timestamp, traceID, policyVersion, success
-  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest, dataSourcesUsed, periodKeyDigest
+  - 可选字段: sourceType, affectedCount, excludedWritten, sourceLanguage, elapsedMs, action, resumePoint, userChoiceOnRestart, outcome, preservedOriginal, sourceDeletionRequested, sourceDeletionCompleted, sourceDeletionOutcome, excludedAutoCleaned, userNotified, templateType, sourceMemoryCount, citationCount, noSourceCount, exportFormat, sharePresented, periodType, shareHandoffIdDigest, dataSourcesUsed, periodKeyDigest, outputLanguage, uiLanguage, languageRetryCount
   - 隐私保护: 标识符和内容仅记录哈希摘要，禁止原文；枚举/布尔/进度整数可作为结构化字段
   - 保留期: 30 天，超期自动清理
   - 加密: NSFileProtectionComplete
@@ -566,6 +568,7 @@ let checkpoint = await PrivacyActor.shared.validate(
 | `.memoryEdited`                   | 手动编辑记忆             | editedFields, reindexed, conflictResolvedWith             |
 | `.synthesis`                      | 来源锚点解析与校验       | citationCount, noSourceCount；MemoryID 仅 hash digest     |
 | `.creativeGeneration`             | 创作生成完成             | templateType, sourceMemoryCount, citationCount, noSourceCount；不记录正文 |
+| `.generationLanguageChecked`      | 结构化模型输出正文语言校验 | outputLanguage（成功时）、uiLanguage、languageRetryCount=`0/1`；仅 zh-Hans/en-US，不记录正文 |
 | `.creationSharePresented`         | 本地导出后呈现系统分享面板 | exportFormat=`plainText/markdown/pdf`, sharePresented, periodType=`month/year`（可选）, shareHandoffIdDigest；不记录 activityType、目标 App、完成状态、原文或 source locator |
 | `.narrativeReportGenerated`       | 月度/年度报告原子 publication 成功 | periodType=`month/year`、canonical JSON 编码且排序去重的真实 source-type enum 数组 dataSourcesUsed、64 字符 hash-only periodKeyDigest；digest 事件范围内唯一，不记录标题/正文/MemoryID/locator |
 | `.cardInteraction`               | 交互式唤醒卡动作       | action=next/record/jump, cardIdDigest, memoryIdDigest, feelingAssociatedToSource（hash-only，禁止感受原文） |
@@ -691,6 +694,8 @@ PR 合并前必须通过:
 - 禁止使用其他设备名称（如 `iPhone 16 Pro`）作为 **`xcodebuild build/test` 的 destination**，避免因设备不存在导致构建失败
 - **Live Simulator Review 例外（Phase 3 UI）**：视觉审批必须**同时**使用两台设备——`iPhone 17 Pro (iOS 26.5)`（主审查设备）+ `iPhone 16 Pro (iOS 18.x)`（最低支持版本审查设备，覆盖 iOS 18 部署目标）。构建仍以 `iPhone 17 Pro` 为 destination，同一产物安装到两台设备。详见 §17 与 `docs/ui/automation-workflow.md`
 - CI 环境可通过环境变量覆盖（如 `IOS_DESTINATION`），本地开发统一使用上述约定之```
+
+**4.0k 获批实机验证例外（2026-09-08）**：用户已批准冻结审批包 `0e202c15169faf241d6ca77fa905493c7d3e57ba1e27f8df2d67c4fc58f136a7` 的工件使用与实机验证计划。该任务的真实模型兼容性、Release 资源与质量测试可使用已连接的获批 iPhone 14 Plus / iOS 18.2.1 作为 `xcodebuild` destination，并保持串行执行；普通单元测试继续使用 iPhone 17 Pro 模拟器。本例外不授权发布、不修改签名配置、不替代后续 iOS 26 实机证据。
 
 ### 9.5 LSP 诊断配置
 
@@ -1422,7 +1427,9 @@ Echo 固定采用用户已批准的 **`echo-memory-canvas`** 设计配置，扩�
 
 **4.0d 交互式唤醒卡边界（2026-09-02 规格审查）**：音乐建议默认且始终可从随 App 打包的离线年份曲库产生；仅当用户在卡片中显式选择“匹配此设备音乐”后，才可请求媒体库权限并通过 `MPMediaQuery` 读取 `isCloudItem == false` 的本地曲目元数据。禁止 `MusicCatalog*`、personal recommendations、recently played 和任意 MusicKit Web Service，禁止上传记忆派生数据。领域 API 可暴露 `userFeelings` 集合，但物理存储必须为以 `memoryId` 为外键的 `MemoryFeeling` 关系表；感受不创建 Memory/Representation，不进入搜索或翻译索引。`next` 按稳定唤醒顺序前进，`record` 仅在事务成功后成立；`.cardInteraction` 仅记录 action、hash-only card/memory digest 与布尔 `feelingAssociatedToSource`。`4.0d` 只负责 card→typed Focus 路由，Focus 内真实来源解析/删除由 `4.0h` 交付，可验证 source anchor 与分享审计由 `4.0i` 交付。详见 ADR-016/017。
 
-**4.0e~4.0k Focus 生产边界（2026-09-07 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 使用版本化、有大小/数量上限的结构化生成 envelope；每段显式返回 `sourceMemoryIDs[]`，仅接受当前策略过滤后实际提交模型的 opaque MemoryID allow-list，禁止暴露 source locator 或 round-robin 伪绑定。allow-list 只验证 provenance 身份，不自动证明事实语义；多引用、`NoSource` 与 `partialNoSource` 必须类型化表达。锚点导航及复制、Markdown/PDF/plain-text 分享准备前均重新执行当前 UserPolicy/PrivacyCheckpoint；所有格式保留可理解引用。`.synthesis`、`.creativeGeneration` 与 `.creationSharePresented` 使用专用结构化审计列；每个 share handoff 以 hash-only `shareHandoffIdDigest` 和唯一索引提供无窗口幂等性。只有系统面板实际呈现回调后才写 `sharePresented=true`，准备/呈现失败写 false，呈现后取消不算失败，呈现后的审计写入失败不得改写呈现事实；无效 `periodType` 在入队前 fail-closed，不得伪装成持久化故障。`4.0j` 的月/年持久开关新安装默认开启，在同意持久化且首条可用 canonical memory 落库时建立各自的 eligibleFrom；关闭后重开只重设对应类型基线；只为刚结束的完整月/年建立冻结时区边界，一次扫描 CAS claim 一个最早周期；`NarrativeReportSchedule/Period/Report/Source` 与审计在无挂起点事务中 publication，L2 仅手动重试，system expiration/资源不足只延后，无数据写 `noData`；用户删除报告或来源删除将周期置 v1 不可重建的 `invalidated`。`4.0k` 才负责 ADR-009 要求的获批 bundled LLM、生产 `LLMProvider` 装配、Language Aligner 与真实消费 `sourceBatches` 的确定性分批/分层聚合；在此之前 4.0j 扫描必须返回 `generationUnavailable` 且不 claim、不写 L2。详见 ADR-017/019/020/021/022。
+**4.0e~4.0k Focus 生产边界（2026-09-07 规格审查）**：`4.0e` 使用 `MemoryUserEdit`/`MemoryEditConflict` 关系交付多行纯文本编辑、成功后发布的新表示与持久冲突，不覆盖原始来源文本；`4.0h` 仅允许对当前可获取且 `PHAsset.canPerform(.delete)` 的 PhotoKit photo/video 发起原始删除，内容可用性与删除能力分开建模。其同一 `MemoryDeletionJournal` 必须正交保存外部结果与本地 D-005 phase，只有 `confirmedDeleted` 解锁本地清理；limited-hidden/撤权不可见不得推断为删除。Share Extension 不猜测 host App，音频原件不持久化时只展示转写；`userNotified=true` 仅在提示实际展示后记录。`4.0i` 使用版本化、有大小/数量上限的结构化生成 envelope；每段显式返回 `sourceMemoryIDs[]`，仅接受当前策略过滤后实际提交模型的 opaque MemoryID allow-list，禁止暴露 source locator 或 round-robin 伪绑定。allow-list 只验证 provenance 身份，不自动证明事实语义；多引用、`NoSource` 与 `partialNoSource` 必须类型化表达。锚点导航及复制、Markdown/PDF/plain-text 分享准备前均重新执行当前 UserPolicy/PrivacyCheckpoint；按 ADR-024，复制与所有外部导出默认只包含标题和正文，不附加 MemoryID 或来源标记；App 内来源验证、提示及跳转保持完整。`.synthesis`、`.creativeGeneration` 与 `.creationSharePresented` 使用专用结构化审计列；每个 share handoff 以 hash-only `shareHandoffIdDigest` 和唯一索引提供无窗口幂等性。只有系统面板实际呈现回调后才写 `sharePresented=true`，准备/呈现失败写 false，呈现后取消不算失败，呈现后的审计写入失败不得改写呈现事实；无效 `periodType` 在入队前 fail-closed，不得伪装成持久化故障。`4.0j` 的月/年持久开关新安装默认开启，在同意持久化且首条可用 canonical memory 落库时建立各自的 eligibleFrom；关闭后重开只重设对应类型基线；只为刚结束的完整月/年建立冻结时区边界，一次扫描 CAS claim 一个最早周期；`NarrativeReportSchedule/Period/Report/Source` 与审计在无挂起点事务中 publication，L2 仅手动重试，system expiration/资源不足只延后，无数据写 `noData`；用户删除报告或来源删除将周期置 v1 不可重建的 `invalidated`。`4.0k` 才负责 ADR-009 要求的获批 bundled LLM、生产 `LLMProvider` 装配、Language Aligner 与真实消费 `sourceBatches` 的确定性分批/分层聚合；在此之前 4.0j 扫描必须返回 `generationUnavailable` 且不 claim、不写 L2。详见 ADR-017/019/020/021/022。
+
+**4.0k 规格合理性复审（2026-09-07 / ADR-023）**：ready 只表示任务依赖就绪；先形成可审阅模型/运行时与预算材料，再取得确切工件的人类审批，之后生产装配，ModelManifestActor 不代替审批。完整 prompt 按获批 tokenizer 计数并预留输出，推理过程约束 token/调用/层级/时间/内存。每层只校验实际输入携带的叶子来源，reduce 仅消费 cited 子段落，省略项记 coverage；派生授权/删除关系覆盖实际贡献输入，不限于可见锚点。先解析 envelope 再校验正文语言，每调用最多一次语言重试且纳入总预算；fallback/空输出不 publication。专名/原文引用由冻结验收标注与人工复核评判，不得由模型自报或正则删正文绕过检测；主体语言匹配不代替可读性验收。Continue 保留 checkpoint 并重建丢失的内存前缀，身份变化要求合法 Restart，仍不得绕过 L3/denial。no-fixture 可使用经生产摄入的无 PII 合成测试记忆，但必须使用真实模型和生产依赖图；模拟器不能替代实机资源/质量证据。具体预算和设备范围未取得审批证据时保持未通过。
 
 ### 17.3 双状态模型
 
@@ -1563,3 +1570,7 @@ $init-session-echo → $next-task-echo → $ui-bootstrap-build-echo <task-id>
 | v5.50 | 2026-09-07 | 4.0j 规格合理性复审（ADR-021）：定义默认开启的持久月/年开关与 eligibleFrom、完整公历周期、冻结时区边界、单周期 CAS claim、持久报告/来源关系与原子 publication；修正 L2 自动重建冲突，区分系统 expiration/资源延后；补齐有界聚合、noData、D-005 派生报告删除与 typed audit 幂等。 | Codex |
 | v5.51 | 2026-09-07 | 4.0j TDD 发现独立开关与单一 eligibleFrom 冲突；改为月/年分别持有基线，关闭后重开只重设对应类型，不影响仍开启的另一类调度。 | Codex |
 | v5.52 | 2026-09-07 | 4.0j PR 预审发现生产 `LLMProvider` 恒为 nil、Stub 证据被误当成自动生成闭环；ADR-022 将 4.0j 收敛为持久调度/存储基础，新增 4.0k 负责获批 bundled LLM、真实有界分层生成与 no-fixture 证据，并要求运行时缺失时在 claim 前 fail-closed。 | Codex |
+| v5.53 | 2026-09-07 | 4.0k 规格合理性复审（ADR-023）：区分候选评估/具体工件审批/生产验收；补齐 token 与运行时预算、逐层来源及派生依赖、结构化语言对齐、降级不 publication、无草稿恢复重放与实机证据；修正模型登记历史计数和双语言图的未批准模型指名，不授予模型审批、不降低门禁。 | Codex |
+| v5.54 | 2026-09-08 | 用户批准 4.0k 确切工件及实机工程验证后，明确获批 iPhone 的串行测试 destination 例外；新增正文语言检查专用审计事件与三项类型化字段，保留质量、资源和发布门禁。 | Codex |
+
+| v5.55 | 2026-09-08 | 用户 Live Review 修复（ADR-024）：复制及全部创作导出默认仅含标题与正文，移除附加 MemoryID/来源状态标记；App 内 provenance 与交接前授权、真实系统呈现审计保留。 | Codex |

@@ -8,6 +8,8 @@
 // 架构约束: AGENTS.md §4.2 (Actor 隔离), R-004/R-005
 // 重要: 项目 SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor，所有 struct stored/computed 需 nonisolated
 // 生成时间: 2026-08-06
+// Task 4.0k (2026-09-08): schema-first body validation and at most one source-revalidated language retry.
+// Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
 import Foundation
@@ -27,18 +29,17 @@ import NaturalLanguage
 /// - `LLMProvider` 抽象推理来源（离线捆绑 LLM 运行时，随 3F.9 落地）
 /// - 无 LLM 提供方时 `align` 直接判定无输出（不伪造生成）
 public actor LanguageAligner {
-
     // MARK: - Constants
 
     /// NLTagger 置信度阈值（AGENTS.md §6.2）
-    private nonisolated static let confidenceThreshold = 0.9
+    nonisolated private static let confidenceThreshold = 0.9
     /// 最大重试次数（严格 1 次）
-    private nonisolated static let maxRetries = 1
+    nonisolated private static let maxRetries = 1
 
     /// zh-Hans 语言码
-    public nonisolated static let zhHans = "zh-Hans"
+    nonisolated public static let zhHans = "zh-Hans"
     /// en-US 语言码
-    public nonisolated static let enUS = "en-US"
+    nonisolated public static let enUS = "en-US"
 
     // MARK: - Dependencies
 
@@ -74,14 +75,12 @@ public actor LanguageAligner {
             throw LanguageAlignerError.runtimeUnavailable
         }
 
-        var lastOutput = ""
         var lastDetected = ""
         for attempt in 0...Self.maxRetries {
             let output = try await provider.generate(
                 prompt: Self.injectedPrompt(base: prompt, preferredLanguage: preferredLanguage),
                 preferredLanguage: preferredLanguage
             )
-            lastOutput = output
             lastDetected = Self.detectLanguage(output)
             if Self.isSupported(lastDetected) && lastDetected == preferredLanguage {
                 return output
@@ -97,6 +96,66 @@ public actor LanguageAligner {
 
     // MARK: - Language Detection
 
+    /// US-SYN-001 AC-4/5 (4.0k): schema first, body-only screening, no repair loop.
+    public func alignEnvelope(
+        request: GenerationRequest,
+        sourceValidation: GenerationSourceValidation? = nil
+    ) async throws -> AlignedGeneration {
+        guard let provider = llmProvider else { throw LanguageAlignerError.runtimeUnavailable }
+        guard Self.isSupported(request.preferredLanguage) else { throw GenerationRuntimeError.invalidRequest }
+        for attempt in 0...Self.maxRetries {
+            try Task.checkCancellation()
+            guard ProcessInfo.processInfo.systemUptime < request.executionDeadline else {
+                throw GenerationRuntimeError.deadline
+            }
+            let current = attempt == 0 ? request : request.languageRetry()
+            try await sourceValidation?.validate()
+            let raw: String
+            if let structured = provider as? any StructuredLLMProvider {
+                raw = try await structured.generate(request: current).envelope
+            } else {
+                raw = try await provider.generate(
+                    prompt: current.system + "\n" + current.user,
+                    preferredLanguage: current.preferredLanguage
+                )
+            }
+            try await sourceValidation?.validate()
+            guard raw.utf8.count <= 65_536 else { throw CreativeError.invalidStructuredOutput(.oversizedPayload) }
+            let paragraphs = try CreativePipeline.parseParagraphs(
+                from: raw,
+                allowedMemoryIDs: Set(request.allowedMemoryIDs),
+                sourceTypes: [:]
+            )
+            guard !paragraphs.isEmpty else { throw CreativeError.invalidStructuredOutput(.emptyParagraph) }
+            if paragraphs.allSatisfy({ Self.bodyMatches($0.text, language: request.preferredLanguage) }) {
+                return AlignedGeneration(
+                    paragraphs: paragraphs,
+                    languageRetryCount: attempt,
+                    modelCallCount: attempt + 1
+                )
+            }
+        }
+        throw GenerationRuntimeError.languageFallback
+    }
+
+    nonisolated static func bodyMatches(_ text: String, language: String) -> Bool {
+        // Remove only protocol-shaped UUID metadata. Names/quotes remain in the sample.
+        let sample = text.replacingOccurrences(
+            of: #"(?i)(?<![\w-])[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}(?![\w-])"#,
+            with: "",
+            options: .regularExpression
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard sample.unicodeScalars.contains(where: CharacterSet.letters.contains),
+            detectLanguage(sample) == language
+        else { return false }
+        if language == zhHans {
+            guard let simplified = sample.applyingTransform(StringTransform("Traditional-Simplified"), reverse: false),
+                simplified == sample
+            else { return false }
+        }
+        return true
+    }
+
     /// 检测文本语言，返回 zh-Hans / en-US / uncertain。
     ///
     /// 使用 `NLLanguageRecognizer`，置信度 ≥ 0.9 才认定；否则 `.uncertain`。
@@ -106,8 +165,9 @@ public actor LanguageAligner {
         let recognizer = NLLanguageRecognizer()
         recognizer.processString(text)
         guard let language = recognizer.dominantLanguage,
-              let confidence = recognizer.languageHypotheses(withMaximum: 1)[language],
-              confidence >= confidenceThreshold else {
+            let confidence = recognizer.languageHypotheses(withMaximum: 1)[language],
+            confidence >= confidenceThreshold
+        else {
             return "uncertain"
         }
         let raw = language.rawValue.lowercased()
@@ -141,7 +201,7 @@ public actor LanguageAligner {
 // MARK: - LLM Provider
 
 /// 离线 LLM 推理来源（ADR-009 决策 4，3F.9 落地捆绑运行时）。
-public protocol LLMProvider: Sendable {
+nonisolated public protocol LLMProvider: Sendable {
     /// 生成文本。
     ///
     /// - Parameters:
@@ -158,7 +218,7 @@ public enum LanguageAlignerError: Error, LocalizedError, Sendable {
     /// 无 LLM 提供方（离线运行时未落地）
     case runtimeUnavailable
 
-    public nonisolated var errorDescription: String? {
+    nonisolated public var errorDescription: String? {
         switch self {
         case .runtimeUnavailable:
             return "Offline LLM runtime not available"

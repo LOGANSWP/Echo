@@ -120,6 +120,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
     enum ErrorLevel: Equatable, Sendable {
         /// L2 可恢复: Toast + 重试按钮
         case l2Recoverable(message: String)
+        case l3Blocking(message: String)
     }
 
     enum ReportLibraryState: Equatable, Sendable {
@@ -127,6 +128,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
         case loading
         case loaded
         case error(message: String)
+        case modelBlocked
     }
 
     /// 导出格式 (US-SYN-003 AC-3)
@@ -148,6 +150,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
     private(set) var viewState: ViewState = .idle
     /// 当前创作结果
     private(set) var creation: CreationModel?
+    /// Distinguishes missing source text from an unavailable generation runtime (4.0k).
+    private(set) var requiresSourceText = false
     /// 已选模板
     private(set) var selectedTemplate: CreationTemplate?
     private(set) var reportLibraryState: ReportLibraryState = .idle
@@ -362,6 +366,9 @@ final class CreationViewModel: CreationSharePresentationReporting {
                 guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.recoverableReportPeriods = recoverable
                 self.reportLibraryState = .loaded
+            } catch let error as GenerationRuntimeError where error.severity == .l3Blocking {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.reportLibraryState = .modelBlocked
             } catch {
                 guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
@@ -407,11 +414,36 @@ final class CreationViewModel: CreationSharePresentationReporting {
                 self.recoverableReportPeriods = snapshot.0
                 self.narrativeReports = snapshot.1
                 self.reportLibraryState = .loaded
+            } catch let error as GenerationRuntimeError where error.severity == .l3Blocking {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.reportLibraryState = .modelBlocked
             } catch {
                 guard requestGeneration == self.reportLibraryRequestGeneration else { return }
                 self.reportLibraryState = .error(
                     message: EchoStrings.tr("Unable to start narrative report generation.")
                 )
+            }
+        }
+    }
+
+    func repairReportRuntime() {
+        reportLibraryState = .loading
+        reportLibraryRequestGeneration += 1
+        let requestGeneration = reportLibraryRequestGeneration
+        guard let pipeline = creativePipeline else {
+            reportLibraryState = .modelBlocked
+            return
+        }
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await pipeline.retryRuntime(traceID: UUID().uuidString)
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.loadReportLibrary()
+            } catch {
+                guard requestGeneration == self.reportLibraryRequestGeneration else { return }
+                self.reportLibraryState = ErrorClassifier.classify(error) == .l3Blocking
+                    ? .modelBlocked : .error(message: EchoStrings.tr("Unable to retry this narrative report."))
             }
         }
     }
@@ -441,7 +473,9 @@ final class CreationViewModel: CreationSharePresentationReporting {
             },
             sourceMemoryCount: report.sources.count,
             sourceTypes: report.sourceTypes,
-            emptyReason: nil
+            emptyReason: nil,
+            reportCoverage: report.envelope.coverage,
+            omittedParagraphCount: report.envelope.omittedParagraphCount
         )
     }
 
@@ -500,6 +534,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     /// 经生产管线 grounded 生成 — 源记忆经检索结果映射（无源 → 空态）。
     private func generateViaPipeline(_ pipeline: CreativePipeline, template: CreationTemplate) async {
+        requiresSourceText = false
         do {
             let coreTemplate: CreativeTemplate
             switch template {
@@ -535,9 +570,21 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
             creation = mapToCreationModel(output)
             viewState = .generated
+        } catch CreativeError.invalidStructuredOutput(.templateMismatch) {
+            creation = nil
+            viewState = .error(.l2Recoverable(
+                message: "The generated text did not follow the selected template. Please try again."
+            ))
         } catch CreativeError.noSources {
             creation = nil
+            requiresSourceText = true
             viewState = .empty
+        } catch is CancellationError {
+            viewState = .idle
+        } catch let error as GenerationRuntimeError where error.severity == .l3Blocking {
+            viewState = .error(.l3Blocking(message: ErrorSeverity.l3Blocking.userFacingMessageKey))
+        } catch let error as GenerationRuntimeError {
+            viewState = .error(.l2Recoverable(message: Self.generationFailureMessage(error)))
         } catch CreativeError.runtimeUnavailable {
             viewState = .error(.l2Recoverable(
                 message: "Offline generation runtime is not available. Please try again."
@@ -546,6 +593,31 @@ final class CreationViewModel: CreationSharePresentationReporting {
             viewState = .error(.l2Recoverable(
                 message: "Generation is currently unavailable. Please try again."
             ))
+        }
+    }
+
+    private static func generationFailureMessage(_ error: GenerationRuntimeError) -> String {
+        switch error {
+        case .deadline:
+            "Generation reached the time limit on this device. Try a shorter memory."
+
+        case .memoryLimit:
+            "This device does not have enough available memory for generation."
+
+        case .contextLimit:
+            "This memory is too long for generation. Choose a shorter memory."
+
+        case .outputLimit, .languageFallback:
+            "The model could not produce a complete response in your selected language. Please try again."
+
+        case .privacyDenied:
+            "The source or its permissions changed. Return to search and select the memory again."
+
+        case .busy:
+            "Another creation is being generated. Wait for it to finish, then try again."
+
+        default:
+            "Generation is currently unavailable. Please try again."
         }
     }
 
@@ -592,7 +664,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
         generate()
     }
 
-    /// Copies citation-preserving plain text after current-policy revalidation.
+    /// Copies title and body after revalidating the complete source-bearing output.
     func copyToClipboard() {
         guard let creation else { return }
         let output = Self.creativeOutput(from: creation)
@@ -906,6 +978,29 @@ final class CreationViewModel: CreationSharePresentationReporting {
         guard case .error = viewState else { return }
         viewState = .idle
         generate()
+    }
+
+    func retryModelLoad() {
+        viewState = .generating
+        guard let pipeline = creativePipeline, let template = selectedTemplate else {
+            viewState = .error(.l3Blocking(message: ErrorSeverity.l3Blocking.userFacingMessageKey))
+            return
+        }
+        generateTask?.cancel()
+        generateTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await pipeline.retryRuntime(traceID: UUID().uuidString)
+                try Task.checkCancellation()
+                await self.generateViaPipeline(pipeline, template: template)
+            } catch is CancellationError {
+                self.viewState = .idle
+            } catch {
+                self.viewState = ErrorClassifier.classify(error) == .l3Blocking
+                    ? .error(.l3Blocking(message: ErrorSeverity.l3Blocking.userFacingMessageKey))
+                    : .error(.l2Recoverable(message: ErrorSeverity.l2Recoverable.userFacingMessageKey))
+            }
+        }
     }
 
     // MARK: - Prompt Editor Actions (US-SYN-005)

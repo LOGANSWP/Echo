@@ -105,6 +105,12 @@ struct CreationCitation: Sendable, Equatable {
 
 /// 创作结果展示模型 — 薄适配器 (docs/ui/architecture.md §7.1)。
 struct CreationModel: Sendable, Equatable {
+    /// Presentation-only grouping in first-appearance order. Per-paragraph provenance remains intact.
+    var distinctSourceCitations: [CreationCitation] {
+        var seen: Set<UUID> = []
+        return paragraphs.flatMap(\.citations).filter { seen.insert($0.memoryId).inserted }
+    }
+
     /// 选中的创作模板
     var selectedTemplate: CreationTemplate
     /// 结果标题（叙事报告含周期, US-SYN-004 AC-5）
@@ -117,6 +123,8 @@ struct CreationModel: Sendable, Equatable {
     var sourceMemoryCount: Int
     /// Source types submitted during production generation, retained for action-time revalidation.
     var sourceTypes: [String]
+    var reportCoverage: NarrativeReportCoverage?
+    var omittedParagraphCount: Int?
     /// 空态原因（无匹配源记忆时非 nil → empty state）
     var emptyReason: String?
 
@@ -127,7 +135,9 @@ struct CreationModel: Sendable, Equatable {
         paragraphs: [CreationParagraph],
         sourceMemoryCount: Int,
         sourceTypes: [String] = [],
-        emptyReason: String?
+        emptyReason: String?,
+        reportCoverage: NarrativeReportCoverage? = nil,
+        omittedParagraphCount: Int? = nil
     ) {
         self.selectedTemplate = selectedTemplate
         self.title = title
@@ -136,6 +146,8 @@ struct CreationModel: Sendable, Equatable {
         self.sourceMemoryCount = sourceMemoryCount
         self.sourceTypes = sourceTypes
         self.emptyReason = emptyReason
+        self.reportCoverage = reportCoverage
+        self.omittedParagraphCount = omittedParagraphCount
     }
 }
 

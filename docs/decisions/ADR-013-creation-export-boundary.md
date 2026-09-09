@@ -13,7 +13,7 @@
 1. **Apple Translation 仅展示层**：`AppleTranslationService` 实现 `TranslationService.translate`；先做 LanguageAvailability 检查（不支持的语言对 → `unavailable` 状态保留原文 + 语言标签）；**绝不编造翻译质量分数**（ADR-005 已把质量兜底改为源语言检测置信度 <0.9 时保留原文）。
 2. **七天持久缓存**：`PersistentTranslationCache`（TTL=7d，持久化跨重启）；术语表优先，未命中再调 Apple Translation；语言对齐重试 ≤1。
 3. **Grounded creation**（ADR-009 批准保留，ADR-017/020 收紧）：`CreativePipeline` 通过批准离线运行时生成。模型只接收 opaque MemoryID，生成协议为版本化、受限 JSON；解析器只接受当前策略过滤后实际提交模型的 allow-list。禁止按段落序号轮询绑定；多引用、无来源和部分无来源使用 `[SourceAnchor]` 与类型化 provenance 状态。allow-list 命中证明来源身份，不自动证明事实正确。
-4. **导出边界**：复制、Markdown/PDF/plain-text 系统 share 统一经 composition-owned export coordinator 在准备前执行当前 UserPolicy + PrivacyCheckpoint；撤权时阻止派生正文交接，策略仍允许但来源离线时保留诚实不可用标记。所有格式保留引用，多页 PDF 不截断。Notes 交接**仅用系统 share/export 流**，删除 `notes://echo/...` 深链；用户中介的 Notes 交接不伪造 URL。只有系统控制器实际呈现回调后才记录 `sharePresented=true`；Echo 不保存 activityType、目标 App 或最终完成状态，完整规则见 ADR-020。
+4. **导出边界**：复制、Markdown/PDF/plain-text 系统 share 统一经 composition-owned export coordinator 在准备前执行当前 UserPolicy + PrivacyCheckpoint；撤权时阻止派生正文交接，策略仍允许但来源离线时 App 内保留诚实不可用标记。按 ADR-024，复制及所有导出默认只含标题和正文，来源关系留在 App 内；多页 PDF 不截断。Notes 交接**仅用系统 share/export 流**，删除 `notes://echo/...` 深链；用户中介的 Notes 交接不伪造 URL。只有系统控制器实际呈现回调后才记录 `sharePresented=true`；Echo 不保存 activityType、目标 App 或最终完成状态，完整规则见 ADR-020。
 5. **创作控制面**：仅当 SYN 保留时创建 `CreativePipeline`/`CreationExportService` 并暴露生产控制；若 SYN 移出 v1 则删除不可达生产控制并断言范围一致性（本 ADR 采用保留路径）。
 
 ## 备选方案

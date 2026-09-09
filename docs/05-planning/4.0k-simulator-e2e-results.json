@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "scope": "real-model-simulator-engineering-e2e",
+  "deviceQualified": false,
+  "productQualityApproved": false,
+  "releaseApproved": false,
+  "target": "iPhone 17 Pro / iOS 26.5",
+  "configuration": "Debug, Swift -O, serial tests",
+  "promptVersion": "observations-production-v4",
+  "testSummary": {
+    "tests": 39,
+    "suites": 5,
+    "failures": 0,
+    "elapsedSeconds": 420.939
+  },
+  "cases": [
+    {
+      "sourceCount": 1,
+      "reports": [
+        {
+          "type": "month",
+          "modelCalls": 1,
+          "aggregationLayers": 1,
+          "contributingSources": 1,
+          "paragraphCount": 1
+        },
+        {
+          "type": "year",
+          "modelCalls": 1,
+          "aggregationLayers": 1,
+          "contributingSources": 1,
+          "paragraphCount": 1
+        }
+      ],
+      "pendingOperationCount": 0,
+      "remainingProgressCount": 0
+    },
+    {
+      "sourceCount": 5,
+      "reports": [
+        {
+          "type": "month",
+          "modelCalls": 8,
+          "aggregationLayers": 3,
+          "contributingSources": 5,
+          "paragraphCount": 1
+        },
+        {
+          "type": "year",
+          "modelCalls": 8,
+          "aggregationLayers": 3,
+          "contributingSources": 5,
+          "paragraphCount": 1
+        }
+      ],
+      "pendingOperationCount": 0,
+      "remainingProgressCount": 0
+    }
+  ],
+  "logSHA256": "40af9446208bd32c37f91813132068bab3a70dac8b3102b819107c6c9c4678bd",
+  "relatedRegression": {
+    "tests": 67,
+    "suites": 10,
+    "failures": 0,
+    "elapsedSeconds": 2.204,
+    "logSHA256": "b01ac9a292af3e3be9e63dffb48256de1eef9ed007bc6a015a32a549e0701418"
+  },
+  "totalTestSummary": {
+    "tests": 106,
+    "suites": 15,
+    "failures": 0
+  }
+}

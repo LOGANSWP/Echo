@@ -362,19 +362,21 @@ struct TranslationCreationTests {
             )
         }
 
-        @Test("US-SYN-003 AC-3: markdown includes title and source anchors")
-        func markdownContainsAnchors() {
+        @Test("US-SYN-003 AC-3: markdown includes title and body without internal source markers")
+        func markdownContainsCleanText() {
             let md = CreationExportService.markdown(from: sampleOutput())
             #expect(md.contains("A letter to your future self"))
-            #expect(md.contains("MemoryID:22222222"))
-            #expect(md.contains("NoSource") == true)
+            #expect(!md.contains("MemoryID:22222222"))
+            #expect(md.contains("You loved walking in the park."))
+            #expect(md.contains("NoSource") == false)
+            #expect(md.contains("You enjoyed quiet mornings."))
         }
 
-        @Test("US-SYN-003 AC-3: share text preserves source markers")
+        @Test("US-SYN-003 AC-3: share text contains body without source markers")
         func shareTextPlain() {
             let share = CreationExportService.shareText(from: sampleOutput())
             #expect(share.contains("You loved walking in the park."))
-            #expect(share.contains("[🔗") == true)
+            #expect(share.contains("[🔗") == false)
         }
 
         @Test("US-SYN-003 AC-3 ADR-013: PDF data is non-empty")

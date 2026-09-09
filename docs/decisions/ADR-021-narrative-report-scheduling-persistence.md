@@ -49,6 +49,8 @@ US-SYN-004 与 ADR-017 已确定月报/年报采用 `earliest-eligible`、持久
 
 ### 5. 读取、分享、删除与审计
 
+> **4.0k 补充（ADR-023）**：§4 的字节/字符限制不能替代 tokenizer 计算的上下文及输出 token 预算，还须约束总调用、层数、驻留结果、时间与 KV 内存。coverage 记录真实执行，不把选中数当提交数。§3 恢复只持久化无原文描述；Continue 重建所需内存前缀，保留原 checkpoint，身份变化走合法 Restart。语言降级或空模型输出不能写 noData/completed。报告派生关系覆盖实际贡献输入，不只最终锚点。仍复用既有 CAS 与原子 publication，不新建中间正文存储。
+
 1. 完成报告仅在本地以 `NSFileProtectionComplete` 保护。Creation/Focus UI 读取持久报告和真实调度状态，不得把 fixture 报告当生产证据。
 2. 查看已持久报告可以保留“来源当前不可用”的诚实标记；导航、复制、导出、打印或系统分享准备仍须按 ADR-020 重新执行当前授权复验。Notes 只通过用户可见的系统 share/export 交接，Echo 不推断目标 App 或保存结果。
 3. 用户可以删除报告；删除事务同时将其周期标记为 `invalidated`。删除 canonical memory 时，同一 D-005 清理事务删除所有引用它的 `NarrativeReportSource` 与对应派生报告，并把周期标记为 `invalidated`。`invalidated` 在 v1 是不可重新生成的终态，防止删除后的派生内容被自动或手动复建；未来若提供历史重建，必须以新的版本化产品合同和身份键另行审批。撤销全部同意时清除调度设置、报告、来源关系、周期状态和相关待处理描述。

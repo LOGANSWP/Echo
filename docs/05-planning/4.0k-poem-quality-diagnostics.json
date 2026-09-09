@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "taskID": "4.0k",
+  "scope": "synthetic-development-diagnostics-only",
+  "formalAcceptanceCorpusUsed": false,
+  "productQualityApproved": false,
+  "experimentsInstalled": false,
+  "model": "Pinned Qwen3-0.6B source; qwen25 group uses cached Qwen2.5-0.5B source only, never installed",
+  "baseline": {
+    "sourceOutput": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"蓝圆测试\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"白背景中\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"合成图像\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"无真实记忆\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n  ]\n}",
+    "outputSHA256": "192ae8310632de5a66a5e631905dafad934d86abde0cc89d5d8834a2b7d5dfa3",
+    "finding": "The unquantized source model reproduces the prior Chinese noun-list result. This is content reproduction, not a logits-parity or production-harness equivalence claim."
+  },
+  "limitations": [
+    "The development grammar enforces four paragraph objects but some experiments permit embedded newlines; it is not full production poem-grammar parity.",
+    "Temporary shared input files were reused; these outputs are diagnostic observations, not frozen formal acceptance evidence.",
+    "Prompt alternatives, sampling and alternate cached models remain outside the installed App.",
+    "No automatic proxy is used to approve readability, factual entailment or literary quality."
+  ],
+  "experiments": [
+    {
+      "name": "profiles",
+      "outputSHA256": "2e56628f1483874960e92c7fb1aff3b1386896728f6c1d73805b203ebbbd2e8e",
+      "results": [
+        {
+          "profile": "compact-en",
+          "case": "circle",
+          "promptTokens": 149,
+          "outputTokens": 241,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"A blue circle is centered on a white background.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"This is a synthetic test image.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"A blue circle is centered on a white background.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"This is a synthetic test image.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n  ]\n}",
+          "seconds": 16.688132209
+        },
+        {
+          "profile": "compact-en",
+          "case": "rain",
+          "promptTokens": 140,
+          "outputTokens": 231,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"Raindrops run down the window.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"The room is quiet.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"The silence is a whisper.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"The world holds its breath.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n  ]\n}",
+          "seconds": 15.487062000000002
+        },
+        {
+          "profile": "compact-en",
+          "case": "river",
+          "promptTokens": 146,
+          "outputTokens": 246,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"At sunset, golden light reflects on the river.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"Two white birds rest on a branch.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"The river flows gently, its waters shimmering.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"The sky is painted with hues of orange and gold.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n  ]\n}",
+          "seconds": 17.188927792
+        },
+        {
+          "profile": "compact-zh",
+          "case": "circle",
+          "promptTokens": 153,
+          "outputTokens": 244,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"A blue circle is centered on a white background.\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n \n  , {\n    \"text\": \"This is a synthetic test image.\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  },\n  {\n    \"text\": \"A blue circle is centered on a white background.\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  },\n  {\n    \"text\": \"This is a synthetic test image.\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  }\n  ]\n}",
+          "seconds": 16.638642416000003
+        },
+        {
+          "profile": "compact-zh",
+          "case": "rain",
+          "promptTokens": 144,
+          "outputTokens": 251,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"雨滴从窗台落下，房间静谧。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n \n  , \n  {\n    \"text\": \"房间的寂静仿佛被时间凝固。\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  },\n  {\n    \"text\": \"雨滴在玻璃上留下无声的痕迹。\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  },\n  {\n    \"text\": \"寂静中，时间仿佛也静止。\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  }\n  ]\n}",
+          "seconds": 18.06827725000001
+        },
+        {
+          "profile": "compact-zh",
+          "case": "river",
+          "promptTokens": 150,
+          "outputTokens": 256,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"夕阳洒落河面，白鸟栖于枝头。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n \n  , \n  {\n    \"text\": \"金色的光晕在水面跳跃，白鸟的影子随风摇曳。\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  },\n  {\n    \"text\": \"两片白鸟的翅膀在暮色中轻颤，仿佛在诉说时光的韵律。\",\n    \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n  },\n  {\n    \"text\": \"暮色渐浓，河岸的轮廓在光影中渐渐模糊，但白鸟的影子却愈发清晰。\",\n    \"sourceMemoryIDs\": [\"aa8ff",
+          "seconds": 22.575623957999994
+        }
+      ]
+    },
+    {
+      "name": "compact",
+      "outputSHA256": "44dbf60ef4f1ac89f39df852494229843c389aeb89e8afc9c60b51ebcd967de4",
+      "results": [
+        {
+          "profile": "compact-zh",
+          "case": "circle",
+          "promptTokens": 185,
+          "outputTokens": 184,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"蓝圆测试图\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"白背景中圆明\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"圆心如星河\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"光晕环绕\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 13.1211465
+        },
+        {
+          "profile": "compact-zh",
+          "case": "rain",
+          "promptTokens": 176,
+          "outputTokens": 219,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴从窗台落下，房间静谧无声。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"月光洒在地板上，像银色的尘埃。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"窗帘轻轻摇曳，仿佛诉说着未说出口的故事。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"寂静中藏着微光，像未完成的诗行。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 14.787552958000003
+        },
+        {
+          "profile": "compact-zh",
+          "case": "river",
+          "promptTokens": 182,
+          "outputTokens": 213,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"夕阳下的河流上，两只白鸟停在枝头。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"金光洒落，水面泛起涟漪。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"枝头的白鸟，像是星辰坠落。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"河面的光，是永恒的倒影。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 14.191181417000003
+        }
+      ]
+    },
+    {
+      "name": "single",
+      "outputSHA256": "939d0cedf6dc8cad46946dd583c1c49da2741ed8b9eba5a132a187f8f3acb068",
+      "results": [
+        {
+          "profile": "single-poem",
+          "case": "circle",
+          "promptTokens": 187,
+          "outputTokens": 66,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"一个蓝色的圆圈在白色背景上，这是合成测试图像。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 8.392310583
+        },
+        {
+          "profile": "single-poem",
+          "case": "rain",
+          "promptTokens": 178,
+          "outputTokens": 61,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴落在窗上，房间静谧。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 6.721041000000001
+        },
+        {
+          "profile": "single-poem",
+          "case": "river",
+          "promptTokens": 184,
+          "outputTokens": 77,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"夕阳余晖洒在河面上，两只白鸟停在枝头。此景如画，静谧而美好。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 8.967317583
+        }
+      ]
+    },
+    {
+      "name": "tagged",
+      "outputSHA256": "9204f2f416a641cc6485135a832356b012d8e04c9e07d729dcb4e1c698ce4a2e",
+      "results": [
+        {
+          "profile": "compact-zh",
+          "case": "circle",
+          "promptTokens": 180,
+          "outputTokens": 180,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"蓝圆测试图\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"白背景中圆环\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"如星辰般闪烁\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"在寂静中流转\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 12.040459208000001
+        },
+        {
+          "profile": "compact-zh",
+          "case": "rain",
+          "promptTokens": 171,
+          "outputTokens": 210,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴在窗上落下，房间静谧无声。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"月光洒在地板上，像银色的羽毛。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"窗帘轻轻摇动，仿佛诉说着往事。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"夜色沉入房间，只剩下心跳的回响。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 14.764524000000002
+        },
+        {
+          "profile": "compact-zh",
+          "case": "river",
+          "promptTokens": 177,
+          "outputTokens": 215,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"金色的夕阳洒在河面上，两只白鸟停在枝头。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"水面泛起涟漪，鸟影摇曳如诗。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"枝头的白鸟与水面的波光相映成趣，\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"天地间仿佛一幅流动的画卷。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 14.425048833999998
+        }
+      ]
+    },
+    {
+      "name": "plain",
+      "outputSHA256": "851ebdc28730aba904778023b224b307b9a999c0deda978eafed771de45d95ae",
+      "results": [
+        {
+          "source": "Blue circle test\nA blue circle is centered on a white background. This is a synthetic test image.",
+          "raw": "蓝圆在白纸上旋转，  \n像未完成的诗行，  \n无声地诉说着秘密。"
+        },
+        {
+          "source": "Raindrops run down the window. The room is quiet.",
+          "raw": "雨滴落在窗上，房间静谧无声。  \n像一串无声的音符，轻轻流淌。"
+        },
+        {
+          "source": "At sunset, golden light reflects on the river. Two white birds rest on a branch.",
+          "raw": "夕阳西下，金光洒在河面上，两只白鸟停在枝头，轻盈如风。"
+        }
+      ]
+    },
+    {
+      "name": "only",
+      "outputSHA256": "84d72dd73d41fdc83293daf20d93003be9e394a344e6a8d859822dd00368691a",
+      "results": [
+        {
+          "profile": "poetry-only",
+          "case": "circle",
+          "promptTokens": 149,
+          "outputTokens": 82,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"蓝圆在白纸上缓缓旋转，像一颗未完成的星，闪烁着未知的光。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 12.936541292000001
+        },
+        {
+          "profile": "poetry-only",
+          "case": "rain",
+          "promptTokens": 140,
+          "outputTokens": 73,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴在窗上滑落，房间静谧无声。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 9.695439625000002
+        },
+        {
+          "profile": "poetry-only",
+          "case": "river",
+          "promptTokens": 146,
+          "outputTokens": 73,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"夕阳洒落河面，白鸟栖于枝头\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 9.325929917
+        }
+      ]
+    },
+    {
+      "name": "style",
+      "outputSHA256": "19f9c8b1a8a29580cc0c054c8fc3b4edac830f4ccc37da831a6c16f24063d01d",
+      "results": [
+        {
+          "profile": "compact-zh",
+          "case": "circle",
+          "promptTokens": 223,
+          "outputTokens": 237,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"蓝光在画布上流转，如同夜色沉睡的星辰。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"圆影在渐暗的天空中摇曳，像是未完成的诗篇。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"光影交织成流动的诗行，仿佛时间在画布上流淌。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"每一笔都藏着未说出口的温柔，像月光在画布上轻吻。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 16.744418833
+        },
+        {
+          "profile": "compact-zh",
+          "case": "rain",
+          "promptTokens": 214,
+          "outputTokens": 237,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴在窗上轻盈落下，房间静谧如沉睡的湖面。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"月光透过窗帘，洒在地板上，像银色的涟漪。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"尘埃在空气中起舞，仿佛时光的碎片，散落在寂静中。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"一盏灯在黑暗中，轻轻照亮了房间，像温柔的星光。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 16.578948083999997
+        },
+        {
+          "profile": "compact-zh",
+          "case": "river",
+          "promptTokens": 220,
+          "outputTokens": 252,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"一盏灯把黄昏轻轻捧起，白鸟在枝头低语。水面泛起涟漪，暮色悄然沉入远方。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"白鸟栖于枝头，水面倒映着黄昏的余晖。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"暮色渐浓，灯影在水面上摇曳，仿佛时间被温柔地凝固。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"白鸟与黄昏共舞，水面与暮色交织成一幅静谧的画卷。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 17.279970916000003
+        }
+      ]
+    },
+    {
+      "name": "chinese-input",
+      "outputSHA256": "6854aa9b5eb146425f172b7990c28654471d5f580c56824eafdc78ee894c7a57",
+      "results": [
+        {
+          "profile": "chinese-input",
+          "case": "circle",
+          "promptTokens": 276,
+          "outputTokens": 223,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"一个诗行\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"一个诗行\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"一个诗行\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"一个诗行\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n  ]\n}",
+          "seconds": 15.900380250000001
+        },
+        {
+          "profile": "chinese-input",
+          "case": "rain",
+          "promptTokens": 279,
+          "outputTokens": 232,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"雨滴沿着窗玻璃滑落。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"房间安静。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"记忆在寂静中沉睡。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"时光在尘埃中流转。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n  ]\n}",
+          "seconds": 17.536551624999998
+        },
+        {
+          "profile": "chinese-input",
+          "case": "river",
+          "promptTokens": 289,
+          "outputTokens": 247,
+          "raw": "{\n  \"schemaVersion\": 1,\n  \"paragraphs\": [\n    {\n      \"text\": \"日落时，金色的光倒映在河面上。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"两只白鸟停在树枝上。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"风轻轻吹过，带来远方的歌。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    },\n    {\n      \"text\": \"记忆在暮色中慢慢沉眠。\",\n      \"sourceMemoryIDs\": [\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]\n    }\n  ]\n}",
+          "seconds": 17.434182375
+        }
+      ]
+    },
+    {
+      "name": "sampled",
+      "outputSHA256": "e9f88466489a9052bed9002ea74dddc404f997d90e55ed3c3ab2499fe9cb0ec1",
+      "results": [
+        {
+          "profile": "sampled-v10",
+          "case": "circle",
+          "promptTokens": 261,
+          "outputTokens": 229,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"一个蓝圆，白底上的一片天空。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"月光洒在湖面上，波光粼粼如碎银。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"风掠过柳枝，轻拂心间，带来远方的温柔。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"夜色沉静，星辰点缀，仿佛时间在等待。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 19.874142917
+        },
+        {
+          "profile": "sampled-v10",
+          "case": "rain",
+          "promptTokens": 252,
+          "outputTokens": 201,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴落在窗上，房间静谧。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"房间里的光影在流动。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"时间在窗前凝结成影子。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"记忆在寂静中缓缓苏醒。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 18.757489749999998
+        },
+        {
+          "profile": "sampled-v10",
+          "case": "river",
+          "promptTokens": 258,
+          "outputTokens": 226,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"黄昏的河流泛着金光，两只白鸟停在枝头。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"风掠过水面，涟漪荡开记忆的涟漪。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"影子在树梢摇曳，诉说着过往的光年。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"记忆在风中飘散，化作河流的倒影。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 19.153430999999998
+        }
+      ]
+    },
+    {
+      "name": "minimum",
+      "outputSHA256": "a70f81cacfc75a1f3ba00883e0f793333b0a3cee1877206a3f64ec15e1a13806",
+      "results": [
+        {
+          "profile": "minimum-line",
+          "case": "circle",
+          "promptTokens": 261,
+          "outputTokens": 240,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"一个蓝圆的测试图像，中心是白色的背景。这是一张合成测试图像。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"蓝圆的测试图像，中心是白色的背景。这是一张合成测试图像。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"蓝圆的测试图像，中心是白色的背景。这是一张合成测试图像。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"蓝圆的测试图像，中心是白色的背景。这是一张合成测试图像。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 23.263311959
+        },
+        {
+          "profile": "minimum-line",
+          "case": "rain",
+          "promptTokens": 252,
+          "outputTokens": 215,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴在窗上落下，房间静谧。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"月光洒在地板上，影子模糊不清。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"风穿过空荡的走廊，声音像叹息。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"记忆在尘埃中沉睡，像旧时光的碎片。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 18.973375375000003
+        },
+        {
+          "profile": "minimum-line",
+          "case": "river",
+          "promptTokens": 258,
+          "outputTokens": 242,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"黄昏的金色光线在河面上泛起涟漪，两只白鸟停在枝头。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"水面倒映着天空的倒影，鸟儿的翅膀划过云层。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"风轻轻吹过，带来远方的回响，鸟儿的歌声在夜色中低语。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"这画面像一幅画，每一帧都诉说着生命的律动。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 18.999229416999995
+        }
+      ]
+    },
+    {
+      "name": "seven",
+      "outputSHA256": "f2b888519e377e1ba92efba8d27eeef34de9b87ef8fd981bbed9d21af699e2ed",
+      "results": [
+        {
+          "profile": "seven-character",
+          "case": "circle",
+          "promptTokens": 173,
+          "outputTokens": 227,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"月色轻柔照花影，心随云影动。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"风起花香满径幽，心随云影入诗中。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"月色轻柔照花影，心随云影动。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"风起花香满径幽，心随云影入诗中。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 16.373689209
+        },
+        {
+          "profile": "seven-character",
+          "case": "rain",
+          "promptTokens": 164,
+          "outputTokens": 208,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨滴落在窗上，房间静谧\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"月色洒满书页，思绪随风飘\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"影子在墙上摇曳，回忆如潮涌\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"时光在记忆里流转，静美如诗\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 13.830447041
+        },
+        {
+          "profile": "seven-character",
+          "case": "river",
+          "promptTokens": 170,
+          "outputTokens": 222,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"夕阳西下，金光映照河面。白鸟栖于枝头。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"江水悠悠，鸟影婆娑。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"白鸟栖于枝头，江水映照夕阳。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"夕阳与江水相映，白鸟与枝头共舞。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 17.334050749999996
+        }
+      ]
+    },
+    {
+      "name": "qwen25",
+      "outputSHA256": "fecdce23f830df3837a6813c03f6b34d2a74b3fb3138cb9776e806a2897fe810",
+      "results": [
+        {
+          "profile": "qwen25-poem-v10",
+          "case": "circle",
+          "promptTokens": 284,
+          "outputTokens": 247,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"在晨曦的微光中，\\n我看见了星辰的轮廓。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"我轻触那静谧的湖面，\\n水波轻拂，映照出我的影子。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"我站在古老的大树下，\\n听风吟唱，岁月的低语。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"我闭上眼睛，\\n感受着时间的流逝。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 15.157005542
+        },
+        {
+          "profile": "qwen25-poem-v10",
+          "case": "rain",
+          "promptTokens": 275,
+          "outputTokens": 216,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"雨点敲打着玻璃窗，寂静笼罩着房间。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"雨滴落在地板上，寂静无声。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"雨点划过窗帘，寂静如梦。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"雨点打在窗户上，寂静如歌。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 11.875400041999999
+        },
+        {
+          "profile": "qwen25-poem-v10",
+          "case": "river",
+          "promptTokens": 281,
+          "outputTokens": 223,
+          "raw": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"夕阳西下，金色的光辉洒满大地。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"两只白鹭在枝头悠闲地觅食。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"河面泛起一片金光，映照出两岸的美景。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]},{\"text\":\"夕阳西下，金色的光辉洒满大地。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+          "seconds": 15.671415749999998
+        }
+      ]
+    }
+  ]
+}
