@@ -95,6 +95,14 @@ jobs:
           pip install --quiet 'huggingface_hub>=0.34,<2.0'
           bash Scripts/prepare_models.sh
 
+      # Human decision, 2026-09-08 / DEF-79-002: do not publish model assets yet.
+      # These real-model tests remain enabled by default outside this CI lane.
+      - name: Record deferred generation artifact integration
+        run: |
+          echo "::notice::DEF-79-002: real bundled generation/poem tests deferred; model distribution not approved."
+          echo "### Deferred model integration (DEF-79-002)" >> "$GITHUB_STEP_SUMMARY"
+          echo "The 2 ingestion/report cases and 4 poem cases are skipped by explicit user decision. Model provisioning and these acceptance checks remain open; this CI result is not full Task 4.0k qualification." >> "$GITHUB_STEP_SUMMARY"
+
       # ── Install SwiftLint ──
       - name: Install SwiftLint
         run: brew install swiftlint
@@ -305,11 +313,20 @@ jobs:
           # DEF-64-007: Swift Testing suites self-disable via this env var
           # (shared-DatabaseManager ordering debt); -skip-testing does not
           # match Swift Testing suites reliably.
-          xcodebuild test \
+          python3 -m unittest Scripts.tests.test_ci_generation_test_run
+          xcodebuild build-for-testing \
             -project Echo.xcodeproj \
             -scheme Echo \
             -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
             -derivedDataPath DerivedData \
+            -enableCodeCoverage YES \
+            -parallel-testing-enabled NO \
+            2>&1 | tee build-for-testing.log
+          # Inject the narrow waiver into the test host, not just the shell.
+          ECHO_TEST_RUN=$(python3 Scripts/prepare_ci_generation_test_run.py DerivedData/Build/Products)
+          xcodebuild test-without-building \
+            -xctestrun "$ECHO_TEST_RUN" \
+            -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
             -enableCodeCoverage YES \
             -resultBundlePath TestResults.xcresult \
             -parallel-testing-enabled NO \
@@ -363,6 +380,7 @@ jobs:
           name: build-failure-log
           path: |
             build.log
+            build-for-testing.log
             test.log
           retention-days: 3
 

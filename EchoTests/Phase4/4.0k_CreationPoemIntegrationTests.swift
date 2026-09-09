@@ -12,7 +12,10 @@ import Testing
 
 @testable import Echo
 
-@Suite("4.0k Real Poem Generation", .serialized)
+// DEF-79-002: explicitly deferred only in the CI lane until artifact distribution is authorized.
+@Suite("4.0k Real Poem Generation", .serialized,
+       .disabled(if: ProcessInfo.processInfo.environment["ECHO_DEFER_GENERATION_ARTIFACT_TESTS"] == "1",
+                 "DEF-79-002: CI model distribution deferred by user; real-model acceptance remains open"))
 @MainActor
 struct CreationPoemIntegrationTests {
     @Test("AC-1/2: bundled model writes verse from a synthetic photo description", arguments: ["en-US", "zh-Hans"])

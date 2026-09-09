@@ -1539,16 +1539,18 @@
       "title": "Required CI does not provision the generation bundles",
       "severity": "🔴",
       "location": "Echo/App/AppComposition.swift:141",
-      "reason": "Six real-model CI cases fail with invalidArtifact because the ignored generation bundle is not provisioned by the required model-preparation lane. Recorded by the requested architecture review; not repaired or waived in this review-only pass.",
-      "defer_to": "Current PR #79 before merge: controlled approved artifact provisioning, integrity verification and passing required CI.",
+      "reason": "User explicitly declined publishing model artifacts and authorized skipping only the related CI tests on 2026-09-08. The two real-generation suites are disabled only by a dedicated CI test-host flag; local defaults and assertions remain enabled. Provisioning is not fixed or claimed passed.",
+      "defer_to": "After explicit artifact-distribution approval: provision and verify frozen model resources in CI, remove the dedicated deferral flag, and rerun the six real-model parameter cases.",
       "deferred_at": "2026-09-09T02:35:10.164115+00:00",
-      "last_checked_at": "2026-09-09T02:35:10.164115+00:00",
-      "tracking_status": "open",
+      "last_checked_at": "2026-09-09T03:47:28.229410+00:00",
+      "tracking_status": "deferred",
       "target_tasks": [
         "4.0k"
       ],
       "recheck_trigger": "PR #79 fix review, required CI and Phase 4 integration",
-      "review_report": "docs/05-planning/4.0k-pr79-review.md"
+      "review_report": "docs/05-planning/4.0k-pr79-review.md",
+      "user_decision": "先不发布，CI可以先跳过这相关的",
+      "verification": "CI-style xctestrun: 26 executed Swift tests passed; three parameterized test declarations (six cases) explicitly skipped with DEF-79-002 reason. No artifact published."
     },
     {
       "id": "DEF-79-003",
@@ -1556,16 +1558,18 @@
       "title": "Manual generation renders unbounded source text before checking input budget",
       "severity": "🟡",
       "location": "Echo/Core/Services/StructuredGeneration.swift:50",
-      "reason": "Production prompt-construction probe accepts 1,000,000-byte source and materializes 1,000,333-byte prompt before the tokenizer byte guard. No early source/aggregate bound protects serialization. Recorded by the requested architecture review; not repaired or waived in this review-only pass.",
+      "reason": "Fixed with SQL byte-bounded conditional projection, aggregate manual input budgets, pre-serialization escaped JSON/source-reference bounds, and bounded source revalidation. Sources are not truncated; tokenizer/output budgets remain authoritative.",
       "defer_to": "Current PR #79 before merge: bound source reads and aggregate/escaped prompt construction; add targeted rejection-before-serialization tests.",
       "deferred_at": "2026-09-09T02:35:10.164115+00:00",
-      "last_checked_at": "2026-09-09T02:35:10.164115+00:00",
-      "tracking_status": "open",
+      "last_checked_at": "2026-09-09T03:47:28.229410+00:00",
+      "tracking_status": "resolved",
       "target_tasks": [
         "4.0k"
       ],
       "recheck_trigger": "PR #79 fix review, required CI and Phase 4 integration",
-      "review_report": "docs/05-planning/4.0k-pr79-review.md"
+      "review_report": "docs/05-planning/4.0k-pr79-review.md",
+      "resolved_at": "2026-09-09T03:47:28.229410+00:00",
+      "resolution": "GenerationInputBudgetTests covers oversized raw/aggregate/Unicode/escaping inputs, four persisted text fields, lossless small inputs, and zero tokenizer/model calls on aggregate overflow. Seven focused Swift suites pass; SwiftLint has zero violations."
     }
   ],
   "last_updated": "2026-09-09T02:35:10.164115+00:00"

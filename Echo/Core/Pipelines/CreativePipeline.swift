@@ -5,6 +5,7 @@
 //            docs/01-spec/用户故事与验收标准规格书.md → US-SYN-002 (溯源锚点), US-SYN-003 (grounded 生成),
 //            US-SYN-007 (术语表注入), US-SYN-008 (合成失败模板降级)
 // 任务: 3F.9 + 4.0a + 4.0i - Grounded creation and verifiable citations
+// AC coverage: 4.0k source-read and pre-render aggregate limits (PR #79);
 // AC 覆盖: US-SYN-002 AC-1/3 ✅ (多锚点/NoSource/partialNoSource), AC-5 ✅ (.synthesis 审计),
 //          US-SYN-003 AC-2 ✅ (版本化 JSON + exact allow-list), AC-6 ✅ (.creativeGeneration typed 审计),
 //          US-SYN-007 AC-1 ✅ (Prompt 注入术语表子集), US-SYN-008 AC-1/5 ✅ (失败模板降级 + .synthesisFallback 审计),
@@ -339,20 +340,29 @@ public actor CreativePipeline {
         }
 
         // Exact allow-list and unique submitted sources define the only legal citation identities.
-        guard Set(sources.map(\.memoryID)).count <= 24 else { throw GenerationRuntimeError.contextLimit }
+        guard Set(sources.map(\.memoryID)).count <= GenerationInputBudget.maximumSources else {
+            throw GenerationRuntimeError.contextLimit
+        }
         var submittedIDs: Set<UUID> = []
         let uniqueSources = sources.filter { submittedIDs.insert($0.memoryID).inserted }
         var currentSources = uniqueSources
         if let canonicalRepository {
             currentSources = []
+            var remaining = GenerationInputBudget.maximumBytes
             for source in uniqueSources {
-                guard let current = try await canonicalRepository.loadCreationSource(memoryID: source.memoryID) else {
+                guard let current = try await canonicalRepository.loadCreationSource(
+                    memoryID: source.memoryID, maximumTextBytes: remaining
+                ) else {
                     throw GenerationRuntimeError.privacyDenied
                 }
+                try GenerationInputBudget.consume(current.text ?? "", remaining: &remaining)
                 currentSources.append(current)
             }
         }
         let submittedSources = currentSources
+        try GenerationInputBudget.validate(submittedSources.map {
+            GenerationPassage(text: $0.text ?? "", sourceMemoryIDs: [$0.memoryID])
+        })
         guard submittedSources.allSatisfy({ !($0.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
         else {
             throw CreativeError.noSources

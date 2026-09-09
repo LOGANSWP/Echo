@@ -13,7 +13,10 @@ import Testing
 
 @testable import Echo
 
-@Suite("4.0k Real Bundled Generation", .serialized)
+// DEF-79-002: explicitly deferred only in the CI lane until artifact distribution is authorized.
+@Suite("4.0k Real Bundled Generation", .serialized,
+       .disabled(if: ProcessInfo.processInfo.environment["ECHO_DEFER_GENERATION_ARTIFACT_TESTS"] == "1",
+                 "DEF-79-002: CI model distribution deferred by user; real-model acceptance remains open"))
 @MainActor
 struct BundledGenerationIntegrationTests {
     @Test("AC-1/3: real ingestion, bilingual creation and hierarchical month/year reports", arguments: [false, true])

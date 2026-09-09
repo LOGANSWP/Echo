@@ -2,7 +2,7 @@
 // File: StructuredGeneration.swift
 // Spec: US-SYN-001/002/003/004; ADR-023 sections 2-4
 // Task: 4.0k - Structured generation and per-layer inputs
-// AC coverage: leaf identity, untrusted sources, body language, poem form and isolated style demonstration
+// AC coverage: leaf identity, pre-render byte bounds, body language and isolated poem demonstration
 // Architecture: AGENTS.md sections 4.2, 6.2
 // Generated: 2026-09-08
 // ==========================================
@@ -41,6 +41,7 @@ nonisolated enum GenerationPrompt {
         context: Context,
         isReduction: Bool = false
     ) throws -> GenerationRequest {
+        try GenerationInputBudget.validate(passages)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
         let memoryIDs = passages.flatMap(\.sourceMemoryIDs)
@@ -81,6 +82,16 @@ nonisolated enum GenerationPrompt {
             }
         }
         if !terms.isEmpty {
+            var remaining = GenerationInputBudget.maximumBytes
+            for (key, values) in terms {
+                try GenerationInputBudget.consume(key, remaining: &remaining, escaped: true)
+                for (language, value) in values {
+                    remaining -= 8
+                    guard remaining >= 0 else { throw GenerationRuntimeError.contextLimit }
+                    try GenerationInputBudget.consume(language, remaining: &remaining, escaped: true)
+                    try GenerationInputBudget.consume(value, remaining: &remaining, escaped: true)
+                }
+            }
             let encodedTerms = try encoder.encode(terms)
             guard let termJSON = String(data: encodedTerms, encoding: .utf8) else {
                 throw GenerationRuntimeError.invalidRequest
@@ -108,6 +119,9 @@ nonisolated enum GenerationPrompt {
             END_UNTRUSTED_SOURCES_JSON
             """
         if let poem, language != "zh-Hans" { user += "\n" + poem.user }
+        var remaining = GenerationInputBudget.maximumBytes
+        try GenerationInputBudget.consume(system, remaining: &remaining)
+        try GenerationInputBudget.consume(user, remaining: &remaining)
         return GenerationRequest(
             system: system,
             user: user,

@@ -140,3 +140,11 @@ v11 在 iOS 18 的完整示范请求超出 60 秒；固定八 token 的计算图
 别名仅是同一身份的传输表示，不是新的来源或模型提供的映射。模型在受限语法内明确选择别名；还原时按名称查表，禁止按生成段落下标、默认首项或 round-robin 绑定。空引用保持空引用；未知别名、畸形或超限传输输出按 L2 拒绝，不生成假 UUID 或自动补绑。还原前后都验证大小/数量边界，正文逐字保留，随后继续原有来源、语言、隐私与导出检查。领域的外来 canonical UUID / `noSource` / `partialNoSource` 语义不变。
 
 请求与一次语言重试携带同一编码版本和实际 allow-list。别名表不进入 TaskProgress、数据库或审计；实际 source count、派生删除关系与导航仍只使用 canonical MemoryID。模型输入及输出 token 指标按真实传输文本计数；还原后的领域 envelope 不伪装为模型多生成的 token。`creative-forms-production-v12` 纳入恢复身份，完整示范、60 秒、输出 256 token 和原有工件保持原预算。本次不装配八 token 图或更大权重，也不将开发样例当正式质量验收。
+
+
+## PR #79 输入边界修复与 CI 临时范围（2026-09-08）
+
+- `GenerationInputBudget` 使用现有 16,384-byte 防御上限，在 JSON 编码、转义、来源连接前检查来源数、合计字节及 JSON 转义膨胀（包括 `<`、引号、反斜杠、控制字符和多字节 Unicode）。不截断或改写来源事实；超限返回既有 `contextLimit`。完整 prompt 仍由获批 tokenizer 精确计数并保留输出预算，该字节防御不能替代 token 上限。
+- 手动创作的 canonical/effective text 读取在同一 SQLite 查询中使用 UTF-8 BLOB 长度和条件投影：超限时不把完整 canonicalText/title/description/tagsJSON 返回 Swift；逐来源扣除本次剩余预算，连接后检查分隔符开销，重新验证来源时同样有界。SQL 的长度判断不承诺底层 SQLite 无页面读取或零内部开销。
+- 用户明确决定“先不发布，CI可以先跳过这相关的”：不发布模型附件、不新下载模型。CI 仅用专用环境开关延期 `BundledGenerationIntegrationTests` 的 2 个参数用例和 `CreationPoemIntegrationTests` 的 4 个参数用例；其原测试断言保留，本地默认启用。CI summary 明示延期，其他测试/编译/覆盖率规则保持现状。
+- `DEF-79-002` 继续追踪资源分发与 CI 真模型验收；解除条件是用户批准分发、正确物化/验证冻结工件、移除开关并重跑真实测试。`DEF-78-001` 的质量/实机/完整资格和 `4.0l` 自动照片理解边界保持未通过。获批临时 CI 范围不等于完整 Task 4.0k 通过。

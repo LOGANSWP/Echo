@@ -120,7 +120,7 @@ nonisolated struct GenerationTokenizer {
     }
 
     func encode(_ text: String) throws -> [Int] {
-        guard text.utf8.count <= 16_384 else { throw GenerationTokenizerError.inputBudget }
+        guard text.utf8.count <= GenerationInputBudget.maximumBytes else { throw GenerationTokenizerError.inputBudget }
         // GenerationTokenizer normalization never mutates the original memory/source value.
         let normalized = text.precomposedStringWithCanonicalMapping as NSString
         let matches = regex.matches(in: normalized as String, range: NSRange(location: 0, length: normalized.length))
