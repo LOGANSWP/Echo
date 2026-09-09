@@ -273,8 +273,11 @@ nonisolated struct GenerationGrammarDecoder {
     private(set) var candidateChecks = 0
 
     func allows(_ id: Int) -> Bool {
+        allows(id, complete: grammar.status(output) == .complete)
+    }
+
+    private func allows(_ id: Int, complete: Bool) -> Bool {
         guard !ended else { return false }
-        let complete = grammar.status(output) == .complete
         if eosIDs.contains(id) { return complete }
         guard !complete, let fragment = tokenBytes[id], !fragment.isEmpty else { return false }
         return grammar.status(output + fragment) != .invalid
@@ -283,18 +286,43 @@ nonisolated struct GenerationGrammarDecoder {
     mutating func select(_ scores: [Float], deadline: Double? = nil) throws -> Int {
         try Task.checkCancellation()
         guard scores.allSatisfy({ !$0.isNaN && $0 != .infinity }) else { throw GenerationGrammarError.invalidLogits }
-        let ranked = scores.indices.sorted {
-            scores[$0] == scores[$1] ? $0 < $1 : scores[$0] > scores[$1]
+        // Heap construction is linear in vocabulary size. Only pop candidates until the
+        // highest-scoring legal token is found; preserve the exhaustive sort's tie order.
+        var heap = Array(scores.indices)
+        func precedes(_ left: Int, _ right: Int) -> Bool {
+            scores[left] == scores[right] ? left < right : scores[left] > scores[right]
         }
-        for id in ranked where scores[id].isFinite {
-            candidateChecks += 1
-            if candidateChecks % 256 == 1 {
-                try Task.checkCancellation()
-                if let deadline, ProcessInfo.processInfo.systemUptime >= deadline {
-                    throw GenerationBudgetError.deadline
-                }
+        func checkDeadline() throws {
+            try Task.checkCancellation()
+            if let deadline, ProcessInfo.processInfo.systemUptime >= deadline {
+                throw GenerationBudgetError.deadline
             }
-            if allows(id) { return id }
+        }
+        func siftDown(_ start: Int, in heap: inout [Int]) {
+            var parent = start
+            while parent * 2 + 1 < heap.count {
+                var child = parent * 2 + 1
+                if child + 1 < heap.count, precedes(heap[child + 1], heap[child]) { child += 1 }
+                guard precedes(heap[child], heap[parent]) else { return }
+                heap.swapAt(parent, child)
+                parent = child
+            }
+        }
+        try checkDeadline()
+        if heap.count > 1 {
+            for index in stride(from: heap.count / 2 - 1, through: 0, by: -1) {
+                if index.isMultiple(of: 256) { try checkDeadline() }
+                siftDown(index, in: &heap)
+            }
+        }
+        let complete = grammar.status(output) == .complete
+        while let id = heap.first, scores[id].isFinite {
+            candidateChecks += 1
+            if candidateChecks % 256 == 1 { try checkDeadline() }
+            if allows(id, complete: complete) { return id }
+            heap.swapAt(0, heap.count - 1)
+            heap.removeLast()
+            if !heap.isEmpty { siftDown(0, in: &heap) }
         }
         throw GenerationGrammarError.noAllowedToken
     }

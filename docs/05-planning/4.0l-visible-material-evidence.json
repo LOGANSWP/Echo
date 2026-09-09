@@ -1,0 +1,16 @@
+{
+  "updatedAt": "2026-09-09T19:24:02.366684+00:00",
+  "scope": "Actual persisted caption and OCR shown separately; no generated replacement content",
+  "testLog": "/tmp/echo-4.0l-visible-material-green.log",
+  "sha256": "39b95eaa38dab674c2e1bb7641b192acb1c618ee3c5062ab7b04da1e35a1ba4a",
+  "tests": "11 tests / 4 suites passed / 1.293s",
+  "iPhone17Pro": {
+    "screenHash": "1t4sqn3",
+    "caption": "In this image there is a red circle.",
+    "captionLabel": "AI image description (English original)",
+    "ocrStatus": "No text was recognized in this photo.",
+    "fixture": false
+  },
+  "iPhone16Pro": "Existing app is on edit form; update pending confirmation that edits are saved. No edit submitted or dismissed.",
+  "staticChecks": "479 bilingual catalog keys; directly changed photo Swift files lint 0 after formatting"
+}

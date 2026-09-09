@@ -18,15 +18,20 @@ nonisolated public struct GenerationSourceValidation: Sendable {
     func validate() async throws {
         for source in sources {
             try Task.checkCancellation()
-            if useEffectiveSourceText {
+            if useEffectiveSourceText || source.sourceType == "photo" {
                 guard let current = try await repository.loadCreationSource(
                     memoryID: source.memoryID, maximumTextBytes: GenerationInputBudget.maximumBytes
                 ),
-                      current.revision == source.revision, current.text == source.text,
+                      current.revision == source.revision,
                       SearchPipeline.normalizeSourceType(current.sourceType)
                         == SearchPipeline.normalizeSourceType(source.sourceType) else {
                     throw GenerationRuntimeError.privacyDenied
                 }
+                let text = current.text ?? ""
+                let compared = excerptScalarLimit.map {
+                    String(String.UnicodeScalarView(text.unicodeScalars.prefix($0)))
+                } ?? text
+                guard compared == source.text ?? "" else { throw GenerationRuntimeError.privacyDenied }
                 continue
             }
             guard let memory = try await repository.loadMemory(memoryId: source.memoryID),

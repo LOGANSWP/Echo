@@ -1,5 +1,51 @@
 # Task 4.0k native research probes
 
+## Task 4.0l photo-understanding screening
+
+`photo_understanding_probe.py` is an offline host-only candidate screen. It verifies
+the pinned source inventory, renders controlled non-personal images in memory,
+and records actual model output, token counts, EOS, timing and host memory.
+It does not save media or prove real PhotoKit/product acceptance.
+
+The first screen found content and language failures. The user then clarified
+that functional closure takes priority over precision. Continue native research
+with the same authorized candidate; retain quality findings separately. Its
+source was removed at the earlier checkpoint, so restore and verify the exact
+authorized inventory before running again. Keep one source copy within 3 GB. The exact source snapshots
+for both experiment versions are embedded in
+`docs/05-planning/4.0l-screening-results.json`; the same file retains all results.
+See `docs/05-planning/4.0l-screening-review.md` for the verdict and scope.
+
+### Native functional checkpoint
+
+The same authorized source has now been restored and verified. Use
+`convert_photo_research.py --attempt 2` as the recorded conversion configuration;
+its exclusive output guard prevents overwriting the existing successful run.
+`prepare_photo_native_probe.py` freezes analytic-circle token/oracle inputs.
+`PhotoNativeProbe.swift` plus `GenerationMemory.swift` compile under Swift 6
+complete concurrency checking and warnings-as-errors. The native probe performs
+image inference and token decoding itself; prompts are pretokenized, so this is
+not a complete production tokenizer or PhotoKit runtime. Both complete outputs
+match the CPU reference. See `docs/05-planning/4.0l-functional-research-review.md`.
+
+### Native inputs and generation bridge
+
+`PhotoTokenizer.swift` and `PhotoImagePreprocessor.swift` remove pretokenized
+input dependence. Their probes cover 103 tokenizer references, four budget
+rejections, 12 image cases and three invalid-image rejections. The fixed vocabulary
+omits some byte symbols; unsupported bytes reject instead of silently disappearing.
+`PhotoFunctionalProbe.swift` runs native image decoding, tokenization and actual
+Core ML inference; `run_photo_functional_probe.py` bounds resources and verifies
+source, converted and compiled identities. Existing run folders reject overwrite.
+`photo_generation_bridge.py` consumes actual caption results in the existing
+native structured generator, with all four bilingual/source checks passing.
+English paragraph repetition remains a quality finding.
+See `docs/05-planning/4.0l-native-input-review.md` and the pending local-App artifact
+packet. These results do not establish production PhotoKit, shared-process memory,
+or final quality/release qualification.
+
+## Task 4.0k probes
+
 These command-line programs implement the bounded research experiments in
 ADR-023. They are outside the Echo target and App Bundle. No model, runtime,
 distribution, quality, or device approval is granted by their results.

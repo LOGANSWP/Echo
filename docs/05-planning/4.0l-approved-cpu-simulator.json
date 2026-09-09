@@ -1,0 +1,9 @@
+{
+  "afterReleasePhysicalFootprint" : 947653632,
+  "beforePhysicalFootprint" : 79120712,
+  "caption" : "In this image there is a red circle.",
+  "elapsedSeconds" : 7.6981059166719206,
+  "outputTokenCount" : 10,
+  "processPeakPhysicalFootprint" : 986614856,
+  "scope" : "simulator-native-module-only"
+}

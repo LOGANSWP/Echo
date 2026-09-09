@@ -1,0 +1,94 @@
+{
+  "taskId": "4.0l",
+  "productionApproval": "pending",
+  "target": "iOS 18.0",
+  "compile": [
+    {
+      "command": [
+        "xcrun",
+        "coremlcompiler",
+        "compile",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolVision512.mlpackage",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1",
+        "--platform",
+        "iOS",
+        "--deployment-target",
+        "18.0"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/coremldata.bin\n",
+      "stderr": "",
+      "seconds": 0.30251850000058766
+    },
+    {
+      "command": [
+        "xcrun",
+        "coremlcompiler",
+        "compile",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolDecoder1024.mlpackage",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1",
+        "--platform",
+        "iOS",
+        "--deployment-target",
+        "18.0"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/coremldata.bin\n",
+      "stderr": "",
+      "seconds": 0.5061450829962268
+    }
+  ],
+  "files": [
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "ae9a13456708557871320dd1cf54a182507d46b239ef759afb3cf1c6b28fac38"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/coremldata.bin",
+      "sizeBytes": 2566,
+      "sha256": "133612ba70c9396a6f1f998ca1237a4217f5a3f271e5e88c02633f255c6b073c"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/metadata.json",
+      "sizeBytes": 19324,
+      "sha256": "11bca977aab841edb5ecafb6e8f7edbc1af819f92c00d350b60467723cdba080"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/model.mil",
+      "sizeBytes": 615112,
+      "sha256": "90d78d0a83ef72105b908cf645b2dbb364de7ca0fb1b02d1ffeaad42c48e81d0"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/weights/weight.bin",
+      "sizeBytes": 326339648,
+      "sha256": "1f5dbf99b4518801ad414defee0ce0b5352b9c22b031fcb4b928bf4834625011"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "5d3d454de517cf7ee127a749d009ca7797054378c5977cf8b178dceca87d8f25"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/coremldata.bin",
+      "sizeBytes": 564,
+      "sha256": "c668b84402a2746ca58a202a3773b824d5f5f90152ee7fe3a9acf97e60b266c4"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/metadata.json",
+      "sizeBytes": 2734,
+      "sha256": "a11a055a6933ed9d94c0d7dfc89b85a0d17a146e6023a1c06ea4bf25c6fd007b"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/model.mil",
+      "sizeBytes": 146515,
+      "sha256": "450eeccaca665079127be4bccfef43ad0b10d0dc7febbfab3e84c037f17f8e60"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/weights/weight.bin",
+      "sizeBytes": 187035776,
+      "sha256": "533311567f769e8222de8dc324b06c4f6dadc1502ea7dc7e37215521711e3fbb"
+    }
+  ],
+  "totalBytes": 514162725
+}

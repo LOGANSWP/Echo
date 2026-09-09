@@ -148,3 +148,16 @@ v11 在 iOS 18 的完整示范请求超出 60 秒；固定八 token 的计算图
 - 手动创作的 canonical/effective text 读取在同一 SQLite 查询中使用 UTF-8 BLOB 长度和条件投影：超限时不把完整 canonicalText/title/description/tagsJSON 返回 Swift；逐来源扣除本次剩余预算，连接后检查分隔符开销，重新验证来源时同样有界。SQL 的长度判断不承诺底层 SQLite 无页面读取或零内部开销。
 - 用户明确决定“先不发布，CI可以先跳过这相关的”：不发布模型附件、不新下载模型。CI 仅用专用环境开关延期 `BundledGenerationIntegrationTests` 的 2 个参数用例和 `CreationPoemIntegrationTests` 的 4 个参数用例；其原测试断言保留，本地默认启用。CI summary 明示延期，其他测试/编译/覆盖率规则保持现状。
 - `DEF-79-002` 继续追踪资源分发与 CI 真模型验收；解除条件是用户批准分发、正确物化/验证冻结工件、移除开关并重跑真实测试。`DEF-78-001` 的质量/实机/完整资格和 `4.0l` 自动照片理解边界保持未通过。获批临时 CI 范围不等于完整 Task 4.0k 通过。
+
+
+### 2026-09-09 模拟器诗歌超时复核
+
+用户要求优先完成真实功能闭环。中文诗歌提示词移除额外写作示范，改为四行短诗；请求版本 `creative-forms-production-v12-compact-poem-v1`，来源、语言、四行结构和模型工件保持原约束。选词改为与全排序等价的 max-heap，并复用本轮 prefix 完成状态。16 Pro 的 prefill 已由 31.51 秒降至 12.43 秒，但真实生成仍未在 60 秒内完成，不能宣称修复。详见 `../05-planning/4.0l-poem-timeout-evidence.json`；新的模拟器时间预算仅为待审批提案，尚未生效。
+
+
+### 2026-09-09 已获批模拟器手动创作预算增补
+
+用户明确批准 `../05-planning/4.0l-simulator-time-budget-proposal.md`：仅 `DEBUG && targetEnvironment(simulator)` 手动创作的单调用 120 秒、同请求总计 240 秒（含最多一次语言重试）；`GenerationExecutionScope` 默认 standard，自动报告继续 60 秒/调用，实机及 Release 均保持原预算。语言重试继承同一 scope 与截止，不重新计时。模型、token、内存和来源限制保持不变。批准记录见 `../05-planning/4.0l-simulator-time-budget-approval.json`；该增补只支持模拟器功能验证，不证明性能或发布资格。
+
+
+获批预算后继续复核：compact-poem-v1 能完成两次调用，但同图返回 languageFallback；该精简提示词实验不保留，恢复 `creative-forms-production-v12` 及其写作示范来源隔离测试。新的时间预算范围保持获批边界。不能把延长时间或完成模型调用等同于语言/生成验收通过。

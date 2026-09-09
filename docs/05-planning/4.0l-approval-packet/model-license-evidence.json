@@ -1,0 +1,38 @@
+{
+  "retrievedAt": "2026-09-09T15:45:44.636713+00:00",
+  "scope": "Pinned declared lineage and license documents only; no base-model weights downloaded. Base revisions record license evidence, not historical training checkpoint attestation.",
+  "files": [
+    {
+      "repository": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac",
+      "sourceURL": "https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct/resolve/12fd25f77366fa6b3b4b768ec3050bf629380bac/README.md",
+      "path": "licenses/HuggingFaceTB-SmolLM2-135M-Instruct-README.md",
+      "bytes": 6772,
+      "sha256": "4f97533ad95b1b2fea15fbc075c01b94578ebdd7c8138888fa43fa3abd530dc4",
+      "gitBlobId": "d168166639f4dec33a0d0bb5f8e7d4e20d9d52ac"
+    },
+    {
+      "repository": "google/siglip-base-patch16-512",
+      "revision": "753a949581523b60257d93e18391e8c27f72eb22",
+      "sourceURL": "https://huggingface.co/google/siglip-base-patch16-512/resolve/753a949581523b60257d93e18391e8c27f72eb22/README.md",
+      "path": "licenses/google-siglip-base-patch16-512-README.md",
+      "bytes": 4116,
+      "sha256": "b29f1544f8810fa8363ae0ee230b28c37e34f587f04c7dad99059e2cdd8c2848",
+      "gitBlobId": "12dfe5ca9945de8f9de647a63ff8245260fa7bb8"
+    },
+    {
+      "sourceURL": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "path": "licenses/Apache-2.0.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "repository": "HuggingFaceTB/SmolVLM-256M-Instruct",
+      "revision": "7e3e67edbbed1bf9888184d9df282b700a323964",
+      "path": "licenses/SmolVLM-256M-README.md",
+      "bytes": 16400,
+      "sha256": "0b687c656b2587d84cb85003825746f8b3a08497dff4ed51b54b1090719fa512"
+    }
+  ],
+  "legalApproval": "pending"
+}

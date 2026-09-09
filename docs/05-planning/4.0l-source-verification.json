@@ -1,0 +1,99 @@
+{
+  "taskId": "4.0l",
+  "repository": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "revision": "7e3e67edbbed1bf9888184d9df282b700a323964",
+  "completedAt": "2026-09-09T14:51:43.089249+00:00",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sizeBytes": 1519,
+      "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "README.md",
+      "sizeBytes": 16400,
+      "sha256": "0b687c656b2587d84cb85003825746f8b3a08497dff4ed51b54b1090719fa512",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "added_tokens.json",
+      "sizeBytes": 4739,
+      "sha256": "74135b8664b56088c0006f1c8e848d79a8eba003411f72ebf1dc2ee96227be3a",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "chat_template.json",
+      "sizeBytes": 429,
+      "sha256": "a68ad1a42681ae44eacd109ff8dd56a840f761c03d72f4ff4c515d092f882168",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "config.json",
+      "sizeBytes": 7353,
+      "sha256": "b70fb4bfde88df9eeebc9d8ff523733b8bf70d6c9b06c610325960e06ae9db52",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "generation_config.json",
+      "sizeBytes": 136,
+      "sha256": "067a2a54e5f87162ecac6e0e911cc4665fc8f7f3324794ecbac0f76badb56636",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "merges.txt",
+      "sizeBytes": 466391,
+      "sha256": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "model.safetensors",
+      "sizeBytes": 513028808,
+      "sha256": "74dea5904032e5ae99a2e0eef5179e6ac0f1dedc3ab0c7c2a5d4d387c843203e",
+      "verifiedAgainst": "upstreamLfsSha256"
+    },
+    {
+      "path": "preprocessor_config.json",
+      "sizeBytes": 486,
+      "sha256": "6cb6e36d6fcb88ca1502c4a26750715dc3e7dedddc9a8f17b27d8d167d1457e7",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "processor_config.json",
+      "sizeBytes": 68,
+      "sha256": "e7bff42da73ae9eec9042ef20e066e11f1ee20f025358ff79131e3c0fb549b46",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "sizeBytes": 1069,
+      "sha256": "aa0ff906077086dfa9734a7f97f68c825877a48f9468807be65504495cdeef09",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "tokenizer.json",
+      "sizeBytes": 3548256,
+      "sha256": "5ece781dc8d2b2f3e2f289ca0ae50b17cfc27dd27bfe7971bb8241e0b964331a",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "sizeBytes": 28249,
+      "sha256": "36c6fd44d07d10fd8180ee6b46dcccf69fb7c06753968ff0d7e17b8bfe17b777",
+      "verifiedAgainst": "gitBlobId"
+    },
+    {
+      "path": "vocab.json",
+      "sizeBytes": 800662,
+      "sha256": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79",
+      "verifiedAgainst": "gitBlobId"
+    }
+  ],
+  "sourceBytes": 517904565,
+  "diskFreeBefore": 147076747264,
+  "diskFreeAfter": 146550464512,
+  "studyBytes": 517904565,
+  "elapsedSeconds": 12.341616250000001,
+  "weightIntegrity": "passed",
+  "productionApproval": "pending"
+}

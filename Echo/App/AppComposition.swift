@@ -69,6 +69,7 @@ public final class AppComposition {
     public let creationExportCoordinator: CreationExportCoordinator
     public let narrativeReportActor: NarrativeReportActor
     public let generationProvider: BundledGenerationActor
+    public let photoUnderstandingActor: PhotoUnderstandingActor
     public let creativePipeline: CreativePipeline
     public let taskRecoveryRegistry: TaskRecoveryRegistry
     public let taskRecoveryCoordinator: TaskRecoveryCoordinator
@@ -133,7 +134,20 @@ public final class AppComposition {
             db: databaseManager,
             generationRegistry: generationRegistry,
             excludedAssets: excludedAssetsActor,
-            privacyActor: privacyActor
+            privacyActor: privacyActor,
+            photoPixelSource: PhotoKitPixelSource()
+        )
+        self.photoUnderstandingActor = PhotoUnderstandingActor(
+            database: databaseManager,
+            privacy: privacyActor,
+            queue: taskQueue,
+            progress: progressActor,
+            pixelSource: PhotoKitPixelSource(),
+            provider: BundledPhotoUnderstandingActor(
+                privacyActor: privacyActor,
+                manifestActor: ModelManifestActor(db: databaseManager)
+            ),
+            ocr: VisionPhotoOCRService()
         )
         self.excludedAssetsActor = excludedAssetsActor
         self.pendingOpsActor = pendingOpsActor
@@ -168,7 +182,8 @@ public final class AppComposition {
             privacyActor: privacyActor,
             taskQueue: taskQueue,
             pendingOps: pendingOpsActor,
-            generator: CreativeNarrativeReportGenerator(pipeline: creativePipeline)
+            generator: CreativeNarrativeReportGenerator(pipeline: creativePipeline),
+            sourceRepository: canonicalRepository
         )
         let taskRecoveryRegistry = TaskRecoveryRegistry()
         self.taskRecoveryRegistry = taskRecoveryRegistry
@@ -210,6 +225,9 @@ public final class AppComposition {
             try await privacyActor.loadPolicy()
             await taskRecoveryRegistry.register(taskType: .narrativeReport) { [narrativeReportActor] request in
                 try await narrativeReportActor.makeRecoveryJob(for: request)
+            }
+            await taskRecoveryRegistry.register(taskType: .photoUnderstanding) { [photoUnderstandingActor] request in
+                try await photoUnderstandingActor.makeRecoveryJob(for: request)
             }
             // UI tests/previews (DEBUG only): -ui-skip-consent bypasses the deny-by-default
             // gate and lands in .ready (fixture-driven XCUITest relies on the ungated path)

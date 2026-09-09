@@ -32,6 +32,7 @@ nonisolated enum GenerationPrompt {
         let traceID: String
         let deadline: Double
         let terminology: TerminologyTable
+        var executionScope: GenerationExecutionScope = .standard
     }
 
     static func request(
@@ -131,7 +132,8 @@ nonisolated enum GenerationPrompt {
             traceID: context.traceID,
             executionDeadline: context.deadline,
             outputForm: poem == nil ? .prose : .poem,
-            referenceEncoding: referenceEncoding
+            referenceEncoding: referenceEncoding,
+            executionScope: context.executionScope
         )
     }
 

@@ -18,6 +18,7 @@
 // Generated: 2026-07-04; Updated: 2026-09-07 (4.0j)
 // Task 4.0k (2026-09-08): atomic consent/source/dependency revalidation and typed language audit columns.
 // Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
+// Task 4.0l / US-ING-004 AC-7/8: independent versioned caption/OCR children, D-005 cascade.
 // ==========================================
 
 import Foundation
@@ -429,6 +430,63 @@ public actor DatabaseManager {
             try execute(sql: "ALTER TABLE Memory ADD COLUMN userLocked INTEGER NOT NULL DEFAULT 0")
         }
         // 4.0e: user-authored fields remain separate from immutable source text.
+        try execute(
+            sql: """
+                CREATE TABLE IF NOT EXISTS PhotoDerivedContent (
+                    memoryId TEXT NOT NULL REFERENCES Memory(memoryId) ON DELETE CASCADE,
+                    kind TEXT NOT NULL CHECK(kind IN ('caption', 'ocr')),
+                    sourceVersion TEXT NOT NULL,
+                    modelVersion TEXT NOT NULL,
+                    processingVersion TEXT NOT NULL,
+                    language TEXT NOT NULL CHECK(language IN ('zh-Hans', 'en-US')),
+                    state TEXT NOT NULL CHECK(state IN ('pending', 'ready', 'failed', 'unavailable')),
+                    body TEXT,
+                    assetRevision TEXT,
+                    bodyVersion INTEGER NOT NULL DEFAULT 1,
+                    updatedAt REAL NOT NULL,
+                    PRIMARY KEY(memoryId, kind),
+                    CHECK(bodyVersion = 1),
+                    CHECK(body IS NULL OR length(CAST(body AS BLOB)) <= 16384),
+                    CHECK(kind != 'caption' OR body IS NULL OR length(CAST(body AS BLOB)) <= 4096),
+                    CHECK(state != 'ready' OR (body IS NOT NULL AND length(trim(body)) > 0))
+                )
+                """
+        )
+        if try !columnNames(in: "PhotoDerivedContent").contains("assetRevision") {
+            try execute(sql: "ALTER TABLE PhotoDerivedContent ADD COLUMN assetRevision TEXT")
+        }
+        try execute(sql: """
+            CREATE TABLE IF NOT EXISTS PhotoUnderstandingJob (
+                memoryId TEXT PRIMARY KEY NOT NULL REFERENCES Memory(memoryId) ON DELETE CASCADE,
+                taskId TEXT UNIQUE NOT NULL,
+                sourceVersion TEXT NOT NULL,
+                assetRevision TEXT NOT NULL,
+                modelVersion TEXT NOT NULL,
+                processingVersion TEXT NOT NULL,
+                state TEXT NOT NULL CHECK(state IN ('queued', 'ready', 'failed', 'unavailable')),
+                updatedAt REAL NOT NULL
+            )
+            """)
+        try execute(sql: """
+            CREATE TRIGGER IF NOT EXISTS photo_job_cleanup AFTER DELETE ON PhotoUnderstandingJob BEGIN
+                DELETE FROM TaskProgress WHERE taskId = OLD.taskId;
+                DELETE FROM PendingOperations WHERE operationId = OLD.taskId;
+            END
+            """)
+        if try !columnNames(in: "PhotoUnderstandingJob").contains("requestOrigin") {
+            try execute(sql: "ALTER TABLE PhotoUnderstandingJob ADD COLUMN requestOrigin TEXT NOT NULL DEFAULT 'automatic'")
+        }
+        // Retire the superseded import-wide backlog before any queue reconstruction.
+        // Ready material, failure facts and requests created by the on-demand version survive.
+        try execute(sql: "DELETE FROM PhotoUnderstandingJob WHERE requestOrigin = 'automatic' AND state = 'queued'")
+        try execute(sql: """
+            CREATE TRIGGER IF NOT EXISTS photo_exclusion_cleanup AFTER INSERT ON ExcludedAssets BEGIN
+                DELETE FROM PhotoDerivedContent WHERE memoryId IN
+                    (SELECT memoryId FROM Memory WHERE sourceLocator = NEW.assetId AND sourceType = 'photo');
+                DELETE FROM PhotoUnderstandingJob WHERE memoryId IN
+                    (SELECT memoryId FROM Memory WHERE sourceLocator = NEW.assetId AND sourceType = 'photo');
+            END
+            """)
         try execute(
             sql: """
                 CREATE TABLE IF NOT EXISTS MemoryUserEdit (
@@ -964,6 +1022,15 @@ public actor DatabaseManager {
             }
             for source in publication.sources {
                 if let revision = source.sourceRevision, let digest = source.contentDigest {
+                    if source.sourceType == "photo" {
+                        guard let current = try readCreationSource(
+                            memoryID: source.memoryID, maximumTextBytes: GenerationInputBudget.maximumBytes
+                        ), current.revision == revision,
+                            AuditContentHasher.sha256Hex(String(String.UnicodeScalarView(
+                                (current.text ?? "").unicodeScalars.prefix(512)))) == digest
+                        else { throw NarrativeReportError.publicationConflict }
+                        continue
+                    }
                     let row = try executeQuery(
                         sql:
                             "SELECT updatedAt, substr(canonicalText, 1, 512) AS canonicalText, sourceType FROM Memory WHERE memoryId = ?",

@@ -1,0 +1,80 @@
+{
+  "parentPacketSha256": "625d3457c9e632b29bd2fe2e40467ba116079f935a4b303ebb3f7dee577117a7",
+  "files": [
+    {
+      "path": "NOTICE.md",
+      "sizeBytes": 2831,
+      "sha256": "bf9c15011e61759d9410bdd4d05134a4029c7df1c7e2e910e0de9979f55d26d0"
+    },
+    {
+      "path": "PhotoStateProbe.swift",
+      "sizeBytes": 11159,
+      "sha256": "15fc712404cff81d162d3f0b83b355db072a52b4b16ee4b98e5d1a01510972e8"
+    },
+    {
+      "path": "README.md",
+      "sizeBytes": 4285,
+      "sha256": "077fae95b3eda505a933ebc84331feb8bdcf92f68f41ef2f2d36115a68e3e8af"
+    },
+    {
+      "path": "candidate-resources.json",
+      "sizeBytes": 6131,
+      "sha256": "045b76147a1c4353ff8dc37135fffa555c00e653c3828cf88a9299dbb44ab449"
+    },
+    {
+      "path": "conversion-manifest.json",
+      "sizeBytes": 935,
+      "sha256": "7659337f5ac1f87050a2c49eb0afdba3f33f5e44148290445b785e40be5ded86"
+    },
+    {
+      "path": "converter.py",
+      "sizeBytes": 3031,
+      "sha256": "e52f655f1d545c198a88936e91f6013363f3a62bdab737a2e6b1eedfd88f2b95"
+    },
+    {
+      "path": "fp32-cpu.json",
+      "sizeBytes": 6767,
+      "sha256": "6875a06b1cb331879e70b28a712a4846f3eee8e81a8487a62672bc4c58ad5646"
+    },
+    {
+      "path": "original-cpu.json",
+      "sizeBytes": 14046,
+      "sha256": "050f0e3715cb68edddbbf8a24a5f1463d026d7811ced44d90fe4df4107f4748d"
+    },
+    {
+      "path": "runtime-lineage.json",
+      "sizeBytes": 581,
+      "sha256": "8a7ac8537c44c6c5778fafd0a5293e1e200109413a29d13b6a02cb1276b34afc"
+    },
+    {
+      "path": "state-cpu.log",
+      "sizeBytes": 384,
+      "sha256": "c8120b8d33e4b5109cb71839b375a18c6fbcb59b3cede1cfb8da3f3656546925"
+    },
+    {
+      "path": "state-fp32-cpu.log",
+      "sizeBytes": 393,
+      "sha256": "8940c53042c59fc1895ad37d2d9fa5ece3ab988cf9de9d00659ed5936000162d"
+    },
+    {
+      "path": "state-gpu.log",
+      "sizeBytes": 399,
+      "sha256": "d78ab20f844ad3b0f15cf69f615866ccd6d7e06ad18ba7c073e26f8412f9badf"
+    },
+    {
+      "path": "validation.json",
+      "sizeBytes": 322,
+      "sha256": "032ed66c0e1a9ceffa78a4548be015ebe2b42a8f299947c781bd0b2dd6901f97"
+    },
+    {
+      "path": "vision-cpu-decoder-gpu.json",
+      "sizeBytes": 6771,
+      "sha256": "d97f3d635c45c0a0a9307d8702a7c213e7c28d700ea43eb72691d6cbf3a377a5"
+    },
+    {
+      "path": "vision-gpu-decoder-cpu.json",
+      "sizeBytes": 13653,
+      "sha256": "e0b3a5a08604bfb75da646c9e63d22a2bb9772cdf68b460a6ef919e421ecaf6d"
+    }
+  ]
+}

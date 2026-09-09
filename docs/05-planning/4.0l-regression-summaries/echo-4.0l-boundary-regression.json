@@ -1,0 +1,69 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "2789B5D1-D292-4144-A66B-649CE2DF32EC",
+        "deviceName" : "iPhone 17 Pro",
+        "modelName" : "iPhone 17 Pro",
+        "osBuildNumber" : "23F77",
+        "osVersion" : "26.5",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 4,
+      "passedTests" : 163,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "Echo · Built with macOS 26.5",
+  "expectedFailures" : 0,
+  "failedTests" : 2,
+  "finishTime" : 1788977116.401,
+  "passedTests" : 122,
+  "result" : "Failed",
+  "skippedTests" : 0,
+  "startTime" : 1788976810.927,
+  "statistics" : [
+    {
+      "subtitle" : "55 test runs",
+      "title" : "12 tests ran with dynamic parameters"
+    }
+  ],
+  "testFailures" : [
+    {
+      "failureText" : "Caught error: .deadline",
+      "targetName" : "EchoTests",
+      "testIdentifier" : 84,
+      "testIdentifierString" : "CreationPoemIntegrationTests/test_AC1_otherSubjects(subject:)",
+      "testIdentifierURL" : "test://com.apple.xcode/Echo/EchoTests/CreationPoemIntegrationTests/test_AC1_otherSubjects(subject:)",
+      "testName" : "AC-1/2: Chinese poems keep independent subjects without importing demonstration content"
+    },
+    {
+      "failureText" : "Caught error: .deadline",
+      "targetName" : "EchoTests",
+      "testIdentifier" : 83,
+      "testIdentifierString" : "CreationPoemIntegrationTests/test_AC1_realPoem(language:)",
+      "testIdentifierURL" : "test://com.apple.xcode/Echo/EchoTests/CreationPoemIntegrationTests/test_AC1_realPoem(language:)",
+      "testName" : "AC-1/2: bundled model writes verse from a synthetic photo description"
+    }
+  ],
+  "title" : "Test - Echo",
+  "topInsights" : [
+    {
+      "category" : "Common Failures",
+      "impact" : "100% of failures",
+      "text" : "4 runs of 2 tests failed with Caught error: .deadline"
+    },
+    {
+      "category" : "Longest Test Runs",
+      "impact" : "98% of duration",
+      "text" : "4 longest test runs with outlier durations exceeding 29.15s (three standard deviations)"
+    }
+  ],
+  "totalTestCount" : 124
+}

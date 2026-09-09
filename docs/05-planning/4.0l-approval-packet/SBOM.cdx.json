@@ -1,0 +1,1465 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "serialNumber": "urn:uuid:68a2c424-db5f-4b0b-8691-17e79167883d",
+  "metadata": {
+    "component": {
+      "type": "application",
+      "bom-ref": "echo:photo-packet",
+      "name": "Echo 4.0l candidate packet",
+      "version": "1"
+    },
+    "properties": [
+      {
+        "name": "echo:scope",
+        "value": "candidate and current research dependencies; not final App SBOM"
+      },
+      {
+        "name": "echo:approval",
+        "value": "pending"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/anyio@4.7.0",
+      "name": "anyio",
+      "version": "4.7.0",
+      "purl": "pkg:pypi/anyio@4.7.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/attrs@26.1.0",
+      "name": "attrs",
+      "version": "26.1.0",
+      "purl": "pkg:pypi/attrs@26.1.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cattrs@26.1.0",
+      "name": "cattrs",
+      "version": "26.1.0",
+      "purl": "pkg:pypi/cattrs@26.1.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/certifi@2026.7.22",
+      "name": "certifi",
+      "version": "2026.7.22",
+      "purl": "pkg:pypi/certifi@2026.7.22",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/click@8.4.2",
+      "name": "click",
+      "version": "8.4.2",
+      "purl": "pkg:pypi/click@8.4.2",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/coremltools@9.0",
+      "name": "coremltools",
+      "version": "9.0",
+      "purl": "pkg:pypi/coremltools@9.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/filelock@3.17.0",
+      "name": "filelock",
+      "version": "3.17.0",
+      "purl": "pkg:pypi/filelock@3.17.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/fsspec@2024.12.0",
+      "name": "fsspec",
+      "version": "2024.12.0",
+      "purl": "pkg:pypi/fsspec@2024.12.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/h11@0.16.0",
+      "name": "h11",
+      "version": "0.16.0",
+      "purl": "pkg:pypi/h11@0.16.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/hf-xet@1.5.1",
+      "name": "hf-xet",
+      "version": "1.5.1",
+      "purl": "pkg:pypi/hf-xet@1.5.1",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpcore@1.0.9",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "purl": "pkg:pypi/httpcore@1.0.9",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpx@0.28.1",
+      "name": "httpx",
+      "version": "0.28.1",
+      "purl": "pkg:pypi/httpx@0.28.1",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/huggingface-hub@1.22.0",
+      "name": "huggingface-hub",
+      "version": "1.22.0",
+      "purl": "pkg:pypi/huggingface-hub@1.22.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/idna@3.7",
+      "name": "idna",
+      "version": "3.7",
+      "purl": "pkg:pypi/idna@3.7",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/jinja2@3.1.6",
+      "name": "jinja2",
+      "version": "3.1.6",
+      "purl": "pkg:pypi/jinja2@3.1.6",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/markupsafe@3.0.2",
+      "name": "markupsafe",
+      "version": "3.0.2",
+      "purl": "pkg:pypi/markupsafe@3.0.2",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mpmath@1.3.0",
+      "name": "mpmath",
+      "version": "1.3.0",
+      "purl": "pkg:pypi/mpmath@1.3.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/networkx@3.4.2",
+      "name": "networkx",
+      "version": "3.4.2",
+      "purl": "pkg:pypi/networkx@3.4.2",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/numpy@2.1.3",
+      "name": "numpy",
+      "version": "2.1.3",
+      "purl": "pkg:pypi/numpy@2.1.3",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/packaging@24.2",
+      "name": "packaging",
+      "version": "24.2",
+      "purl": "pkg:pypi/packaging@24.2",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pillow@11.1.0",
+      "name": "pillow",
+      "version": "11.1.0",
+      "purl": "pkg:pypi/pillow@11.1.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/protobuf@5.29.3",
+      "name": "protobuf",
+      "version": "5.29.3",
+      "purl": "pkg:pypi/protobuf@5.29.3",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/psutil@5.9.0",
+      "name": "psutil",
+      "version": "5.9.0",
+      "purl": "pkg:pypi/psutil@5.9.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyaml@26.7.0",
+      "name": "pyaml",
+      "version": "26.7.0",
+      "purl": "pkg:pypi/pyaml@26.7.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyyaml@6.0.2",
+      "name": "pyyaml",
+      "version": "6.0.2",
+      "purl": "pkg:pypi/pyyaml@6.0.2",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/regex@2026.6.28",
+      "name": "regex",
+      "version": "2026.6.28",
+      "purl": "pkg:pypi/regex@2026.6.28",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/safetensors@0.8.0",
+      "name": "safetensors",
+      "version": "0.8.0",
+      "purl": "pkg:pypi/safetensors@0.8.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/setuptools@72.1.0",
+      "name": "setuptools",
+      "version": "72.1.0",
+      "purl": "pkg:pypi/setuptools@72.1.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sniffio@1.3.0",
+      "name": "sniffio",
+      "version": "1.3.0",
+      "purl": "pkg:pypi/sniffio@1.3.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sympy@1.13.3",
+      "name": "sympy",
+      "version": "1.13.3",
+      "purl": "pkg:pypi/sympy@1.13.3",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tokenizers@0.22.2",
+      "name": "tokenizers",
+      "version": "0.22.2",
+      "purl": "pkg:pypi/tokenizers@0.22.2",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/torch@2.12.1",
+      "name": "torch",
+      "version": "2.12.1",
+      "purl": "pkg:pypi/torch@2.12.1",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tqdm@4.67.1",
+      "name": "tqdm",
+      "version": "4.67.1",
+      "purl": "pkg:pypi/tqdm@4.67.1",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/transformers@5.13.0",
+      "name": "transformers",
+      "version": "5.13.0",
+      "purl": "pkg:pypi/transformers@5.13.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": "chat-template"
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/typer@0.9.0",
+      "name": "typer",
+      "version": "0.9.0",
+      "purl": "pkg:pypi/typer@0.9.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/typing-extensions@4.16.0",
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "purl": "pkg:pypi/typing-extensions@4.16.0",
+      "description": "Current installed research tool dependency; not linked or shipped by the native runtime.",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "research-tool-only"
+        },
+        {
+          "name": "echo:selectedExtras",
+          "value": ""
+        },
+        {
+          "name": "echo:licenseEvidence",
+          "value": "licenses-index.json"
+        },
+        {
+          "name": "echo:legalApproval",
+          "value": "pending"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "echo:system:CoreML",
+      "name": "Apple CoreML",
+      "version": "Xcode 26.5 SDK; iOS 18 target",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "system-provided-runtime"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "echo:system:Foundation",
+      "name": "Apple Foundation",
+      "version": "Xcode 26.5 SDK; iOS 18 target",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "system-provided-runtime"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "echo:system:ImageIO",
+      "name": "Apple ImageIO",
+      "version": "Xcode 26.5 SDK; iOS 18 target",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "system-provided-runtime"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "echo:system:CoreGraphics",
+      "name": "Apple CoreGraphics",
+      "version": "Xcode 26.5 SDK; iOS 18 target",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "system-provided-runtime"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "echo:system:CryptoKit",
+      "name": "Apple CryptoKit",
+      "version": "Xcode 26.5 SDK; iOS 18 target",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "system-provided-runtime"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "echo:system:UniformTypeIdentifiers",
+      "name": "Apple UniformTypeIdentifiers",
+      "version": "Xcode 26.5 SDK; iOS 18 target",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "system-provided-runtime"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "echo:system:Swift",
+      "name": "Apple Swift",
+      "version": "Xcode 26.5 SDK; iOS 18 target",
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "system-provided-runtime"
+        }
+      ]
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "echo:smolvlm-256m:source",
+      "name": "SmolVLM-256M source",
+      "version": "7e3e67edbbed1bf9888184d9df282b700a323964",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "candidate-pending-approval"
+        },
+        {
+          "name": "echo:inventory",
+          "value": "artifact-inventory.json"
+        },
+        {
+          "name": "echo:licenseClaim",
+          "value": "upstream declaration; human disposition pending"
+        }
+      ]
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "echo:smolvlm-256m:converted",
+      "name": "SmolVLM-256M converted",
+      "version": "7e3e67edbbed1bf9888184d9df282b700a323964",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "candidate-pending-approval"
+        },
+        {
+          "name": "echo:inventory",
+          "value": "artifact-inventory.json"
+        },
+        {
+          "name": "echo:licenseClaim",
+          "value": "upstream declaration; human disposition pending"
+        }
+      ]
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "echo:smolvlm-256m:compiled",
+      "name": "SmolVLM-256M compiled",
+      "version": "7e3e67edbbed1bf9888184d9df282b700a323964",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "echo:scope",
+          "value": "candidate-pending-approval"
+        },
+        {
+          "name": "echo:inventory",
+          "value": "artifact-inventory.json"
+        },
+        {
+          "name": "echo:licenseClaim",
+          "value": "upstream declaration; human disposition pending"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "echo:first-party:photo-runtime",
+      "name": "Echo Swift photo-understanding research runtime",
+      "version": "4.0l-native-v1",
+      "properties": [
+        {
+          "name": "echo:sourceIdentity",
+          "value": "runtime-lineage.json"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "echo:photo-packet",
+      "dependsOn": [
+        "pkg:pypi/anyio@4.7.0",
+        "pkg:pypi/attrs@26.1.0",
+        "pkg:pypi/cattrs@26.1.0",
+        "pkg:pypi/certifi@2026.7.22",
+        "pkg:pypi/click@8.4.2",
+        "pkg:pypi/coremltools@9.0",
+        "pkg:pypi/filelock@3.17.0",
+        "pkg:pypi/fsspec@2024.12.0",
+        "pkg:pypi/h11@0.16.0",
+        "pkg:pypi/hf-xet@1.5.1",
+        "pkg:pypi/httpcore@1.0.9",
+        "pkg:pypi/httpx@0.28.1",
+        "pkg:pypi/huggingface-hub@1.22.0",
+        "pkg:pypi/idna@3.7",
+        "pkg:pypi/jinja2@3.1.6",
+        "pkg:pypi/markupsafe@3.0.2",
+        "pkg:pypi/mpmath@1.3.0",
+        "pkg:pypi/networkx@3.4.2",
+        "pkg:pypi/numpy@2.1.3",
+        "pkg:pypi/packaging@24.2",
+        "pkg:pypi/pillow@11.1.0",
+        "pkg:pypi/protobuf@5.29.3",
+        "pkg:pypi/psutil@5.9.0",
+        "pkg:pypi/pyaml@26.7.0",
+        "pkg:pypi/pyyaml@6.0.2",
+        "pkg:pypi/regex@2026.6.28",
+        "pkg:pypi/safetensors@0.8.0",
+        "pkg:pypi/setuptools@72.1.0",
+        "pkg:pypi/sniffio@1.3.0",
+        "pkg:pypi/sympy@1.13.3",
+        "pkg:pypi/tokenizers@0.22.2",
+        "pkg:pypi/torch@2.12.1",
+        "pkg:pypi/tqdm@4.67.1",
+        "pkg:pypi/transformers@5.13.0",
+        "pkg:pypi/typer@0.9.0",
+        "pkg:pypi/typing-extensions@4.16.0",
+        "echo:system:CoreML",
+        "echo:system:Foundation",
+        "echo:system:ImageIO",
+        "echo:system:CoreGraphics",
+        "echo:system:CryptoKit",
+        "echo:system:UniformTypeIdentifiers",
+        "echo:system:Swift",
+        "echo:smolvlm-256m:source",
+        "echo:smolvlm-256m:converted",
+        "echo:smolvlm-256m:compiled",
+        "echo:first-party:photo-runtime"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/anyio@4.7.0",
+      "dependsOn": [
+        "pkg:pypi/idna@3.7",
+        "pkg:pypi/sniffio@1.3.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/attrs@26.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/cattrs@26.1.0",
+      "dependsOn": [
+        "pkg:pypi/attrs@26.1.0",
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/certifi@2026.7.22",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/click@8.4.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/coremltools@9.0",
+      "dependsOn": [
+        "pkg:pypi/attrs@26.1.0",
+        "pkg:pypi/cattrs@26.1.0",
+        "pkg:pypi/numpy@2.1.3",
+        "pkg:pypi/packaging@24.2",
+        "pkg:pypi/protobuf@5.29.3",
+        "pkg:pypi/pyaml@26.7.0",
+        "pkg:pypi/sympy@1.13.3",
+        "pkg:pypi/tqdm@4.67.1"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/filelock@3.17.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/fsspec@2024.12.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/h11@0.16.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/hf-xet@1.5.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/httpcore@1.0.9",
+      "dependsOn": [
+        "pkg:pypi/certifi@2026.7.22",
+        "pkg:pypi/h11@0.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/httpx@0.28.1",
+      "dependsOn": [
+        "pkg:pypi/anyio@4.7.0",
+        "pkg:pypi/certifi@2026.7.22",
+        "pkg:pypi/httpcore@1.0.9",
+        "pkg:pypi/idna@3.7"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/huggingface-hub@1.22.0",
+      "dependsOn": [
+        "pkg:pypi/click@8.4.2",
+        "pkg:pypi/filelock@3.17.0",
+        "pkg:pypi/fsspec@2024.12.0",
+        "pkg:pypi/hf-xet@1.5.1",
+        "pkg:pypi/httpx@0.28.1",
+        "pkg:pypi/packaging@24.2",
+        "pkg:pypi/pyyaml@6.0.2",
+        "pkg:pypi/tqdm@4.67.1",
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/idna@3.7",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/jinja2@3.1.6",
+      "dependsOn": [
+        "pkg:pypi/markupsafe@3.0.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/markupsafe@3.0.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/mpmath@1.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/networkx@3.4.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/numpy@2.1.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/packaging@24.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pillow@11.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/protobuf@5.29.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/psutil@5.9.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/pyaml@26.7.0",
+      "dependsOn": [
+        "pkg:pypi/pyyaml@6.0.2"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/pyyaml@6.0.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/regex@2026.6.28",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/safetensors@0.8.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/setuptools@72.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/sniffio@1.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/sympy@1.13.3",
+      "dependsOn": [
+        "pkg:pypi/mpmath@1.3.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/tokenizers@0.22.2",
+      "dependsOn": [
+        "pkg:pypi/huggingface-hub@1.22.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/torch@2.12.1",
+      "dependsOn": [
+        "pkg:pypi/filelock@3.17.0",
+        "pkg:pypi/fsspec@2024.12.0",
+        "pkg:pypi/jinja2@3.1.6",
+        "pkg:pypi/networkx@3.4.2",
+        "pkg:pypi/setuptools@72.1.0",
+        "pkg:pypi/sympy@1.13.3",
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/tqdm@4.67.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/transformers@5.13.0",
+      "dependsOn": [
+        "pkg:pypi/huggingface-hub@1.22.0",
+        "pkg:pypi/jinja2@3.1.6",
+        "pkg:pypi/numpy@2.1.3",
+        "pkg:pypi/packaging@24.2",
+        "pkg:pypi/pyyaml@6.0.2",
+        "pkg:pypi/regex@2026.6.28",
+        "pkg:pypi/safetensors@0.8.0",
+        "pkg:pypi/tokenizers@0.22.2",
+        "pkg:pypi/tqdm@4.67.1",
+        "pkg:pypi/typer@0.9.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/typer@0.9.0",
+      "dependsOn": [
+        "pkg:pypi/click@8.4.2",
+        "pkg:pypi/typing-extensions@4.16.0"
+      ]
+    },
+    {
+      "ref": "pkg:pypi/typing-extensions@4.16.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:system:CoreML",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:system:Foundation",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:system:ImageIO",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:system:CoreGraphics",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:system:CryptoKit",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:system:UniformTypeIdentifiers",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:system:Swift",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:smolvlm-256m:source",
+      "dependsOn": []
+    },
+    {
+      "ref": "echo:smolvlm-256m:converted",
+      "dependsOn": [
+        "echo:smolvlm-256m:source"
+      ]
+    },
+    {
+      "ref": "echo:smolvlm-256m:compiled",
+      "dependsOn": [
+        "echo:smolvlm-256m:converted"
+      ]
+    },
+    {
+      "ref": "echo:first-party:photo-runtime",
+      "dependsOn": [
+        "echo:system:CoreML",
+        "echo:system:Foundation",
+        "echo:system:ImageIO",
+        "echo:system:CoreGraphics",
+        "echo:system:CryptoKit",
+        "echo:system:UniformTypeIdentifiers",
+        "echo:system:Swift"
+      ]
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "echo:photo-packet"
+      ]
+    }
+  ]
+}

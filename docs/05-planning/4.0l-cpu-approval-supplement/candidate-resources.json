@@ -1,0 +1,127 @@
+{
+  "status": "pending",
+  "replacesOnly": "SmolDecoder1024.mlmodelc plus NOTICE; other existing resources remain identical",
+  "files": [
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "5d3d454de517cf7ee127a749d009ca7797054378c5977cf8b178dceca87d8f25",
+      "destination": "SmolVision512.mlmodelc/analytics/coremldata.bin"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/coremldata.bin",
+      "sizeBytes": 564,
+      "sha256": "c668b84402a2746ca58a202a3773b824d5f5f90152ee7fe3a9acf97e60b266c4",
+      "destination": "SmolVision512.mlmodelc/coremldata.bin"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/metadata.json",
+      "sizeBytes": 2734,
+      "sha256": "a11a055a6933ed9d94c0d7dfc89b85a0d17a146e6023a1c06ea4bf25c6fd007b",
+      "destination": "SmolVision512.mlmodelc/metadata.json"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/model.mil",
+      "sizeBytes": 146515,
+      "sha256": "450eeccaca665079127be4bccfef43ad0b10d0dc7febbfab3e84c037f17f8e60",
+      "destination": "SmolVision512.mlmodelc/model.mil"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/weights/weight.bin",
+      "sizeBytes": 187035776,
+      "sha256": "533311567f769e8222de8dc324b06c4f6dadc1502ea7dc7e37215521711e3fbb",
+      "destination": "SmolVision512.mlmodelc/weights/weight.bin"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/tokenizer.json",
+      "destination": "SmolVLMTokenizer/tokenizer.json",
+      "sizeBytes": 3548256,
+      "sha256": "5ece781dc8d2b2f3e2f289ca0ae50b17cfc27dd27bfe7971bb8241e0b964331a"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/tokenizer_config.json",
+      "destination": "SmolVLMTokenizer/tokenizer_config.json",
+      "sizeBytes": 28249,
+      "sha256": "36c6fd44d07d10fd8180ee6b46dcccf69fb7c06753968ff0d7e17b8bfe17b777"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/config.json",
+      "destination": "SmolVLMTokenizer/config.json",
+      "sizeBytes": 7353,
+      "sha256": "b70fb4bfde88df9eeebc9d8ff523733b8bf70d6c9b06c610325960e06ae9db52"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/preprocessor_config.json",
+      "destination": "SmolVLMTokenizer/preprocessor_config.json",
+      "sizeBytes": 486,
+      "sha256": "6cb6e36d6fcb88ca1502c4a26750715dc3e7dedddc9a8f17b27d8d167d1457e7"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/processor_config.json",
+      "destination": "SmolVLMTokenizer/processor_config.json",
+      "sizeBytes": 68,
+      "sha256": "e7bff42da73ae9eec9042ef20e066e11f1ee20f025358ff79131e3c0fb549b46"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/generation_config.json",
+      "destination": "SmolVLMTokenizer/generation_config.json",
+      "sizeBytes": 136,
+      "sha256": "067a2a54e5f87162ecac6e0e911cc4665fc8f7f3324794ecbac0f76badb56636"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/chat_template.json",
+      "destination": "SmolVLMTokenizer/chat_template.json",
+      "sizeBytes": 429,
+      "sha256": "a68ad1a42681ae44eacd109ff8dd56a840f761c03d72f4ff4c515d092f882168"
+    },
+    {
+      "path": "docs/05-planning/4.0l-approval-packet/licenses/Apache-2.0.txt",
+      "destination": "SmolVLMLegal/Apache-2.0.txt",
+      "sizeBytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "docs/05-planning/4.0l-approval-packet/licenses/SmolVLM-256M-README.md",
+      "destination": "SmolVLMLegal/SmolVLM-256M-README.md",
+      "sizeBytes": 16400,
+      "sha256": "0b687c656b2587d84cb85003825746f8b3a08497dff4ed51b54b1090719fa512"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/cpu-decoder-diagnostic/compiled/SmolDecoder1024.mlmodelc/analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "e1e819ea0fe53e01ef0edff2721ca1409518ab44c4d08e9cb0d0ffa03f8f32b8",
+      "destination": "SmolDecoder1024.mlmodelc/analytics/coremldata.bin"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/cpu-decoder-diagnostic/compiled/SmolDecoder1024.mlmodelc/coremldata.bin",
+      "sizeBytes": 2505,
+      "sha256": "a78c30ab6f5db25d3eadf2c2a4ea662f340c7a038241c937071848c39787f102",
+      "destination": "SmolDecoder1024.mlmodelc/coremldata.bin"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/cpu-decoder-diagnostic/compiled/SmolDecoder1024.mlmodelc/metadata.json",
+      "sizeBytes": 19249,
+      "sha256": "d07f547076f600311ff2947f3c4db6a8ee03868029cb591cd6160ad2bf200881",
+      "destination": "SmolDecoder1024.mlmodelc/metadata.json"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/cpu-decoder-diagnostic/compiled/SmolDecoder1024.mlmodelc/model.mil",
+      "sizeBytes": 643575,
+      "sha256": "5ec28e43d9404f1abf7da93f034e787da315301b8d0b19288c9d5e765b29be8e",
+      "destination": "SmolDecoder1024.mlmodelc/model.mil"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/cpu-decoder-diagnostic/compiled/SmolDecoder1024.mlmodelc/weights/weight.bin",
+      "sizeBytes": 652657088,
+      "sha256": "93ff52137e84d38f4d7b6e7dcd9d2b67d6ebc7108a4f2e071845c31e9bd6c310",
+      "destination": "SmolDecoder1024.mlmodelc/weights/weight.bin"
+    },
+    {
+      "path": "docs/05-planning/4.0l-cpu-approval-supplement/NOTICE.md",
+      "sizeBytes": 2831,
+      "sha256": "bf9c15011e61759d9410bdd4d05134a4029c7df1c7e2e910e0de9979f55d26d0",
+      "destination": "NOTICE.md"
+    }
+  ],
+  "totalBytes": 844124058
+}

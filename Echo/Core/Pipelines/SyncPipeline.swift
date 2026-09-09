@@ -64,7 +64,7 @@ public enum SyncError: Error, LocalizedError, Sendable, Equatable {
     case cancelled
 
     /// L1~L4 错误分级
-    public nonisolated var errorLevel: Int {
+    nonisolated public var errorLevel: Int {
         switch self {
         case .privacyDenied:              return 2
         case .assetExcluded:              return 2
@@ -84,31 +84,41 @@ public enum SyncError: Error, LocalizedError, Sendable, Equatable {
         switch self {
         case .privacyDenied(let types):
             return "Privacy denied for source types: \(types.joined(separator: ","))"
+
         case .assetExcluded(let assetId):
             return "Asset excluded by user: \(assetId)"
+
         case .excludedAssetsLookupFailed(let error):
             return "ExcludedAssets lookup failed: \(error.localizedDescription)"
+
         case .embeddingFailed(let error):
             return "Embedding failed: \(error.localizedDescription)"
+
         case .metadataEncodingFailed(let error):
             return "Metadata encoding failed: \(error.localizedDescription)"
+
         case .vectorStoreFailed(let error):
             return "Vector store operation failed: \(error.localizedDescription)"
+
         case .canonicalDeleteFailed(let error):
             return "Canonical memory delete failed: \(error.localizedDescription)"
+
         case .productionReplacementFailed(let error):
             return "Production replacement write failed: \(error.localizedDescription)"
+
         case .memoryLockedDuringSync(let memoryId):
             return "Memory \(memoryId) is locked during sync — 该记忆正在同步更新中，请稍后再编辑"
+
         case .hashSkippedDueToConstraints(let reason):
             return "Hash comparison skipped due to constraints: \(reason)"
+
         case .cancelled:
             return "Sync cancelled by user or system"
         }
     }
 
     // MARK: Equatable
-    public static func == (lhs: SyncError, rhs: SyncError) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs, rhs) {
         case (.privacyDenied(let a), .privacyDenied(let b)): return a == b
         case (.assetExcluded(let a), .assetExcluded(let b)): return a == b
@@ -150,15 +160,15 @@ public enum ChangeType: String, Sendable, Codable, Equatable {
 
 /// 检测到的变更事件（AC-1, AC-2）
 public struct ChangeEvent: Sendable, Equatable {
-    public nonisolated let assetId: String
-    public nonisolated let source: ChangeSource
-    public nonisolated let changeType: ChangeType
+    nonisolated public let assetId: String
+    nonisolated public let source: ChangeSource
+    nonisolated public let changeType: ChangeType
     /// 新内容的哈希值（用于确认内容确实变更）
-    public nonisolated let newContentHash: String?
+    nonisolated public let newContentHash: String?
     /// 是否因约束条件跳过了哈希对比（AC-2）
-    public nonisolated let hashSkipped: Bool
+    nonisolated public let hashSkipped: Bool
 
-    public nonisolated init(
+    nonisolated public init(
         assetId: String,
         source: ChangeSource,
         changeType: ChangeType,
@@ -177,12 +187,12 @@ public struct ChangeEvent: Sendable, Equatable {
 
 /// 同步操作结果
 public struct SyncResult: Sendable, Equatable {
-    public nonisolated let replacedCount: Int
-    public nonisolated let skippedCount: Int
-    public nonisolated let failedCount: Int
-    public nonisolated let hashSkippedCount: Int
+    nonisolated public let replacedCount: Int
+    nonisolated public let skippedCount: Int
+    nonisolated public let failedCount: Int
+    nonisolated public let hashSkippedCount: Int
 
-    public nonisolated init(
+    nonisolated public init(
         replacedCount: Int = 0,
         skippedCount: Int = 0,
         failedCount: Int = 0,
@@ -218,7 +228,6 @@ public struct SyncResult: Sendable, Equatable {
 ///      → ProgressActor.delete(taskId)
 /// ```
 public actor SyncPipeline: MemoryExternalChangeApplying {
-
     // MARK: - Dependencies
 
     private let embedder: any EmbedderProtocol
@@ -231,6 +240,7 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
     /// 分代索引注册表（CR-3 方案A）— 生产替换路径经活跃路由写入 canonical + 每代向量
     private let generationRegistry: GenerationRegistryActor?
     private let memoryEditActor: MemoryEditActor?
+    private let photoPreparation: PhotoUnderstandingActor?
 
     /// 当前同步中锁定的内存 ID 引用计数（AC-6: 防止并发编辑，N-2 修复）
     ///
@@ -247,7 +257,7 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
     /// 跨投递变更去重窗口内的已投递键（`assetId|changeType` → 投递时间，ADR-008 §决策-1）
     private var recentChangeKeys: [String: Date] = [:]
     /// 去重窗口（秒）
-    private nonisolated let changeDedupeWindow: TimeInterval = 2.0
+    nonisolated private let changeDedupeWindow: TimeInterval = 2.0
 
     // MARK: - Initialization
 
@@ -259,7 +269,8 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
         progressActor: ProgressActor = .shared,
         canonicalRepository: CanonicalMemoryRepositoryActor? = nil,
         generationRegistry: GenerationRegistryActor? = nil,
-        memoryEditActor: MemoryEditActor? = nil
+        memoryEditActor: MemoryEditActor? = nil,
+        photoPreparation: PhotoUnderstandingActor? = nil
     ) {
         self.embedder = embedder
         self.privacyActor = privacyActor
@@ -269,6 +280,7 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
         self.canonicalRepository = canonicalRepository
         self.generationRegistry = generationRegistry
         self.memoryEditActor = memoryEditActor
+        self.photoPreparation = photoPreparation
     }
 
     // MARK: - Sync Execution (AC-4, AC-5, AC-7, AC-9)
@@ -461,12 +473,34 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
                             sourceLocator: change.assetId,
                             sourceType: change.source.rawValue
                         )
+                        // Photo-derived reports belong to the capture period, not the synchronization date.
+                        let captureDate: Date
+                        if photoPreparation != nil {
+                            guard let asset = PHAsset.fetchAssets(
+                                withLocalIdentifiers: [change.assetId], options: nil
+                            ).firstObject else {
+                                throw GenerationRuntimeError.privacyDenied
+                            }
+                            captureDate = asset.creationDate ?? Date()
+                        } else {
+                            captureDate = try await canonicalRepository.loadMemory(memoryId: memoryId)?.createdAt ?? Date()
+                        }
+                        if photoPreparation != nil,
+                            try await canonicalRepository.loadMemory(memoryId: memoryId)?.createdAt == captureDate,
+                            try await canonicalRepository.loadRepresentations(memoryId: memoryId).contains(where: {
+                                $0.modality == .visionDense && $0.contentHash == Self.sha256(of: newEmbedding)
+                            }) {
+                            // Re-observing identical pixels preserves both queued work and published material.
+                            // Description work is requested only from the selected detail or creation surface.
+                            skippedCount += 1
+                            continue
+                        }
                         let memory = Memory(
                             memoryId: memoryId,
                             sourceLocator: change.assetId,
                             canonicalText: nil,
                             sourceType: change.source.rawValue,
-                            createdAt: Date(),
+                            createdAt: captureDate,
                             recoverability: .full
                         )
                         let rep = Representation(
@@ -622,7 +656,8 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
                 changeType: changeType,
                 newContentHash: change.newContentHash,
                 hashSkipped: change.hashSkipped
-            )],
+            ),
+            ],
             traceID: traceID
         )
         guard result.replacedCount == 1, result.failedCount == 0 else {
@@ -677,10 +712,10 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
         // `changeDetails(for:)` requires a fetch result from before the change.
         // Seed it before registration so the first delivered change is not lost.
         await MonitoredFetchResult.seedIfNeeded()
-        let observer = PhotoKitChangeObserver(onPhotoLibraryChange: { [weak self] events in
+        let observer = PhotoKitChangeObserver { [weak self] events in
             guard let self else { return }
             Task { await self.processPhotoChanges(events) }
-        })
+        }
         photoObserver = observer
         PHPhotoLibrary.shared().register(observer)
     }
@@ -748,7 +783,7 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
     /// 用户是否启用了后台自动同步（AC-3: 默认开启）
     ///
     /// 存储在 UserDefaults 中，键名: `sync_autoSyncEnabled`
-    public nonisolated var isAutoSyncEnabled: Bool {
+    nonisolated public var isAutoSyncEnabled: Bool {
         get {
             if UserDefaults.standard.object(forKey: "sync_autoSyncEnabled") == nil {
                 return true  // AC-3: 默认开启
@@ -801,7 +836,7 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
 
     /// 解析记忆 ID 为 UUID；非法时抛 `SyncError.canonicalDeleteFailed`（CR-11，
     /// 不再回退随机 UUID 静默跳过删除）。
-    private nonisolated static func requireUUID(_ memoryId: String) throws -> UUID {
+    nonisolated private static func requireUUID(_ memoryId: String) throws -> UUID {
         guard let uuid = UUID(uuidString: memoryId) else {
             throw SyncError.canonicalDeleteFailed(
                 underlying: CanonicalRepositoryError.invalidMemoryID(memoryId: memoryId)
@@ -811,7 +846,7 @@ public actor SyncPipeline: MemoryExternalChangeApplying {
     }
 
     /// 向量 SHA-256 摘要（Representation contentHash，CR-3 方案A）。
-    private nonisolated static func sha256(of vector: [Float]) -> String {
+    nonisolated private static func sha256(of vector: [Float]) -> String {
         let data = vector.withUnsafeBytes { Data($0) }
         let digest = CryptoKit.SHA256.hash(data: data)
         return digest.map { String(format: "%02x", $0) }.joined()

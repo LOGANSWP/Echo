@@ -1,0 +1,61 @@
+{
+  "taskId": "4.0l",
+  "checks": [
+    {
+      "id": "photo-0-zh-Hans",
+      "sourceAllowListPassed": true,
+      "eos": true,
+      "paragraphs": 1,
+      "bodyLanguage": {
+        "confidence": 1,
+        "dominantLanguage": "zh-Hans",
+        "hasLetters": true,
+        "simplificationChanged": false
+      },
+      "languagePassed": true
+    },
+    {
+      "id": "photo-0-en-US",
+      "sourceAllowListPassed": true,
+      "eos": true,
+      "paragraphs": 2,
+      "bodyLanguage": {
+        "confidence": 0.9990409016609192,
+        "dominantLanguage": "en",
+        "hasLetters": true,
+        "simplificationChanged": false
+      },
+      "languagePassed": true
+    },
+    {
+      "id": "photo-1-zh-Hans",
+      "sourceAllowListPassed": true,
+      "eos": true,
+      "paragraphs": 1,
+      "bodyLanguage": {
+        "confidence": 1,
+        "dominantLanguage": "zh-Hans",
+        "hasLetters": true,
+        "simplificationChanged": false
+      },
+      "languagePassed": true
+    },
+    {
+      "id": "photo-1-en-US",
+      "sourceAllowListPassed": true,
+      "eos": true,
+      "paragraphs": 2,
+      "bodyLanguage": {
+        "confidence": 0.9990409016609192,
+        "dominantLanguage": "en",
+        "hasLetters": true,
+        "simplificationChanged": false
+      },
+      "languagePassed": true
+    }
+  ],
+  "bodyLanguageOnly": true,
+  "qualityNotes": "Both English cases repeat the same paragraph; tracked for later quality optimization, not claimed fixed. Two images share a scene and do not form independent quality trials.",
+  "bridgeSha256": "5a76f544c859d5c2259bb4f3c0babc65bb6c77234f686d5f37e3023edecc78bf",
+  "languageProbeSha256": "caddf7cc454505f6704f726ae4da78a2acec837fa11d867163e8b83794ded816"
+}

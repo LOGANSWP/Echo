@@ -1,0 +1,8 @@
+{
+  "status": "approved",
+  "packetManifestSha256": "ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367",
+  "scope": "Exact FLOAT32 decoder and <=900 MB visual module for local App integration and dual simulator validation only",
+  "approvedBy": "human user",
+  "approvedAt": "2026-09-09T17:08:08.221537+00:00",
+  "userInstruction": "批准"
+}

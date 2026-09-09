@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-09T14:35:55Z",
+  "last_updated": "2026-09-09T20:31:17.707885+00:00",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -3016,7 +3016,7 @@
         },
         {
           "id": "4.0l",
-          "title": "照片自动理解与无需手写描述的创作闭环",
+          "title": "照片按需理解与无需手写描述的创作闭环",
           "story": [
             "US-ING-004",
             "US-SYN-001",
@@ -3028,7 +3028,7 @@
             "US-SYS-001"
           ],
           "owner": "On-device ML Lead",
-          "status": "ready",
+          "status": "review",
           "dependencies": [
             "4.0k"
           ],
@@ -3049,8 +3049,8 @@
           ],
           "test_file": "EchoTests/Phase4/4.0l_PhotoUnderstandingCreationTests.swift",
           "implementation_constraints": [
-            "产品合同已确定，视觉模型/运行时和具体预算未选定；先形成固定 hash/许可/NOTICE/SBOM/转换/资源材料，再取得确切工件审批；不继承 4.0k 文本权重批准，不在 App 下载或使用云端推理。",
-            "照片生产导入后自动有界排队进行真实像素理解，OCR 为独立辅助；不阻塞导入/浏览，支持已有照片版本化幂等补处理，手写描述不是正常流程前置条件。",
+            "视觉运行时已获得本地 App/双模拟器确切工件批准：CPU 增补 manifest SHA256=ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367，20 文件 844,124,058 bytes，模块预算 900MB；固定许可/NOTICE/SBOM/转换材料保持冻结。不授权分发、签名或实机资格，不在 App 下载或使用云端推理。",
+            "照片导入/同步仅建立既有检索索引；仅用户打开该照片详情或选择其进行 AI 创作时，才有界幂等准备真实像素描述和 OCR 创作素材。前后台与自动报告扫描不发起全相册理解。有效素材复用，失效后待下一次按需访问，L2 仍仅手动重试。",
             "机器描述/OCR 正文由 DatabaseManager 管辖的 Actor 独立持久化，关联原 MemoryID 和来源/模型/处理/语言/正文版本及状态；不覆盖 canonicalText、originalText 或 MemoryUserEdit，不创建伪用户记忆。",
             "用户描述/校正优先；无用户描述时消费有效机器描述/OCR，仅标题/标签不屏蔽机器描述。机器文本明确标注，不推断身份/关系/感受/画外事件，不把来源文字当指令。",
             "队列/进度/取消/重启恢复遵循现有合同，限额覆盖图像、正文/token、调用/时间/内存；L2 仅手动重试，资源延后不伪装成功，恢复描述不含原图/原文/授权快照。",
@@ -3059,16 +3059,17 @@
             "UI 投影真实进度/可用/失败并支持等待继续/手动重试和自愿校正；不能用占位文字、仅 OCR、手写描述、fixture 或 Stub 证明无字照片直接创作。"
           ],
           "acceptance_evidence": [
-            "US-ING-004 AC-6~9 / US-SYN-003 AC-7：双模拟器真实 PhotoKit 无字照片摄入，不编辑、不注入描述，完成实际本地图像理解、创作、来源跳转、正文复制/PDF/系统分享。",
+            "US-ING-004 AC-6~9 / US-SYN-003 AC-7：双模拟器真实 PhotoKit 无字照片摄入，确认导入不创建理解任务，打开该照片详情/选择创作后，不编辑、不注入描述，完成实际本地图像理解、创作、来源跳转、正文复制/PDF/系统分享。",
             "含字截图与无字场景分开验证，输出来自当前图片的真实模型；原图引用、机器/OCR/用户文字类型隔离，用户校正优先与仅标题/标签组合。",
-            "新旧照片、有界补处理、并发去重、source/model版本失效、重启/取消/恢复/资源延后及缺失/损坏/未批准模型矩阵。",
+            "新旧照片、仅详情/所选创作触发的有界按需处理、并发去重、source/model版本失效、重启/取消/恢复/资源延后及缺失/损坏/未批准模型矩阵。",
             "授权/来源每阶段竞态、排除/确认删除/全量撤权的 D-005、审计无正文、checkpoint无原图/原文、零网络。",
             "真实图像派生素材进入月/年分层报告；部分/全部未准备、L2、noData、coverage、原照片时间戳、完成/invalidated不自动重开。",
-            "中英输出与 UI 状态/可访问等价动作；模型预算和最终实机资源/质量/覆盖率资格单独记录，模拟器功能通过不替代发布门禁。"
+            "中英输出与 UI 状态/可访问等价动作；模型预算和最终实机资源/质量/覆盖率资格单独记录，模拟器功能通过不替代发布门禁。",
+            "首页/导入/同步/前后台/自动报告不触发理解；打开单张仅创建该张任务，有效结果复用；迁移清理旧自动 queued 及其恢复记录，保留已完成素材和新按需任务。"
           ],
           "pr": null,
-          "last_updated": "2026-09-09T14:35:55Z",
-          "notes": "Created under explicit user request to update documents/tasks after discovering that newly imported photos require manual descriptions for AI Creation. ADR-025 records the accepted functional scope; implementation, model selection/download and artifact approval have not started. Task 4.0k remains the reviewed text runtime dependency and retains its outstanding gates. Planned test path is not an existing test or pass claim. 2026-09-09：4.0k 经 PR #79 人类合并后依赖满足，按 §12.1 级联为 ready；尚未开始实现，具体视觉模型/工件/预算审批仍待执行。"
+          "last_updated": "2026-09-09T20:49:39.483495+00:00",
+          "notes": "用户已批准固定 SmolVLM-256M 的有界研究并要求控制磁盘、及时清理；14 个源文件校验通过，27 次参考调用保留真实输出。此前因双语/可见内容失败停止转换并删除 517,904,565 bytes 源的决定已由最新优先级修订：用户明确项目初期先追求功能闭环，不追求高精确度。继续同一获批候选 Core ML/Swift 研究，质量问题单独记录，不因此换更大模型；Qwen3.5 提议延后。保留单份源与必要产物，新增磁盘不超过 3GB。生产模型具体工件审批、App 接线、真实 PhotoKit 验收仍待完成，未声明 AC 通过。见 ADR-025、4.0l-screening-review.md 与原始输出/清理记录。 原生功能检查点完成：同一源恢复校验通过，FP16 视觉/解码两包共 514,124,146 bytes；Torch 对照 8/8 top-1 匹配，Swift/Core ML 对两张像素不同的受控无字图完成 186 次预测，完整输出与参考逐 token 一致且均 EOS，耗时 3.98/1.61s。Swift 6 严格并发/警告即错误编译通过。总研究占用约 1.03GB；保留一份源与必要包，清理本次 Swift cache 和空临时目录。此为 Mac 原生预分词输入研究，不是生产 PhotoKit、任意输入 tokenizer 或实机/质量通过；后续按 4.0l-functional-research-review.md 继续。 原生输入与生成组合检查点：103 tokenizer 对照+4限额拒绝、12图片方向/比例/mask+3无效输入拒绝通过；三图原生分词/图片解码/模型生成通过，实际视觉预测后取消无描述输出。精确iOS18编译10文件共514,162,725 bytes，直接加载三图输出复核通过；两条真实视觉描述×中英文4次既有原生生成器调用，JSON/EOS/来源/正文语言4/4通过，英文重复段落保留为质量待办，不阻断接线。确切本地App工件使用审批包已完成：模型及附属资源517,775,460 bytes，47组件SBOM schema通过，manifest SHA256=625d3457c9e632b29bd2fe2e40467ba116079f935a4b303ebb3f7dee577117a7。目前仅等待用户批准该包进入本地App生产适配和双模拟器验证，非等待质量提升；原研究下载授权持续有效。未授权分发/签名/发布/实机工作。任务暂标blocked；批准后恢复本任务TDD实现。证据：4.0l-native-input-review.md、4.0l-approval-packet/README.md。\n2026-09-09T16:03:31+00:00：用户回复「批准」，批准固定审批包 625d3457c9e632b29bd2fe2e40467ba116079f935a4b303ebb3f7dee577117a7 的本地 App 接线与双模拟器功能验证；记录见 4.0l-approval-packet/approval.json。恢复生产实现，功能闭环优先，研究磁盘预算 3GB；不授权分发、签名或最终资格通过。\n2026-09-09T17:04:30.977930+00:00：独立描述/OCR 存储、创作素材读取、队列/恢复幂等与取消/撤权/删除/来源变化/L2 不自动重放的单元 seam 回归通过（5 tests / 3 suites，含参数化用例）；不是 PhotoKit E2E。原 FP16 解码器在模拟器 CPU 非法输出、GPU 加载 -14；Mac 后端交叉验证确认失败跟随 CPU 解码路径。同源 FLOAT32 解码诊断三图 CPU 正常 EOS，无新下载。增补资源844,124,058 bytes，拟模块预算900MB，原始预算550MB；确切增补审批包 SHA256=ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367，见4.0l-cpu-approval-supplement/README.md。新工件尚未替换App，等待本次预算/工件增补批准；原批准仍有效。后续生产来源/摄入/报告/UI接线及双模拟器完整验收仍未完成；质量/实机/发布未通过。研究目录约2.856GB；本轮清理记录见implementation-evidence。\n2026-09-09T17:08:08.221537+00:00：用户明确「批准」CPU 增补包 ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367；允许844,124,058 bytes确切工件及900MB模块预算进入本地App/双模拟器功能验证。原其他边界保留，继续4.0l。\n2026-09-09T17:14:02.903298+00:00：获批CPU工件20文件844,124,058bytes已接入并校验。17Pro/iOS26.5实际像素生成及连续两次推理通过（首次10token、约7.7s；重复测试14.5s，峰值断言<1.5GB）；缺失工件/视觉文本lease互斥通过。更新有效素材测试身份，并新增旧工件身份失效用例；素材/队列全部参数化回归通过。该结果是模拟器模块测试，不是PhotoKit摄入、报告/UI接线或完整双设备验收。继续in_progress，见implementation-evidence。\n2026-09-09T18:31:10.996273+00:00：真实 PhotoKit 无字合成照片经正常摄入、真实视觉/文本模型、来源跳转与导出授权、原拍摄月报告 publication 全部通过（4 tests/3 suites）；照片专项最新 10 tests/5 suites 通过，含真实 OCR。SwiftLint 0、474 双语条目及静态禁用扫描通过。相关回归 124 tests/21 suites 保留 4 个既有诗歌生成 deadline；不调整预算/质量/CI 门禁。正常 App 双模拟器来源/复制/PDF/系统呈现仍验证中，任务保持 in_progress。清理已完成重复失败 xcresult 602,172,460 bytes，摘要及原始失败日志保留。见 implementation-evidence 与 photokit-production-evidence。\n2026-09-09T18:40:00.536270+00:00：iOS 26 正常 App 无字红圆创作、真实来源跳转、精确正文复制及 10,415 bytes PDF 的系统呈现成功审计通过。发现并以真实 PhotoKit Red 复现重复同步清除 queued 描述任务；修复为相同来源保留 canonical/任务/素材并幂等调度，Green 4 tests/3 suites/102.722s，真实创作/月报均通过。21 个新增 Swift 文件逐文件 lint 0；默认 lint included 路径未覆盖 Echo/Core，既有 SyncPipeline 显式扫描存在旧样式警告，不宣称全源码零违规。iOS 18 系统限选照片选择器无法被当前自动化正确读取，已请求用户选择唯一的 13:11 红圆合成图后继续界面验收；双设备完整通过和人类视觉批准尚未成立。累计本轮清理717,738,605 bytes重复结果包，保留摘要/日志。\n2026-09-09T18:59:29.922909+00:00：用户明确修订为按需理解：不是所有导入图片立即处理，仅打开详情或选择 AI 创作的照片需要。取消导入/同步/前台批量调度，自动报告只消费已准备素材；迁移清理旧自动 queued 意图与关联恢复记录，保留有效素材、新按需任务及失败事实。此前自动全量实现/验收作为历史证据，不代表新触发合同通过；当前 TDD 进行中。\n2026-09-09T19:08:57.980935+00:00：按需触发修订已交付到 iPhone 16 Pro。7 tests/5 suites/133.607s通过（真实 PhotoKit 导入零理解任务，主动请求后真实创作/月报成功；按需 UI 不重试 L2；旧自动队列迁移）。升级前14 queued/23 ready/39照片，升级后0 queued/23 ready/39照片且恢复进度0；仅打开红圆详情新增1个onDemand任务，随后真实模型完成，页面显示可用于创作。8个直接修改照片文件lint0、474条双语及静态禁用检查通过。见4.0l-on-demand-evidence.json；既有质量/完整双设备创作分享/最终资格仍单独追踪。\n2026-09-09T19:24:02.366684+00:00：用户验收发现只显示素材就绪而不显示理解正文；新增有界、授权/版本重验的机器素材读取，UI 分别显示真实画面描述（明确英语原始结果）和 OCR/无文字状态。11 tests/4 suites通过；17Pro正常App实际显示 In this image there is a red circle. 及无OCR文字提示。16Pro处于编辑页，为避免丢失未保存输入，待用户确认后安装；未提交或关闭编辑。证据4.0l-visible-material-evidence.json。 | 2026-09-09 用户批准照片生成门禁：允许进入选模板，全部所选照片有当前 AI 描述或非空手写描述才生成；UI 与生产管线双重检查，标题/标签/OCR 不单独放行。定向回归 41 tests/5 suites 全通过，480 keys 双语校验通过；证据 docs/05-planning/4.0l-creation-gate-evidence.json。16 Pro 保留待确认的编辑页，未覆盖安装。 | 2026-09-09T19:53Z 用户授权更新安装 16 Pro 进行 Live Review；最新生成门禁构建覆盖安装/启动成功，首页语义快照 01qwpin，等待用户审查反馈。 | 2026-09-09 16 Pro 用户照片诗歌失败已复现为 deadline：素材已 ready。等价 max-heap 选词与 prefix 状态复用、精简中文诗提示词后 prefill 31.51s→12.43s，但 104 tokens 时仍触发 60s cap；18 tests/2 suites 通过不代表同图生成成功。证据 4.0l-poem-timeout-evidence.json；仅模拟器手动创作 120s/调用、240s/请求增补提案待用户批准，尚未启用。 | 2026-09-09T20:31:17.707885+00:00 用户批准的 DEBUG 模拟器手动创作 120/240s 预算已接线并安装 16 Pro；标准/自动报告 scope 仍60s，语言重试继承原截止。19 tests/2 suites通过。compact 提示词因 languageFallback 撤回，恢复v12；最终同图120.245s deadline，prefill94.305s、75 tokens，功能未通过，不再自动延时。证据 4.0l-poem-timeout-evidence.json。 | 2026-09-09 用户提出统一查看 AI 创作结果、无需停留生成页的新需求。当前手动结果仅存 ViewModel 且 onDisappear 取消生成；已形成独立 4.0m 需求方案 docs/05-planning/4.0m-creation-library-proposal.md，涵盖统一手动作/报告结果、页面无关队列、持久化与失败恢复、D-005。App 内离页与系统后台/锁屏范围待澄清；尚未实现，不扩大4.0l完成声明。\n2026-09-09T20:49:39.483495+00:00：用户批准先提交推送当前变更。提交前当前修改 Swift 文件显式 SwiftLint 0，照片与生成预算定向单元回归通过（echo-precommit-final）；保留真实诗歌 deadline/语言失败，完整双设备与质量/实机/覆盖率/发布未通过。review 仅表示交付审查，不标记 done。"
         },
         {
           "id": "4.1",
@@ -4451,6 +4452,41 @@
         "docs/05-planning/task-status.json",
         "docs/05-planning/deferred-items.json"
       ]
+    },
+    {
+      "id": "DOC-20260909-FUNCTIONAL-CLOSURE-FIRST",
+      "status": "resolved",
+      "detected_at": "2026-09-09T15:16:24.724541+00:00",
+      "resolved_at": "2026-09-09T15:16:24.724541+00:00",
+      "decision_maker": "User",
+      "user_instruction": "我们需要明确一点，现在项目初期构建闭环阶段不需要追求高精确度，首先是追求功能闭环",
+      "selected_option": "functional-closure-before-quality-optimization",
+      "decision": "Continue authorized SmolVLM native functional research; record precision/language findings without using them to block engineering or require a larger model. Preserve truthful intermediate-language metadata, final preferredLanguage, privacy, real inference, bounded resources and separate production artifact approval. Do not waive final release qualification or claim quality passed.",
+      "affected_documents": [
+        "AGENTS.md",
+        "docs/decisions/ADR-025-photo-understanding-creation.md",
+        "docs/01-spec/用户故事与验收标准规格书.md",
+        "docs/02-architecture/技术选型文档.md",
+        "docs/03-implementation/双语言实现说明文档.md",
+        "docs/03-implementation/开发避坑与关键注意点手册.md",
+        "docs/05-planning/开发计划安排文档.md",
+        "docs/05-planning/task-status.json",
+        "docs/05-planning/deferred-items.json",
+        "docs/05-planning/4.0l-photo-understanding-evaluation.md",
+        "docs/05-planning/4.0l-screening-review.md",
+        "docs/05-planning/4.0l-research-request.md",
+        "docs/05-planning/4.0l-next-candidate-request.md",
+        "docs/INDEX.md",
+        "Scripts/Research/README.md"
+      ]
+    },
+    {
+      "task_id": "4.0l",
+      "status": "resolved",
+      "decided_at": "2026-09-09T18:59:29.922909+00:00",
+      "decided_by": "user",
+      "decision": "Only photos opened in detail or selected for AI creation request visual understanding. Import/sync/foreground/automatic reports do not initiate bulk understanding. Preserve ready material; retire legacy automatic queued work.",
+      "reference": "docs/decisions/ADR-025-photo-understanding-creation.md"
     }
   ],
   "decisions": [

@@ -38,6 +38,7 @@ Echo/Resources/Models/*.aimodel/
 Echo/Resources/Models/*.safetensors
 Echo/Resources/Models/**/*.safetensors
 Echo/Resources/Models/OfflineGeneration.bundle/
+Echo/Resources/Models/PhotoUnderstanding.bundle/
 # Keep .gitkeep to preserve directory structure
 !Echo/Resources/Models/.gitkeep
 

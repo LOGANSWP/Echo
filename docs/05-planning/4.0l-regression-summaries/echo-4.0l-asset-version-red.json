@@ -1,0 +1,52 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "2789B5D1-D292-4144-A66B-649CE2DF32EC",
+        "deviceName" : "iPhone 17 Pro",
+        "modelName" : "iPhone 17 Pro",
+        "osBuildNumber" : "23F77",
+        "osVersion" : "26.5",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 1,
+      "passedTests" : 8,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "Echo · Built with macOS 26.5",
+  "expectedFailures" : 0,
+  "failedTests" : 1,
+  "finishTime" : 1788974627.207,
+  "passedTests" : 1,
+  "result" : "Failed",
+  "skippedTests" : 0,
+  "startTime" : 1788974538.945,
+  "statistics" : [
+    {
+      "subtitle" : "8 test runs",
+      "title" : "1 test ran with dynamic parameters"
+    }
+  ],
+  "testFailures" : [
+    {
+      "failureText" : "Expectation failed: (source.text → \"A red circle\nOPEN\") == \"\"",
+      "targetName" : "EchoTests",
+      "testIdentifier" : 1,
+      "testIdentifierString" : "PhotoUnderstandingCreationTests/test_AC7_creationSource(_:)",
+      "testIdentifierURL" : "test://com.apple.xcode/Echo/EchoTests/PhotoUnderstandingCreationTests/test_AC7_creationSource(_:)",
+      "testName" : "AC-7: creation consumes bounded current derived text with correction precedence"
+    }
+  ],
+  "title" : "Test - Echo",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 2
+}

@@ -48,6 +48,7 @@ public actor NarrativeReportActor {
     private let pendingOps: PendingOpsActor
     private var generator: (any NarrativeReportGenerating)?
     private let omittedPartitions: [String]
+    private let sourceRepository: CanonicalMemoryRepositoryActor
 
     public init(
         database: DatabaseManager = .shared,
@@ -55,7 +56,8 @@ public actor NarrativeReportActor {
         taskQueue: TaskQueueActor = .shared,
         pendingOps: PendingOpsActor = .shared,
         generator: (any NarrativeReportGenerating)? = nil,
-        omittedPartitions: [String] = ["healthKit", "people"]
+        omittedPartitions: [String] = ["healthKit", "people"],
+        sourceRepository: CanonicalMemoryRepositoryActor? = nil
     ) {
         self.database = database
         self.privacyActor = privacyActor
@@ -63,6 +65,7 @@ public actor NarrativeReportActor {
         self.pendingOps = pendingOps
         self.generator = generator
         self.omittedPartitions = omittedPartitions.sorted()
+        self.sourceRepository = sourceRepository ?? CanonicalMemoryRepositoryActor(db: database, privacyActor: privacyActor)
     }
 
     public func attachGenerator(
@@ -286,6 +289,9 @@ public actor NarrativeReportActor {
             )
             try await taskQueue.enqueue(job)
             return .enqueued(taskID: taskID, periodKey: period.periodKey)
+        } catch NarrativeReportError.resourceDeferred {
+            try await releaseClaimForResource(taskID: taskID, traceID: traceID)
+            return .deferredForResources
         } catch is CancellationError {
             try await releaseClaimForResource(taskID: taskID, traceID: traceID)
             throw CancellationError()
@@ -603,6 +609,11 @@ public actor NarrativeReportActor {
             guard finalCheckpoint.isAllowed, finalCheckpoint.policyVersion == sourceCheckpoint.policyVersion else {
                 throw GenerationRuntimeError.privacyDenied
             }
+            try await GenerationSourceValidation(
+                repository: sourceRepository,
+                sources: prepared.request.sources.filter { contributingIDs.contains($0.memoryID) },
+                excerptScalarLimit: 512
+            ).validate()
             let audit = try await privacyActor.prepareNarrativeReportAuditPayload(
                 checkpoint: finalCheckpoint,
                 period: period,
@@ -664,7 +675,8 @@ public actor NarrativeReportActor {
                   AND CASE sourceType WHEN 'text' THEN 'note'
                       WHEN 'video_frame' THEN 'video' WHEN 'video_audio' THEN 'video'
                       ELSE sourceType END IN (\(placeholders))
-                  AND length(trim(COALESCE(canonicalText, ''))) > 0
+                  AND (sourceType = 'photo' OR length(trim(COALESCE(canonicalText, ''))) > 0)
+                  AND NOT EXISTS (SELECT 1 FROM ExcludedAssets e WHERE e.assetId = Memory.sourceLocator)
                 ORDER BY sourceType ASC, memoryTimestamp ASC, memoryId ASC
                 LIMIT 256
                 """,
@@ -673,9 +685,26 @@ public actor NarrativeReportActor {
                 .double(period.endInstant.timeIntervalSince1970),
             ] + allowedTypes.map(DBBinding.text)
         )
+        var preparedRows: [[String: DBValue]] = []
+        var waitingPhotos = false
+        for var row in rows {
+            if row["sourceType"]?.stringValue == "photo",
+                let raw = row["memoryId"]?.stringValue, let id = UUID(uuidString: raw) {
+                let source = try await sourceRepository.loadCreationSource(
+                    memoryID: id,
+                    maximumTextBytes: GenerationInputBudget.maximumBytes
+                )
+                let text = source?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                if text.isEmpty { waitingPhotos = true; continue }
+                row["canonicalText"] = .text(String(String.UnicodeScalarView(text.unicodeScalars.prefix(512))))
+                row["updatedAt"] = .double(source?.revision ?? 0)
+            }
+            preparedRows.append(row)
+        }
+        if preparedRows.isEmpty, waitingPhotos { throw NarrativeReportError.resourceDeferred }
         return NarrativeReportAggregator.prepare(
             period: period,
-            rows: rows,
+            rows: preparedRows,
             authorizedSourceTypes: policy.authorizedSourceTypes,
             omittedPartitions: omittedPartitions
         )

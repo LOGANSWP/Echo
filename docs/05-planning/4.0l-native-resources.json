@@ -1,0 +1,12 @@
+{
+  "exitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 9.337702042001183,
+  "sampledPeakProcessTreeRSSBytes": 984350720,
+  "peakResearchDiskBytesIncludingOwnedSwiftCache": 1078356705,
+  "pollIntervalSeconds": 1,
+  "scope": "Mac native research process tree, not whole App/iPhone qualification",
+  "packageAndInputIntegrityBeforeAfter": true,
+  "executableSha256": "eccf01397d2d51f741d710bdd2ec9ce092c3810a8acff2e138b5364e18e0baec",
+  "swiftSha256": "6b25336c110b53efe05330bc5eed8ce1ada8a2cc212f2c34c89b9d207ca55406"
+}

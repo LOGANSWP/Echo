@@ -1,0 +1,103 @@
+{
+  "task": "4.0l",
+  "date": "2026-09-09",
+  "device": "iPhone 16 Pro / iOS 18.2 simulator",
+  "status": "Approved simulator allowance implemented; user photo poem remains unresolved",
+  "reproduction": {
+    "photoUnderstanding": "ready",
+    "manualDescriptionRequired": false,
+    "template": "poem",
+    "language": "zh-Hans",
+    "failure": "GenerationRuntimeError.deadline",
+    "screenHash": "04u0ozn"
+  },
+  "experiments": [
+    {
+      "change": "Exact max-heap candidate ordering",
+      "result": "deadline",
+      "screenHash": "1lbzdwj",
+      "tests": "13 tests passed; /tmp/echo-poem-ranking.log"
+    },
+    {
+      "change": "Reuse complete-prefix result within candidate selection; numeric timing diagnostics",
+      "result": "deadline",
+      "elapsedSeconds": 60.350593,
+      "loadSeconds": 1.772573,
+      "prefillSeconds": 31.506344,
+      "decodeSeconds": 20.347882,
+      "selectionSeconds": 6.545828,
+      "outputTokensBeforeFailure": 77,
+      "tests": "13 tests passed; /tmp/echo-poem-timing.log"
+    },
+    {
+      "change": "Compact Chinese four-line poem instructions without unrelated demonstration",
+      "result": "deadline",
+      "elapsedSeconds": 60.645191,
+      "loadSeconds": 1.718415,
+      "prefillSeconds": 12.425747,
+      "decodeSeconds": 37.339368,
+      "selectionSeconds": 8.94072,
+      "outputTokensBeforeFailure": 104,
+      "tests": "18 tests in 2 suites passed; /tmp/echo-poem-compact.log",
+      "screenHash": "1lbzdwj"
+    },
+    {
+      "change": "Approved manual simulator budget with compact poem prompt",
+      "result": "languageFallback after the allowed single retry",
+      "screenHash": "1kkq8ij",
+      "calls": [
+        {
+          "elapsedSeconds": 50.630334,
+          "outputTokens": 115
+        },
+        {
+          "elapsedSeconds": 44.78571,
+          "outputTokens": 95
+        }
+      ],
+      "conclusion": "Complete model calls do not imply accepted language or successful creation; compact prompt not retained"
+    },
+    {
+      "change": "Restore original creative-forms-production-v12 prompt with approved manual-only simulator budget",
+      "result": "deadline at approved 120-second single-call cap",
+      "elapsedSeconds": 120.24498,
+      "loadSeconds": 1.656044,
+      "prefillSeconds": 94.304777,
+      "decodeSeconds": 18.46254,
+      "selectionSeconds": 5.479577,
+      "outputTokensBeforeFailure": 75,
+      "screenHash": "04u0ozn",
+      "tests": "19 tests in 2 suites passed; /tmp/echo-manual-budget-final.log"
+    }
+  ],
+  "unchangedBoundaries": [
+    "approved model artifacts",
+    "256-output-token ceiling",
+    "current source allow-list",
+    "preferred-language validation",
+    "four-line grammar",
+    "60-second standard budget for automatic reports, devices and Release"
+  ],
+  "privacy": "No image or generated body recorded in diagnostic logs",
+  "nextDecision": "4.0l-simulator-time-budget-proposal.md",
+  "approvedException": {
+    "callSeconds": 120,
+    "requestSeconds": 240,
+    "scope": "DEBUG simulator manual creation only",
+    "approval": "4.0l-simulator-time-budget-approval.json"
+  },
+  "notes": [
+    "Observed prefill timing varies across simulator runs; root cause of variance not yet established",
+    "Time budget implementation passed; successful user photo poem creation did not",
+    "No automatic extension beyond approved 120/240 seconds",
+    "Original v12 poem prompt retained; compact experiment reverted after language rejection"
+  ],
+  "recordedAt": "2026-09-09T20:31:17.707885+00:00",
+  "cleanup": {
+    "removedDuplicateTestResultBytes": 302863,
+    "retained": [
+      "/tmp/echo-manual-budget-final.xcresult",
+      "all text test logs and summarized Red/Green results"
+    ]
+  }
+}

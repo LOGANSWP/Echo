@@ -1,0 +1,10 @@
+{
+  "resourceFilesVerified": 20,
+  "totalBytes": 844124058,
+  "nativeCPUFunctionalCasesPassed": 3,
+  "sameSyntheticPixelHashes": true,
+  "simulatorValidated": false,
+  "fullAppMemoryValidated": false,
+  "parentPacketSha256": "625d3457c9e632b29bd2fe2e40467ba116079f935a4b303ebb3f7dee577117a7",
+  "approvalRequired": true
+}

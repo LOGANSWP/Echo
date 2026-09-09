@@ -1,0 +1,52 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "2789B5D1-D292-4144-A66B-649CE2DF32EC",
+        "deviceName" : "iPhone 17 Pro",
+        "modelName" : "iPhone 17 Pro",
+        "osBuildNumber" : "23F77",
+        "osVersion" : "26.5",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 1,
+      "passedTests" : 8,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "Echo · Built with macOS 26.5",
+  "expectedFailures" : 0,
+  "failedTests" : 1,
+  "finishTime" : 1788976061.254,
+  "passedTests" : 3,
+  "result" : "Failed",
+  "skippedTests" : 0,
+  "startTime" : 1788975997.21,
+  "statistics" : [
+    {
+      "subtitle" : "6 test runs",
+      "title" : "1 test ran with dynamic parameters"
+    }
+  ],
+  "testFailures" : [
+    {
+      "failureText" : "Expectation failed: (access → PHAuthorizationStatus(rawValue: 2)) == (.authorized → PHAuthorizationStatus(rawValue: 3))",
+      "targetName" : "EchoTests",
+      "testIdentifier" : 4,
+      "testIdentifierString" : "PhotoProductionIntegrationTests/test_AC7_photoToCreation()",
+      "testIdentifierURL" : "test://com.apple.xcode/Echo/EchoTests/PhotoProductionIntegrationTests/test_AC7_photoToCreation()",
+      "testName" : "AC-7: a real uncaptioned PhotoKit asset reaches grounded creation"
+    }
+  ],
+  "title" : "Test - Echo",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 4
+}

@@ -1,0 +1,461 @@
+{
+  "status": "in_progress",
+  "scope": "Real PhotoKit synthetic no-text photo passed ingestion, visual caption, text creation, source/export authorization, unchanged-source sync and persisted monthly report on iOS 26.5. Dual-simulator live UI verification remains in progress.",
+  "runs": [
+    {
+      "log": "/tmp/echo-4.0l-runtime-green.log",
+      "sha256": "22c24a93e71bf571cb2058fa7ec3e07da6ad51d1fb1a28d706a048f4ca3089f5",
+      "result": [
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/Echo/Core/Actors/BundledPhotoUnderstandingActor.swift:86:52: error: sending 'vision' risks causing data races",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/Echo/Core/Actors/BundledPhotoUnderstandingActor.swift:99:21: error: sending 'decoder' risks causing data races"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-runtime-green2.log",
+      "sha256": "b605c6367ce2eb8124a125c8da911ea9bbf697596503781151ccac28c09ae69f",
+      "result": [
+        "✘ Test run with 1 test in 1 suite failed after 19.063 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6: real bundled visual inference produces a bounded caption without a description\" recorded an issue at 4.0l_PhotoRuntimeTests.swift:20:6: Caught error: .outputLimit"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-runtime-green3.log",
+      "sha256": "b76e7dbc7c5cf40dbee1a0ea1c3d2b0a1694076a6c6dbf8d43f8244c2746704c",
+      "result": [
+        "✘ Test run with 3 tests in 2 suites failed after 2.767 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "2026-09-09 11:26:11.576348-0500 Echo[38354:3072804] [espresso] [Espresso::handle_ex_plan] exception=Espresso exception: \"Network translation error\": Unknown MIL->EIR network translation error: std::bad_cast status=-14",
+        "✘ Test \"AC-6: real bundled visual inference produces a bounded caption without a description\" recorded an issue at 4.0l_PhotoRuntimeTests.swift:20:6: Caught error: Error Domain=com.apple.CoreML Code=0 \"Failed to build the model execution plan using a model architecture file '/Users/logansu/Library/Developer/CoreSimulator/Devices/2789B5D1-D292-4144-A66B-649CE2DF32EC/data/Containers/Bundle/Application/6A5E211F-46A6-470B-AF5A-3C3871DC1214/Echo.app/PhotoUnderstanding.bundle/SmolDecoder1024.mlmodelc/model.mil' with error code: -14.\" UserInfo={NSLocalizedDescription=Failed to build the model execution plan using a model architecture file '/Users/logansu/Library/Developer/CoreSimulator/Devices/2789B5D1-D292-4144-A66B-649CE2DF32EC/data/Containers/Bundle/Application/6A5E211F-46A6-470B-AF5A-3C3871DC1214/Echo.app/PhotoUnderstanding.bundle/SmolDecoder1024.mlmodelc/model.mil' with error code: -14.}"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-runtime-green4.log",
+      "sha256": "1da427936eaca6483d0b68ac4b3a8b0a17ddb85cb0268a73a91f300dee985f7a",
+      "result": [
+        "✘ Test run with 1 test in 1 suite failed after 6.933 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6: real bundled visual inference produces a bounded caption without a description\" recorded an issue at 4.0l_PhotoRuntimeTests.swift:20:6: Caught error: .modelContract"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-runtime-red.log",
+      "sha256": "5c8998e7825283f48ebec1cb35b0426f9cc1407149880c56cef49b43c97eb809",
+      "result": [
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:30:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:36:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:30:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:36:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:30:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:36:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:30:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:36:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:30:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoRuntimeTests.swift:36:23: error: main actor-isolated initializer 'init(privacyActor:resourceRoot:)' cannot be called from outside of the actor"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-runtime-red2.log",
+      "sha256": "4f3fd65975090cbb7677a3f7f53181a1d217c3674d10ea92e9a4b87aa5bc0347",
+      "result": [
+        "✘ Test run with 1 test in 1 suite failed after 0.131 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6: real bundled visual inference produces a bounded caption without a description\" recorded an issue at 4.0l_PhotoRuntimeTests.swift:20:6: Caught error: .invalidArtifact"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-source-green.log",
+      "sha256": "833ab4c1349f0c60c4ab8450366922bed05d9ab9f0f17aa860cff0bed19bc615",
+      "result": [
+        "✔ Test run with 3 tests in 2 suites passed after 0.517 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-source-red.log",
+      "sha256": "ca41a18959efe810cec895f5a07cd33f1170e538c67a4bef360f63189754d36b",
+      "result": [
+        "✘ Test run with 2 tests in 1 suite failed after 0.367 seconds with 4 issues.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .automatic at 4.0l_PhotoUnderstandingCreationTests.swift:59:30: Expectation failed: (source.text → \"\") == (\"A red circle\\nOPEN\" → \"A red circle",
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .correction at 4.0l_PhotoUnderstandingCreationTests.swift:62:17: Expectation failed: (source.text → \"My title",
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .titleOnly at 4.0l_PhotoUnderstandingCreationTests.swift:60:30: Expectation failed: (source.text → \"My title",
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .budget at 4.0l_PhotoUnderstandingCreationTests.swift:52:19: Expectation failed: an error was expected but none was thrown"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-storage-green.log",
+      "sha256": "77ca3b1894033afe55e625381a1bf1880e97293918aa3df1845bbc6d4f907989",
+      "result": [
+        "✔ Test run with 1 test in 1 suite passed after 0.039 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-storage-red.log",
+      "sha256": "e4e496a20b68d41c9f1c896c50294f052e2a6c29c387afb7df3323175a9f5d4b",
+      "result": [
+        "✘ Test run with 1 test in 1 suite failed after 0.038 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-7: derived bodies survive migration without changing source or user text\" recorded an issue at 4.0l_PhotoUnderstandingCreationTests.swift:17:6: Caught error: .writeFailed(operation: \"prepare\", underlying: Error Domain=sqlite3 Code=-1 \"no such table: PhotoDerivedContent\" UserInfo={NSLocalizedDescription=no such table: PhotoDerivedContent})"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-lifecycle-green.log",
+      "sha256": "04207b50492ae9bf9562b5abe736456e5a9009af369f964b27370d05c3aacd1b",
+      "result": [
+        "✔ Test run with 4 tests in 2 suites passed after 0.407 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-lifecycle-green2.log",
+      "sha256": "83ddbd9c04d47c990fd8c8cbc4d8ce3dbde09ce3250a2ef16ff6bf29d3eb7406",
+      "result": [
+        "✔ Test run with 5 tests in 3 suites passed after 0.489 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-queue-green.log",
+      "sha256": "0adbb6c9819e858ce91cb584504528d70696655f51a30d257c87932d00a50478",
+      "result": [
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/Echo/Core/Actors/PhotoUnderstandingActor.swift:52:40: error: missing argument for parameter 'progressPolicy' in call"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-queue-green2.log",
+      "sha256": "8a47b0af10a49788655c7e88fc3776019f3b162cd504cf5beb1f7b2344baee7d",
+      "result": [
+        "✔ Test run with 3 tests in 2 suites passed after 0.184 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-queue-red.log",
+      "sha256": "afa5ced811a22d62f947fe2ad9da913b4220206f1c2589c2c10372b7fb913bff",
+      "result": [
+        "✘ Test run with 1 test in 1 suite failed after 0.028 seconds with 4 issues.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6/8: duplicate scheduling owns one queued job and publishes separate material\" recorded an issue at 4.0l_PhotoPreparationQueueTests.swift:53:9: Expectation failed: try await preparation.schedule(memoryID: id, traceID: \"photo-first\")",
+        "✘ Test \"AC-6/8: duplicate scheduling owns one queued job and publishes separate material\" recorded an issue at 4.0l_PhotoPreparationQueueTests.swift:59:9: Expectation failed: await provider.callCount == 1",
+        "✘ Test \"AC-6/8: duplicate scheduling owns one queued job and publishes separate material\" recorded an issue at 4.0l_PhotoPreparationQueueTests.swift:60:9: Expectation failed: try await preparation.status(memoryID: id, traceID: \"photo-status\") == .ready",
+        "✘ Test \"AC-6/8: duplicate scheduling owns one queued job and publishes separate material\" recorded an issue at 4.0l_PhotoPreparationQueueTests.swift:63:9: Expectation failed: (source.text → \"\") == (\"A red circle\\nOPEN\" → \"A red circle"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-queued-denial-red.log",
+      "sha256": "b833e251dbc94893b9bc35a380eb5169bb638e7840799f35d6e4f6135d6bf42e",
+      "result": [
+        "✘ Test run with 2 tests in 1 suite failed after 0.295 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-8: interrupted inference never publishes stale material\" recorded an issue with 1 argument interruption → .queuedRevoked at 4.0l_PhotoPreparationQueueTests.swift:111:13: Expectation failed: (pending.count → 0) == 1"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-recovery-red.log",
+      "sha256": "15edfa9347602476d9efff06586a870b7798dc5d75999679ec6af377eff2ab7f",
+      "result": [
+        "✘ Test run with 1 test in 1 suite failed after 0.062 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6/8: duplicate scheduling owns one queued job and publishes separate material\" recorded an issue at 4.0l_PhotoPreparationQueueTests.swift:83:9: Expectation failed: await provider.callCount == 1"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-runtime-green5.log",
+      "sha256": "5bfb41773869e5409829c17fd70143b13445b4d2d05bf73c57a58a45673eb1c3",
+      "result": [
+        "✘ Test run with 2 tests in 1 suite failed after 5.414 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6: real bundled visual inference produces a bounded caption without a description\" recorded an issue at 4.0l_PhotoRuntimeTests.swift:32:6: Caught error: .modelContract"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-runtime-green6.log",
+      "sha256": "e9ecf576222952bad34d0b92e05c768dd17d7dda08578241db7bf504624efb97",
+      "result": [
+        "✘ Test run with 2 tests in 1 suite failed after 5.405 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6: real bundled visual inference produces a bounded caption without a description\" recorded an issue at 4.0l_PhotoRuntimeTests.swift:32:6: Caught error: .generatedProtocolToken"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-cpu-approved-green.log",
+      "sha256": "3ee34bb1b0c0da2e864f595a1ead35237352c59b090155c3f3ee8337a487c124",
+      "result": [
+        "✘ Test run with 6 tests in 3 suites failed after 8.166 seconds with 4 issues.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .automatic at 4.0l_PhotoUnderstandingCreationTests.swift:59:30: Expectation failed: (source.text → \"\") == (\"A red circle\\nOPEN\" → \"A red circle",
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .correction at 4.0l_PhotoUnderstandingCreationTests.swift:62:17: Expectation failed: (source.text → \"My title",
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .titleOnly at 4.0l_PhotoUnderstandingCreationTests.swift:60:30: Expectation failed: (source.text → \"My title",
+        "✘ Test \"AC-7: creation consumes bounded current derived text with correction precedence\" recorded an issue with 1 argument scenario → .budget at 4.0l_PhotoUnderstandingCreationTests.swift:52:19: Expectation failed: an error was expected but none was thrown"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-cpu-approved-material-green.log",
+      "sha256": "b8fb9d69a2dbecc7eb50aeac806a22544577ee55ffc3504da4882df61a67c3e4",
+      "result": [
+        "✔ Test run with 4 tests in 2 suites passed after 0.449 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-cpu-repeat-red.log",
+      "sha256": "c3dd2748dbc2e15d36a916e1185290f75ccb017d4e34047a4301abc96b4d5cb2",
+      "result": [
+        "✔ Test run with 2 tests in 1 suite passed after 14.513 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-photo-month-green.log",
+      "sha256": "5d67690634f70a1e8df3ff99616d584d02f7b072fda27204887ef0cf5a19b156",
+      "result": [
+        "✔ Test run with 4 tests in 3 suites passed after 124.463 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-final-unit-green.log",
+      "sha256": "80f8068c86c15e5e2046d31af9fc21bfd222b5e95a0d48a01a83d7aed40cbc17",
+      "result": [
+        "✔ Test run with 10 tests in 5 suites passed after 2.102 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    },
+    {
+      "log": "/tmp/echo-4.0l-boundary-regression.log",
+      "sha256": "734c4e2182e71d2fd44b09e409e29e5644f42f841e018750a872d69e11554739",
+      "result": [
+        "✘ Test run with 124 tests in 21 suites failed after 246.328 seconds with 4 issues.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-1/2: bundled model writes verse from a synthetic photo description\" recorded an issue with 1 argument language → \"en-US\" at 4.0k_CreationPoemIntegrationTests.swift:21:6: Caught error: .deadline",
+        "✘ Test \"AC-1/2: bundled model writes verse from a synthetic photo description\" recorded an issue with 1 argument language → \"zh-Hans\" at 4.0k_CreationPoemIntegrationTests.swift:21:6: Caught error: .deadline",
+        "✘ Test \"AC-1/2: Chinese poems keep independent subjects without importing demonstration content\" recorded an issue with 1 argument subject → \"rain\" at 4.0k_CreationPoemIntegrationTests.swift:28:6: Caught error: .deadline",
+        "✘ Test \"AC-1/2: Chinese poems keep independent subjects without importing demonstration content\" recorded an issue with 1 argument subject → \"river\" at 4.0k_CreationPoemIntegrationTests.swift:28:6: Caught error: .deadline"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-generation-ordering-green.log",
+      "sha256": "5555205648945100423b268dfc4c43b835900c5d811684684bebbb8df879e6fd",
+      "result": [
+        "✘ Test run with 15 tests in 3 suites failed after 239.265 seconds with 4 issues.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-1/2: bundled model writes verse from a synthetic photo description\" recorded an issue with 1 argument language → \"en-US\" at 4.0k_CreationPoemIntegrationTests.swift:21:6: Caught error: .deadline",
+        "✘ Test \"AC-1/2: bundled model writes verse from a synthetic photo description\" recorded an issue with 1 argument language → \"zh-Hans\" at 4.0k_CreationPoemIntegrationTests.swift:21:6: Caught error: .deadline",
+        "✘ Test \"AC-1/2: Chinese poems keep independent subjects without importing demonstration content\" recorded an issue with 1 argument subject → \"rain\" at 4.0k_CreationPoemIntegrationTests.swift:28:6: Caught error: .deadline",
+        "✘ Test \"AC-1/2: Chinese poems keep independent subjects without importing demonstration content\" recorded an issue with 1 argument subject → \"river\" at 4.0k_CreationPoemIntegrationTests.swift:79:17: Expectation failed: !((body → \"夕阳洒在河面上，白鸟停在枝头"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-duplicate-sync-red.log",
+      "sha256": "d0921f0864eee75c42d0c115cd56acfad6bbc671fbdaf8d45026fd266e46fdc0",
+      "result": [
+        "✔ Test run with 0 tests in 1 suite passed after 0.002 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": [],
+      "scope": "Zero-test selector attempt is not validation"
+    },
+    {
+      "log": "/tmp/echo-4.0l-duplicate-sync-red2.log",
+      "sha256": "fbb75a134969032a915b30aa4178b67d0909e8fff532e2abf7ecb96096af30b7",
+      "result": [
+        "✘ Test run with 1 test in 1 suite failed after 17.614 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-8: duplicate source notifications retain queued photo preparation\" recorded an issue at 4.0l_PhotoProductionIntegrationTests.swift:101:25: Expectation failed: try await db.photoJobRow(memoryID: id)?[\"state\"]?.stringValue == \"queued\""
+      ],
+      "scope": "Duplicate PhotoKit notifications while caption work is queued"
+    },
+    {
+      "log": "/tmp/echo-4.0l-duplicate-sync-green.log",
+      "sha256": "405e4dfca6eea29bd6e422baba1c8919713530af220ee8d5534c88c9a426d8e8",
+      "result": [
+        "✔ Test run with 4 tests in 3 suites passed after 102.722 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": [],
+      "scope": "Duplicate PhotoKit notifications while caption work is queued"
+    },
+    {
+      "log": "/tmp/echo-4.0l-demand-red.log",
+      "sha256": "0e5206c26b6f1ff585f7761214891df23d19063f240fb8cf881e28b28923d40c",
+      "result": [
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoPreparationViewModelTests.swift:28:21: error: value of type 'PhotoPreparationViewModel' has no member 'prepareOnAccess'",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoPreparationViewModelTests.swift:29:21: error: value of type 'PhotoPreparationViewModel' has no member 'prepareOnAccess'",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoPreparationViewModelTests.swift:33:21: error: value of type 'PhotoPreparationViewModel' has no member 'prepareOnAccess'",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoPreparationViewModelTests.swift:35:21: error: value of type 'PhotoPreparationViewModel' has no member 'prepareOnAccess'"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-demand-migration-red.log",
+      "sha256": "84e4a8d6eaa702fd8849ac85db4f1b05a32f906db4d3a4b0cbf6ff760985295b",
+      "result": [
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoDemandMigrationTests.swift:17:86: error: missing argument for parameter 'bindings' in call",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoDemandMigrationTests.swift:20:138: error: missing argument for parameter 'bindings' in call",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoDemandMigrationTests.swift:34:113: error: missing argument for parameter 'bindings' in call",
+        "/Users/logansu/Documents/Dev/SwiftProjects/Echo/EchoTests/Phase4/4.0l_PhotoDemandMigrationTests.swift:36:77: error: missing argument for parameter 'bindings' in call"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-demand-migration-red2.log",
+      "sha256": "e0cafa703cf5a9345886b08e179e7685a2f970d1ee884e223e70ed00da25eccf",
+      "result": [
+        "✘ Test run with 3 tests in 2 suites failed after 0.055 seconds with 1 issue.",
+        "** TEST FAILED **"
+      ],
+      "failures": [
+        "✘ Test \"AC-6: reopening clears only legacy automatic queued photo work\" recorded an issue at 4.0l_PhotoDemandMigrationTests.swift:35:9: Expectation failed: (rows.compactMap { $0[\"memoryId\"]?.stringValue } → [\"old\", \"ready\", \"requested\"]) == [\"ready\", \"requested\"]"
+      ]
+    },
+    {
+      "log": "/tmp/echo-4.0l-demand-green.log",
+      "sha256": "e4f6a2e96528b08234df70c835d5a5dde41599887fb87fda765075a5278113d8",
+      "result": [
+        "✔ Test run with 7 tests in 5 suites passed after 133.607 seconds.",
+        "** TEST SUCCEEDED **"
+      ],
+      "failures": []
+    }
+  ],
+  "obsoleteResultBytesRemoved": 367580247,
+  "latestCheckpoint": {
+    "status": "approved_CPU_artifact_simulator_module_passed",
+    "tests": "5 tests in 3 suites passed, including all parameterized interruption/source cases; injected unit seams only",
+    "lint": "PhotoUnderstandingActor, PhotoUnderstandingStorage and PhotoPreparationQueueTests: 0 violations",
+    "realRuntime": "iPhone 17 Pro / iOS 26.5: real synthetic pixels produced valid caption twice; repeated-call peak assertion <1.5GB passed; missing artifact and exclusive visual/text model lease checks passed. Not full PhotoKit E2E or final release qualification.",
+    "supplement": "docs/05-planning/4.0l-cpu-approval-supplement/README.md",
+    "packetManifestSha256": "ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367",
+    "cleanup": [
+      {
+        "path": "/tmp/echo-4.0l-lifecycle-green.xcresult",
+        "bytes": 237458
+      },
+      {
+        "path": "/tmp/echo-4.0l-queue-green.xcresult",
+        "bytes": 18837
+      },
+      {
+        "path": "/tmp/echo-4.0l-queue-green2.xcresult",
+        "bytes": 241606
+      },
+      {
+        "path": "/tmp/echo-4.0l-queue-red.xcresult",
+        "bytes": 61020705
+      },
+      {
+        "path": "/tmp/echo-4.0l-queued-denial-red.xcresult",
+        "bytes": 59737927
+      },
+      {
+        "path": "/tmp/echo-4.0l-recovery-red.xcresult",
+        "bytes": 59745892
+      },
+      {
+        "path": "/tmp/echo-4.0l-runtime-green5.xcresult",
+        "bytes": 65759945
+      },
+      {
+        "path": "/tmp/echo-4.0l-runtime-green6.xcresult",
+        "bytes": 60476397
+      },
+      {
+        "path": "/tmp/echo-photo-tensor-module-cache",
+        "bytes": 87036036
+      },
+      {
+        "path": "/tmp/echo-photo-cpu-probe",
+        "bytes": 240344
+      },
+      {
+        "path": "/tmp/echo-photo-split-probe",
+        "bytes": 240392
+      },
+      {
+        "path": "/tmp/echo-photo-state-probe",
+        "bytes": 257704
+      },
+      {
+        "path": "/tmp/echo-photo-tensor-stride-probe",
+        "bytes": 63584
+      },
+      {
+        "path": "/tmp/echo-4.0l-cpu-approved-green.xcresult",
+        "bytes": 60870943
+      }
+    ],
+    "removedBytes": 455947770
+  },
+  "functionalCheckpoint": {
+    "updatedAt": "2026-09-09T18:40:00.536270+00:00",
+    "productionEvidence": "4.0l-photokit-production-evidence.json",
+    "unitTests": "10 tests / 5 suites passed, including parameterized cases and real Vision OCR",
+    "productionTests": "4 tests / 3 suites passed; real monthly report persisted",
+    "staticChecks": {
+      "swiftlint": "Configured default command: 0 violations; explicit scan of all 21 new production/test Swift files: 0 violations. Existing default included paths omit Echo/Core; explicit scan of legacy SyncPipeline exposes existing style warnings, so no whole-source zero-violation claim.",
+      "localization": "474 keys, parity 100%",
+      "staticBans": "passed",
+      "artifactVerification": "20 files / 844124058 bytes, frozen CPU supplement verified"
+    },
+    "regression": "124 tests / 21 suites: 4 issues in existing CreationPoemIntegrationTests, generation deadlines. Other boundary suites passed. No budget or gate relaxation. Candidate-ordering experiment did not resolve the failures and was reverted; subsequent trial also retained a known unsupported birdsong quality assertion.",
+    "releaseQualified": false,
+    "cleanupEvidence": "4.0l-regression-cleanup.json",
+    "duplicateSync": "Red reproduced queued intent deletion; identical source sync now retains canonical record, queued/published material, and idempotent scheduling without automatic L2 retry. Green: 4 tests / 3 suites / 102.722s with real caption, creation and monthly publication.",
+    "liveUIEvidence": "4.0l-live-functional-review.json"
+  },
+  "onDemandRevision": "4.0l-on-demand-evidence.json: latest triggering contract supersedes earlier automatic import/backfill evidence; 7 tests/5 suites passed and iOS18 upgrade/one-photo demand verified."
+}

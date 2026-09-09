@@ -48,6 +48,7 @@ public actor CanonicalMemoryRepositoryActor {
     nonisolated let generationRegistry: GenerationRegistryActor
     private let excludedAssets: ExcludedAssetsActor
     private let privacyActor: PrivacyActor
+    private let photoPixelSource: (any PhotoPixelSourceReading)?
 
     /// 故障注入点（测试用）— 模拟事务边界处的崩溃/失败。DEBUG only。
     #if DEBUG
@@ -58,12 +59,14 @@ public actor CanonicalMemoryRepositoryActor {
         db: DatabaseManager = .shared,
         generationRegistry: GenerationRegistryActor = .shared,
         excludedAssets: ExcludedAssetsActor = .shared,
-        privacyActor: PrivacyActor = .shared
+        privacyActor: PrivacyActor = .shared,
+        photoPixelSource: (any PhotoPixelSourceReading)? = nil
     ) {
         self.db = db
         self.generationRegistry = generationRegistry
         self.excludedAssets = excludedAssets
         self.privacyActor = privacyActor
+        self.photoPixelSource = photoPixelSource
     }
 
     // MARK: - Deterministic ID
@@ -219,64 +222,21 @@ public actor CanonicalMemoryRepositoryActor {
         try await writeTransactionAudit(traceID: traceID, rolledBack: false)
     }
 
+    // Task 4.0l / US-ING-004 AC-7: current caption/OCR and user correction source reads.
     // MARK: - Reads
 
     /// Task 4.0k / US-SYN-003: atomically read the same persisted text used by editing.
     /// The caller owns the operation checkpoint; this read never changes original text.
     public func loadCreationSource(memoryID: UUID, maximumTextBytes: Int? = nil) async throws -> CreativeSource? {
-        let limit = maximumTextBytes ?? Int.max
-        guard limit >= 0 else { throw GenerationRuntimeError.contextLimit }
-        let rows = try await db.executeQuery(
-            sql: """
-                WITH source AS (
-                    SELECT m.memoryId, m.sourceType, m.canonicalText, m.createdAt, m.updatedAt,
-                           m.originalTimestamp, e.title, e.description, e.tagsJSON, e.updatedAt AS editUpdatedAt,
-                           COALESCE(length(CAST(m.canonicalText AS BLOB)), 0)
-                           + COALESCE(length(CAST(e.title AS BLOB)), 0)
-                           + COALESCE(length(CAST(e.description AS BLOB)), 0)
-                           + COALESCE(length(CAST(e.tagsJSON AS BLOB)), 0) AS sourceBytes
-                    FROM Memory m LEFT JOIN MemoryUserEdit e ON e.memoryId = m.memoryId
-                    WHERE m.memoryId = ?1
-                )
-                SELECT memoryId, '' AS sourceLocator, sourceType, createdAt, updatedAt,
-                       originalTimestamp, editUpdatedAt, sourceBytes,
-                       CASE WHEN sourceBytes <= ?2 THEN canonicalText END AS canonicalText,
-                       CASE WHEN sourceBytes <= ?2 THEN title END AS title,
-                       CASE WHEN sourceBytes <= ?2 THEN description END AS description,
-                       CASE WHEN sourceBytes <= ?2 THEN tagsJSON END AS tagsJSON
-                FROM source
-                """,
-            bindings: [.text(memoryID.uuidString), .int(Int64(limit))]
-        )
-        guard let row = rows.first else { return nil }
-        guard let size = row["sourceBytes"]?.intValue, size <= Int64(limit) else {
-            throw GenerationRuntimeError.contextLimit
+        var assetRevision: String?
+        if let photoPixelSource, let row = try await db.photoSourceRow(memoryID: memoryID),
+            let locator = row["sourceLocator"]?.stringValue {
+            assetRevision = try await photoPixelSource.currentRevision(assetID: locator)
         }
-        guard let memory = Self.rowToMemory(row) else { return nil }
-        let tags: [String]
-        if let json = row["tagsJSON"]?.stringValue {
-            tags = try JSONDecoder().decode([String].self, from: Data(json.utf8))
-        } else {
-            tags = []
-        }
-        let text = MemoryEditActor.effectiveText(
-            title: row["title"]?.stringValue ?? "",
-            description: row["description"]?.stringValue ?? "",
-            tags: tags,
-            canonicalText: memory.canonicalText
-        )
-        // Joining adds separators; validate the bounded effective text without truncation.
-        if maximumTextBytes != nil {
-            var remaining = limit
-            try GenerationInputBudget.consume(text, remaining: &remaining)
-        }
-        return CreativeSource(
-            memoryID: memory.memoryId,
-            assetID: "",
-            sourceType: memory.sourceType,
-            text: text,
-            timestamp: (memory.originalTimestamp ?? memory.createdAt).timeIntervalSince1970,
-            revision: max(memory.updatedAt.timeIntervalSince1970, row["editUpdatedAt"]?.doubleValue ?? 0)
+        return try await db.readCreationSource(
+            memoryID: memoryID,
+            maximumTextBytes: maximumTextBytes,
+            assetRevision: assetRevision
         )
     }
 

@@ -99,6 +99,8 @@ struct CreationTemplateTests {
         }
         #expect(await provider.requests.count == 1)
         let request = try #require(await provider.requests.first)
+        #expect(request.executionScope == .manualCreation)
+        #expect(request.languageRetry().executionScope == .manualCreation)
         #expect(request.outputForm == .poem)
         #expect(request.languageRetry().outputForm == .poem)
     }

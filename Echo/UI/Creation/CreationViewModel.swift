@@ -215,6 +215,21 @@ final class CreationViewModel: CreationSharePresentationReporting {
     private var reportLibraryRequestGeneration = 0
     /// 创作源记忆（grounded 输入，经检索结果映射）— 3F.9 生产路径
     private var sourceMemories: [CreativeSource] = []
+    var photoSourceIDs: [UUID] {
+        sourceMemories.filter { $0.sourceType == "photo" }.map(\.memoryID)
+    }
+
+    private var readyPhotoIDs: Set<UUID> = []
+    var photoMaterialsReady: Bool {
+        isFixtureBacked || photoSourceIDs.allSatisfy { readyPhotoIDs.contains($0) }
+    }
+    var canGenerate: Bool {
+        viewState == .idle && selectedTemplate != nil && photoMaterialsReady
+    }
+    func updatePhotoReadiness(memoryID: UUID, ready: Bool) {
+        guard photoSourceIDs.contains(memoryID) else { return }
+        if ready { readyPhotoIDs.insert(memoryID) } else { readyPhotoIDs.remove(memoryID) }
+    }
 
     init(
         creativePipeline: CreativePipeline? = nil,
@@ -490,7 +505,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
     /// Production uses grounded generation through CreativePipeline. Fixture output is
     /// available only after explicit Preview/test injection.
     func generate() {
-        guard viewState == .idle, selectedTemplate != nil else { return }
+        guard canGenerate else { return }
 
         generateTask?.cancel()
 
@@ -1073,6 +1088,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
     ///
     /// 生产路径从检索结果映射 `CreativeSource` 后调用；UI 切片/测试可注入确定性源。
     func loadSourceMemories(_ sources: [CreativeSource]) {
+        readyPhotoIDs.removeAll()
         sourceMemories = sources
     }
 

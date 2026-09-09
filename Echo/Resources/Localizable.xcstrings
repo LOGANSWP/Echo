@@ -1,6 +1,22 @@
 {
   "sourceLanguage": "en-US",
   "strings": {
+    "%@ items indexed — tap to re-sync": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ items indexed — tap to re-sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 项已索引 — 轻点以重新同步"
+          }
+        }
+      }
+    },
     "%@ match": {
       "extractionState": "manual",
       "localizations": {
@@ -69,6 +85,40 @@
         }
       }
     },
+    "%lld active task": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld active task"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个进行中任务"
+          }
+        }
+      }
+    },
+    "%lld active tasks": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld active tasks"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个进行中任务"
+          }
+        }
+      }
+    },
     "%lld cards": {
       "extractionState": "manual",
       "localizations": {
@@ -86,6 +136,22 @@
         }
       }
     },
+    "%lld excluded item references were removed because their original Photo Library items no longer exist.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld excluded item references were removed because their original Photo Library items no longer exist."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由于照片图库中的原始项目已不存在，已移除 %lld 条无效排除记录。"
+          }
+        }
+      }
+    },
     "%lld indexed items": {
       "extractionState": "manual",
       "localizations": {
@@ -99,6 +165,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld 个已索引条目"
+          }
+        }
+      }
+    },
+    "%lld intermediate paragraphs omitted": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld intermediate paragraphs omitted"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "省略了 %lld 段中间摘要"
+          }
+        }
+      }
+    },
+    "%lld items indexed — tap to re-sync": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld items indexed — tap to re-sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 项已索引 — 轻点以重新同步"
           }
         }
       }
@@ -150,6 +249,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld 条源记忆"
+          }
+        }
+      }
+    },
+    "%lld source memories omitted by generation limits": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld source memories omitted by generation limits"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "受生成限额限制，省略了 %lld 条来源记忆"
           }
         }
       }
@@ -256,6 +372,23 @@
         }
       }
     },
+    "A bright moment from the past": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A bright moment from the past"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自过去的美好时刻"
+          }
+        }
+      }
+    },
     "A letter to future self from your park memories — every claim links to its source memory.": {
       "extractionState": "manual",
       "localizations": {
@@ -269,6 +402,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "一封来自你公园记忆、写给未来自己的信——每个表述都链接到其源记忆。"
+          }
+        }
+      }
+    },
+    "A memory from %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A memory from %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自 %@ 的记忆"
           }
         }
       }
@@ -324,6 +474,23 @@
         }
       }
     },
+    "A quiet moment to reflect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A quiet moment to reflect"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一个安静反思的时刻"
+          }
+        }
+      }
+    },
     "A temporary issue occurred. Please wait and try again.": {
       "extractionState": "manual",
       "localizations": {
@@ -358,6 +525,23 @@
         }
       }
     },
+    "AI Creation uses saved text, not photo pixels. Return to the memory details and add a description, or choose a memory with text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Creation uses saved text, not photo pixels. Return to the memory details and add a description, or choose a memory with text."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 创作以保存的文字为依据，暂不识别照片画面。请返回记忆详情添加描述，或选择已有文字的记忆。"
+          }
+        }
+      }
+    },
     "AI Models": {
       "extractionState": "manual",
       "localizations": {
@@ -371,6 +555,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "AI 模型"
+          }
+        }
+      }
+    },
+    "AI image description (English original)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI image description (English original)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 画面描述（英语原始结果）"
           }
         }
       }
@@ -545,6 +746,22 @@
         }
       }
     },
+    "Allow Background Location": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Background Location"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "允许后台定位"
+          }
+        }
+      }
+    },
     "Allow Echo to send you awakening notifications when memories surface.": {
       "extractionState": "manual",
       "localizations": {
@@ -558,6 +775,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "允许 Echo 在记忆浮现时向你发送唤醒通知。"
+          }
+        }
+      }
+    },
+    "An encrypted Echo migration package can move Echo-owned indices, settings, feedback, and exclusions. Original media stays in its system source and is not exported.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An encrypted Echo migration package can move Echo-owned indices, settings, feedback, and exclusions. Original media stays in its system source and is not exported."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加密的 Echo 迁移包可以迁移 Echo 自有的索引、设置、反馈和排除项。原始媒体仍保留在系统数据源中，不会被导出。"
           }
         }
       }
@@ -596,6 +830,23 @@
         }
       }
     },
+    "Another creation is being generated. Wait for it to finish, then try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another creation is being generated. Wait for it to finish, then try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一项创作正在生成，请等待完成后再试。"
+          }
+        }
+      }
+    },
     "App Language": {
       "extractionState": "manual",
       "localizations": {
@@ -626,6 +877,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "已到达 %@"
+          }
+        }
+      }
+    },
+    "Ask Echo": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask Echo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "问问 Echo"
           }
         }
       }
@@ -749,6 +1016,23 @@
         }
       }
     },
+    "Back to memories": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to memories"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回记忆"
+          }
+        }
+      }
+    },
     "Background Auto Sync": {
       "extractionState": "manual",
       "localizations": {
@@ -796,6 +1080,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "开始之前，请了解 Echo 如何处理你的数据。"
+          }
+        }
+      }
+    },
+    "Best-effort daily delivery when the system first permits it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best-effort daily delivery when the system first permits it"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天在系统首次允许时尽力投递"
           }
         }
       }
@@ -902,6 +1203,22 @@
         }
       }
     },
+    "Check for completed periods": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check for completed periods"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检查已结束的周期"
+          }
+        }
+      }
+    },
     "Choose Language": {
       "extractionState": "manual",
       "localizations": {
@@ -953,6 +1270,23 @@
         }
       }
     },
+    "Choose a template again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a template again"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新选择模板"
+          }
+        }
+      }
+    },
     "Choose how to remove this memory. Your photos and files in the system library are kept unless you choose to delete the original.": {
       "extractionState": "manual",
       "localizations": {
@@ -983,6 +1317,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "清理未完成。请重试。"
+          }
+        }
+      }
+    },
+    "Clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除"
           }
         }
       }
@@ -1038,6 +1389,39 @@
         }
       }
     },
+    "Confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认"
+          }
+        }
+      }
+    },
+    "Connect a memory source": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect a memory source"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接记忆来源"
+          }
+        }
+      }
+    },
     "Consent Declined": {
       "extractionState": "manual",
       "localizations": {
@@ -1085,6 +1469,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "撤回同意不可用"
+          }
+        }
+      }
+    },
+    "Consent was not saved": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consent was not saved"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未能保存同意"
           }
         }
       }
@@ -1157,19 +1557,19 @@
         }
       }
     },
-    "Creation copied to clipboard": {
+    "Create from this photo": {
       "extractionState": "manual",
       "localizations": {
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Creation copied to clipboard"
+            "value": "Create from this photo"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "创作已复制到剪贴板"
+            "value": "用这张照片创作"
           }
         }
       }
@@ -1187,6 +1587,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在生成叙事报告"
+          }
+        }
+      }
+    },
+    "Creation copied to clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creation copied to clipboard"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创作已复制到剪贴板"
+          }
+        }
+      }
+    },
+    "Creation material is not ready": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creation material is not ready"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创作素材尚未准备好"
           }
         }
       }
@@ -1225,23 +1659,6 @@
         }
       }
     },
-    "Best-effort daily delivery when the system first permits it": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Best-effort daily delivery when the system first permits it"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每天在系统首次允许时尽力投递"
-          }
-        }
-      }
-    },
     "Data Management": {
       "extractionState": "manual",
       "localizations": {
@@ -1272,40 +1689,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "数据迁移指引"
-          }
-        }
-      }
-    },
-    "An encrypted Echo migration package can move Echo-owned indices, settings, feedback, and exclusions. Original media stays in its system source and is not exported.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An encrypted Echo migration package can move Echo-owned indices, settings, feedback, and exclusions. Original media stays in its system source and is not exported."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "加密的 Echo 迁移包可以迁移 Echo 自有的索引、设置、反馈和排除项。原始媒体仍保留在系统数据源中，不会被导出。"
-          }
-        }
-      }
-    },
-    "Transfer an encrypted Echo migration package using AirDrop or an encrypted Finder backup. Original media stays in its system source and is not exported.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Transfer an encrypted Echo migration package using AirDrop or an encrypted Finder backup. Original media stays in its system source and is not exported."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "可通过隔空投送或加密的 Finder 备份传输 Echo 迁移包。原始媒体仍保留在系统数据源中，不会被导出。"
           }
         }
       }
@@ -1412,6 +1795,54 @@
         }
       }
     },
+    "Delete feeling": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete feeling"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除感受"
+          }
+        }
+      }
+    },
+    "Delete narrative report": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete narrative report"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除叙事报告"
+          }
+        }
+      }
+    },
+    "Delete narrative report?": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete narrative report?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除叙事报告？"
+          }
+        }
+      }
+    },
     "Delete original file too": {
       "extractionState": "manual",
       "localizations": {
@@ -1425,6 +1856,55 @@
           "stringUnit": {
             "state": "translated",
             "value": "同时删除原始文件"
+          }
+        }
+      }
+    },
+    "Delete report": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete report"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除报告"
+          }
+        }
+      }
+    },
+    "Deleting Echo data will erase all indices, vectors, settings and feedback. Your original photos, videos, and files in system apps will NOT be affected. A 24-hour cooling period applies before data is permanently removed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deleting Echo data will erase all indices, vectors, settings and feedback. Your original photos, videos, and files in system apps will NOT be affected. A 24-hour cooling period applies before data is permanently removed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除 Echo 数据将清除所有索引、向量、设置和反馈。你在系统应用中的原始照片、视频和文件不受影响。数据永久删除前有 24 小时冷却期。"
+          }
+        }
+      }
+    },
+    "Deletion could not be confirmed. Echo kept the memory and will check again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deletion could not be confirmed. Echo kept the memory and will check again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法确认删除结果。Echo 已保留记忆，稍后会再次核对。"
           }
         }
       }
@@ -1510,6 +1990,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "详细模型状态页将在下一迭代提供。"
+          }
+        }
+      }
+    },
+    "Details": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "详情"
           }
         }
       }
@@ -1616,6 +2113,39 @@
         }
       }
     },
+    "Earlier feelings": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earlier feelings"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "之前的感受"
+          }
+        }
+      }
+    },
+    "Echo Memory": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo Memory"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo 记忆"
+          }
+        }
+      }
+    },
     "Echo can wake with memories tied to where you are.": {
       "extractionState": "manual",
       "localizations": {
@@ -1697,6 +2227,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Echo 创作"
+          }
+        }
+      }
+    },
+    "Echo has not requested access to any protected data. Retry to continue.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo has not requested access to any protected data. Retry to continue."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo 尚未请求访问任何受保护数据。请重试后继续。"
+          }
+        }
+      }
+    },
+    "Echo is getting ready…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo is getting ready…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo 正在准备中…"
           }
         }
       }
@@ -1799,6 +2362,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Echo · 回响"
+          }
+        }
+      }
+    },
+    "Echo · 回响 — Your memories, always within reach. All AI processing runs locally on your device. No data ever leaves your phone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo · 回响 — Your memories, always within reach. All AI processing runs locally on your device. No data ever leaves your phone."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echo · 回响 — 你的记忆，永远触手可及。所有 AI 处理均在设备本地完成，没有任何数据离开你的手机。"
           }
         }
       }
@@ -1939,6 +2519,38 @@
         }
       }
     },
+    "Excluded items cleaned up": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Excluded items cleaned up"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已清理无效排除项"
+          }
+        }
+      }
+    },
+    "Explore your memories with an offline search": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore your memories with an offline search"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过离线搜索探索你的记忆"
+          }
+        }
+      }
+    },
     "Export Audit Log": {
       "extractionState": "manual",
       "localizations": {
@@ -2003,6 +2615,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "导出创作"
+          }
+        }
+      }
+    },
+    "Failed": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "失败"
           }
         }
       }
@@ -2160,6 +2788,22 @@
         }
       }
     },
+    "From your connected sources": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From your connected sources"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自已连接的数据源"
+          }
+        }
+      }
+    },
     "Functional limitations due to model loading issues.": {
       "extractionState": "manual",
       "localizations": {
@@ -2228,6 +2872,23 @@
         }
       }
     },
+    "Generation inputs or settings changed. Restart is required.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generation inputs or settings changed. Restart is required."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生成输入或设置已变化，需要重新开始。"
+          }
+        }
+      }
+    },
     "Generation is currently unavailable. Please try again.": {
       "extractionState": "manual",
       "localizations": {
@@ -2241,6 +2902,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "生成功能当前不可用。请重试。"
+          }
+        }
+      }
+    },
+    "Generation needs your retry.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generation needs your retry."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要你手动重试生成。"
+          }
+        }
+      }
+    },
+    "Generation reached the time limit on this device. Try a shorter memory.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generation reached the time limit on this device. Try a shorter memory."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生成在此设备上超时，请选择更短的记忆再试。"
           }
         }
       }
@@ -2275,6 +2969,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "地理围栏详情"
+          }
+        }
+      }
+    },
+    "Geofence push resets on exit+re-enter. Anniversary delivery is attempted at the earliest eligible system opportunity each day. Emotion analysis caches results for 24 hours and uses 30-second debounce for new queries/feelings. Auditing records all awakening activity for 30 days (viewable in Audit Log).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geofence push resets on exit+re-enter. Anniversary delivery is attempted at the earliest eligible system opportunity each day. Emotion analysis caches results for 24 hours and uses 30-second debounce for new queries/feelings. Auditing records all awakening activity for 30 days (viewable in Audit Log)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地理围栏推送在退出并重新进入时重置。纪念日投递会在系统每天首次允许的时机尝试。情绪分析缓存结果 24 小时，并对新查询或感受使用 30 秒防抖。审计记录所有唤醒活动 30 天（可在审计日志中查看）。"
           }
         }
       }
@@ -2347,6 +3058,38 @@
         }
       }
     },
+    "Health data is unavailable on this device.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health data is unavailable on this device."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此设备上的健康数据不可用。"
+          }
+        }
+      }
+    },
+    "HealthKit could not complete the request. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit could not complete the request. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HealthKit 无法完成请求，请重试。"
+          }
+        }
+      }
+    },
     "Hello, world!": {
       "extractionState": "manual",
       "localizations": {
@@ -2377,6 +3120,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "首页"
+          }
+        }
+      }
+    },
+    "How do you feel?": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How do you feel?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你此刻有什么感受？"
+          }
+        }
+      }
+    },
+    "Importing photos…": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importing photos…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在导入照片…"
+          }
+        }
+      }
+    },
+    "In-app awakening cards remain available. Enable notifications only for system delivery.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In-app awakening cards remain available. Enable notifications only for system delivery."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用内唤醒卡片仍然可用。仅在需要系统投递时启用通知。"
           }
         }
       }
@@ -2428,6 +3219,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "已索引条目"
+          }
+        }
+      }
+    },
+    "Interaction unavailable": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interaction unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作暂不可用"
           }
         }
       }
@@ -2568,6 +3375,22 @@
         }
       }
     },
+    "Loading": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载中"
+          }
+        }
+      }
+    },
     "Loading AI model": {
       "extractionState": "manual",
       "localizations": {
@@ -2653,6 +3476,39 @@
         }
       }
     },
+    "Loading narrative reports…": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading narrative reports…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在载入叙事报告…"
+          }
+        }
+      }
+    },
+    "Loading settings...": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading settings..."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在加载设置…"
+          }
+        }
+      }
+    },
     "Loading tasks...": {
       "extractionState": "manual",
       "localizations": {
@@ -2670,6 +3526,22 @@
         }
       }
     },
+    "Local notification delivery is optional and independent from in-app awakening cards.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local notification delivery is optional and independent from in-app awakening cards."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地通知投递是可选项，与应用内唤醒卡片相互独立。"
+          }
+        }
+      }
+    },
     "Location": {
       "extractionState": "manual",
       "localizations": {
@@ -2683,6 +3555,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "位置"
+          }
+        }
+      }
+    },
+    "Location access enables geofence awakening.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Location access enables geofence awakening."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位置权限可启用地理围栏唤醒。"
           }
         }
       }
@@ -2755,6 +3643,23 @@
         }
       }
     },
+    "Machine-generated; may contain mistakes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Machine-generated; may contain mistakes."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由模型生成，可能存在识别错误。"
+          }
+        }
+      }
+    },
     "Management interface coming in next iteration.": {
       "extractionState": "manual",
       "localizations": {
@@ -2823,6 +3728,38 @@
         }
       }
     },
+    "Match device music": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Match device music"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匹配此设备音乐"
+          }
+        }
+      }
+    },
+    "Memories from this month": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memories from this month"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个月的记忆"
+          }
+        }
+      }
+    },
     "Memories from years past": {
       "extractionState": "manual",
       "localizations": {
@@ -2836,6 +3773,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "往年今日的记忆"
+          }
+        }
+      }
+    },
+    "Memories from years past on this day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memories from years past on this day"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这一天的往日记忆"
           }
         }
       }
@@ -2959,6 +3913,38 @@
         }
       }
     },
+    "Memory unavailable": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memory unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记忆不可用"
+          }
+        }
+      }
+    },
+    "MemoryID: %@": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MemoryID: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记忆 ID：%@"
+          }
+        }
+      }
+    },
     "Migration Guide": {
       "extractionState": "manual",
       "localizations": {
@@ -3044,6 +4030,22 @@
         }
       }
     },
+    "Moments that made me smile": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moments that made me smile"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "让我微笑的时刻"
+          }
+        }
+      }
+    },
     "Monitored Geofences": {
       "extractionState": "manual",
       "localizations": {
@@ -3057,6 +4059,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "监控中的地理围栏"
+          }
+        }
+      }
+    },
+    "Monthly and yearly reports are generated on device after a period ends.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monthly and yearly reports are generated on device after a period ends."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每个周期结束后，月报和年报会在设备端生成。"
+          }
+        }
+      }
+    },
+    "Monthly reports": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monthly reports"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "月度报告"
           }
         }
       }
@@ -3078,6 +4112,54 @@
         }
       }
     },
+    "Narrative report is unavailable.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Narrative report is unavailable."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "叙事报告当前不可用。"
+          }
+        }
+      }
+    },
+    "Narrative report scheduling is unavailable.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Narrative report scheduling is unavailable."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "叙事报告调度当前不可用。"
+          }
+        }
+      }
+    },
+    "Narrative reports": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Narrative reports"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "叙事报告"
+          }
+        }
+      }
+    },
     "Never": {
       "extractionState": "manual",
       "localizations": {
@@ -3091,6 +4173,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "从未"
+          }
+        }
+      }
+    },
+    "Next": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一张"
+          }
+        }
+      }
+    },
+    "Next memory": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next memory"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一条记忆"
           }
         }
       }
@@ -3163,6 +4277,54 @@
         }
       }
     },
+    "No memories yet": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No memories yet"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有记忆"
+          }
+        }
+      }
+    },
+    "No readable HRV samples are available. Echo uses local query and feeling history instead.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No readable HRV samples are available. Echo uses local query and feeling history instead."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前没有可读取的 HRV 样本。Echo 将改用本地查询和感受历史。"
+          }
+        }
+      }
+    },
+    "No source for part or all of this paragraph": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No source for part or all of this paragraph"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此段落的部分或全部内容没有来源"
+          }
+        }
+      }
+    },
     "No source memories found": {
       "extractionState": "manual",
       "localizations": {
@@ -3193,6 +4355,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "此模板未找到源记忆"
+          }
+        }
+      }
+    },
+    "No text was recognized in this photo.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No text was recognized in this photo."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这张照片中未识别出文字。"
           }
         }
       }
@@ -3231,6 +4410,22 @@
         }
       }
     },
+    "Not authorized — tap to grant access": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not authorized — tap to grant access"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未授权 — 轻点以授权访问"
+          }
+        }
+      }
+    },
     "Notes": {
       "extractionState": "manual",
       "localizations": {
@@ -3244,6 +4439,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "备忘录"
+          }
+        }
+      }
+    },
+    "Notification services are unavailable.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notification services are unavailable."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知服务当前不可用。"
           }
         }
       }
@@ -3278,6 +4489,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "通知已启用"
+          }
+        }
+      }
+    },
+    "OCR text": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OCR text"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "图片文字（OCR）"
           }
         }
       }
@@ -3367,6 +4595,55 @@
         }
       }
     },
+    "On-device image description and available image text are ready for creation. Machine descriptions can be corrected in memory details.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On-device image description and available image text are ready for creation. Machine descriptions can be corrected in memory details."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地生成的画面描述和可识别的图片文字已可用于创作。可在记忆详情中校正机器描述。"
+          }
+        }
+      }
+    },
+    "Open": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开"
+          }
+        }
+      }
+    },
+    "Open Search and run this query": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Search and run this query"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开搜索并执行此查询"
+          }
+        }
+      }
+    },
     "Open Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -3418,6 +4695,22 @@
         }
       }
     },
+    "Open memory": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open memory"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开记忆"
+          }
+        }
+      }
+    },
     "Open settings for model recovery": {
       "extractionState": "manual",
       "localizations": {
@@ -3431,6 +4724,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开设置以恢复模型"
+          }
+        }
+      }
+    },
+    "Open source memory citation": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open source memory citation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开来源记忆引用"
           }
         }
       }
@@ -3588,6 +4897,40 @@
         }
       }
     },
+    "Photo preparation is unavailable or failed. Check photo access and local model availability, then retry.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo preparation is unavailable or failed. Check photo access and local model availability, then retry."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "照片准备不可用或已失败。请检查照片访问权限及本地模型，然后重试。"
+          }
+        }
+      }
+    },
+    "Photo understanding": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo understanding"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "照片理解"
+          }
+        }
+      }
+    },
     "Photos": {
       "extractionState": "manual",
       "localizations": {
@@ -3601,6 +4944,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "照片"
+          }
+        }
+      }
+    },
+    "Photos, videos, notes and voice — all offline on your device.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos, videos, notes and voice — all offline on your device."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "照片、视频、备忘录和语音——全部离线存储在你的设备上。"
           }
         }
       }
@@ -3635,6 +4995,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "请重试。"
+          }
+        }
+      }
+    },
+    "Prepare or retry photo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare or retry photo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "准备或重试照片"
+          }
+        }
+      }
+    },
+    "Prepare photo material or choose another available memory, then try creation again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare photo material or choose another available memory, then try creation again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请准备照片素材或选择其他可用记忆，然后重新创作。"
+          }
+        }
+      }
+    },
+    "Prepare this photo on device to create from its image. A written description is optional.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare this photo on device to create from its image. A written description is optional."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在设备上准备照片素材，即可基于画面创作。手写描述为可选项。"
+          }
+        }
+      }
+    },
+    "Preparing photo material": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing photo material"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在准备照片素材"
           }
         }
       }
@@ -3741,6 +5169,38 @@
         }
       }
     },
+    "Readable HRV samples are available for local emotion context.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Readable HRV samples are available for local emotion context."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已有可读取的 HRV 样本，可用于本地情绪情境。"
+          }
+        }
+      }
+    },
+    "Ready": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已就绪"
+          }
+        }
+      }
+    },
     "Receive memories when arriving at meaningful places": {
       "extractionState": "manual",
       "localizations": {
@@ -3754,6 +5214,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "到达有意义的地方时收到记忆"
+          }
+        }
+      }
+    },
+    "Recent memories": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent memories"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最近的记忆"
+          }
+        }
+      }
+    },
+    "Record feeling": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record feeling"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录感受"
+          }
+        }
+      }
+    },
+    "Recovering interrupted task": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovering interrupted task"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在恢复中断的任务"
           }
         }
       }
@@ -3809,6 +5317,22 @@
         }
       }
     },
+    "Reports unavailable": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reports unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告不可用"
+          }
+        }
+      }
+    },
     "Required Permissions": {
       "extractionState": "manual",
       "localizations": {
@@ -3839,6 +5363,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "所需模型无法加载。请重新安装 Echo 以恢复。"
+          }
+        }
+      }
+    },
+    "Reset": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置"
           }
         }
       }
@@ -3996,6 +5537,22 @@
         }
       }
     },
+    "Review data sources in Settings to start importing memories.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review data sources in Settings to start importing memories."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在设置中检查数据源授权，以开始导入记忆。"
+          }
+        }
+      }
+    },
     "Running": {
       "extractionState": "manual",
       "localizations": {
@@ -4077,6 +5634,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在保存到备忘录…"
+          }
+        }
+      }
+    },
+    "Saving your consent...": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving your consent..."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在保存你的同意…"
+          }
+        }
+      }
+    },
+    "Scanning your memories (%lld of %lld)": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanning your memories (%1$lld of %2$lld)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在扫描记忆（%1$lld/%2$lld）"
           }
         }
       }
@@ -4336,6 +5925,22 @@
         }
       }
     },
+    "Share a note or voice memo to Echo to begin.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share a note or voice memo to Echo to begin."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将备忘录或语音备忘录分享到 Echo 即可开始。"
+          }
+        }
+      }
+    },
     "Share or export this creation as text, PDF, or Markdown.": {
       "extractionState": "manual",
       "localizations": {
@@ -4404,6 +6009,23 @@
         }
       }
     },
+    "Some source categories are not included.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some source categories are not included."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "部分来源类别未包含在报告中。"
+          }
+        }
+      }
+    },
     "Something went wrong": {
       "extractionState": "manual",
       "localizations": {
@@ -4434,6 +6056,70 @@
           "stringUnit": {
             "state": "translated",
             "value": "出现短暂错误。Echo 正在自动重试。"
+          }
+        }
+      }
+    },
+    "Source available": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source available"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源可用"
+          }
+        }
+      }
+    },
+    "Source currently unavailable": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source currently unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源当前不可用"
+          }
+        }
+      }
+    },
+    "Source memory": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source memory"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源记忆"
+          }
+        }
+      }
+    },
+    "Source memory %lld": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source memory %lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源记忆 %lld"
           }
         }
       }
@@ -4523,6 +6209,22 @@
         }
       }
     },
+    "Suggestion": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suggestion"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音乐建议"
+          }
+        }
+      }
+    },
     "Surfaces joyful memories when mood is low": {
       "extractionState": "manual",
       "localizations": {
@@ -4591,6 +6293,22 @@
         }
       }
     },
+    "Task recovery is not available.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Task recovery is not available."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任务恢复当前不可用。"
+          }
+        }
+      }
+    },
     "Terminates the task and saves progress": {
       "extractionState": "manual",
       "localizations": {
@@ -4625,6 +6343,22 @@
         }
       }
     },
+    "The current privacy policy no longer permits opening this source.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current privacy policy no longer permits opening this source."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前隐私策略已不允许打开此来源。"
+          }
+        }
+      }
+    },
     "The external source was modified while you were editing. Your edits are not saved.": {
       "extractionState": "manual",
       "localizations": {
@@ -4638,6 +6372,87 @@
           "stringUnit": {
             "state": "translated",
             "value": "你编辑期间外部源已被修改。你的编辑未保存。"
+          }
+        }
+      }
+    },
+    "The generated text did not follow the selected template. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The generated text did not follow the selected template. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生成内容未符合所选模板，请重试。"
+          }
+        }
+      }
+    },
+    "The model could not produce a complete response in your selected language. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The model could not produce a complete response in your selected language. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模型未能以你选择的语言生成完整回答，请重试。"
+          }
+        }
+      }
+    },
+    "The original source is no longer available or authorized.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The original source is no longer available or authorized."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原始来源已不可用或不再获得授权。"
+          }
+        }
+      }
+    },
+    "The original source is not currently available for deletion.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The original source is not currently available for deletion."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前无法删除原始来源。"
+          }
+        }
+      }
+    },
+    "The original was not deleted. Your Echo memory was kept.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The original was not deleted. Your Echo memory was kept."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原始项目未被删除，Echo 记忆已保留。"
           }
         }
       }
@@ -4659,6 +6474,39 @@
         }
       }
     },
+    "The share was presented, but its audit record is pending retry.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The share was presented, but its audit record is pending retry."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享面板已显示，但审计记录仍待重试。"
+          }
+        }
+      }
+    },
+    "The source or its permissions changed. Return to search and select the memory again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The source or its permissions changed. Return to search and select the memory again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源内容或权限已变更，请返回搜索重新选择记忆。"
+          }
+        }
+      }
+    },
     "This action could not be completed. You can retry it when ready.": {
       "extractionState": "manual",
       "localizations": {
@@ -4672,6 +6520,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "此操作无法完成。你可以在准备好时重试。"
+          }
+        }
+      }
+    },
+    "This device does not have enough available memory for generation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device does not have enough available memory for generation."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此设备当前没有足够的可用内存来生成内容。"
           }
         }
       }
@@ -4706,6 +6571,137 @@
           "stringUnit": {
             "state": "translated",
             "value": "这条记忆已从 Echo 移除。"
+          }
+        }
+      }
+    },
+    "This memory is no longer available.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This memory is no longer available."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这条记忆已不可用。"
+          }
+        }
+      }
+    },
+    "This memory is too long for generation. Choose a shorter memory.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This memory is too long for generation. Choose a shorter memory."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这条记忆超出生成长度上限，请选择更短的记忆。"
+          }
+        }
+      }
+    },
+    "This memory needs text for creation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This memory needs text for creation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这条记忆需要文字才能创作"
+          }
+        }
+      }
+    },
+    "This moment": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This moment"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此刻"
+          }
+        }
+      }
+    },
+    "This report cannot be regenerated in this version.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This report cannot be regenerated in this version."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此版本无法重新生成该报告。"
+          }
+        }
+      }
+    },
+    "This report covers part of the period.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This report covers part of the period."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本报告仅覆盖该周期的一部分。"
+          }
+        }
+      }
+    },
+    "This saved task type is not supported by this app version.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This saved task type is not supported by this app version."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 App 版本不支持该已保存任务类型。"
+          }
+        }
+      }
+    },
+    "This source memory is currently unavailable.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This source memory is currently unavailable."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此来源记忆当前不可用。"
           }
         }
       }
@@ -4791,6 +6787,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "标题"
+          }
+        }
+      }
+    },
+    "Transfer an encrypted Echo migration package using AirDrop or an encrypted Finder backup. Original media stays in its system source and is not exported.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transfer an encrypted Echo migration package using AirDrop or an encrypted Finder backup. Original media stays in its system source and is not exported."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可通过隔空投送或加密的 Finder 备份传输 Echo 迁移包。原始媒体仍保留在系统数据源中，不会被导出。"
           }
         }
       }
@@ -4948,6 +6961,22 @@
         }
       }
     },
+    "Unable to Load Excluded Items": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to Load Excluded Items"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法加载已排除项目"
+          }
+        }
+      }
+    },
     "Unable to Load Settings": {
       "extractionState": "manual",
       "localizations": {
@@ -4961,6 +6990,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法加载设置"
+          }
+        }
+      }
+    },
+    "Unable to cancel this task because it is no longer active.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to cancel this task because it is no longer active."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法取消此任务，因为它已不再活跃。"
           }
         }
       }
@@ -5016,6 +7061,70 @@
         }
       }
     },
+    "Unable to continue this task. Review access and try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to continue this task. Review access and try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法继续此任务。请检查访问权限后重试。"
+          }
+        }
+      }
+    },
+    "Unable to delete the original source. Your Echo memory was kept.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to delete the original source. Your Echo memory was kept."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法删除原始来源，Echo 记忆已保留。"
+          }
+        }
+      }
+    },
+    "Unable to delete this feeling. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to delete this feeling. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法删除这条感受，请重试。"
+          }
+        }
+      }
+    },
+    "Unable to delete this narrative report.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to delete this narrative report."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法删除此叙事报告。"
+          }
+        }
+      }
+    },
     "Unable to generate": {
       "extractionState": "manual",
       "localizations": {
@@ -5029,6 +7138,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法生成"
+          }
+        }
+      }
+    },
+    "Unable to generate a response in your language. Please try again later.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to generate a response in your language. Please try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法生成符合您语言的回应，请稍后重试。"
           }
         }
       }
@@ -5118,6 +7244,22 @@
         }
       }
     },
+    "Unable to load narrative reports. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to load narrative reports. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法载入叙事报告，请重试。"
+          }
+        }
+      }
+    },
     "Unable to load this memory. Please try again.": {
       "extractionState": "manual",
       "localizations": {
@@ -5135,6 +7277,246 @@
         }
       }
     },
+    "Unable to open this memory. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to open this memory. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法打开这条记忆，请重试。"
+          }
+        }
+      }
+    },
+    "Unable to open this narrative report.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to open this narrative report."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法打开此叙事报告。"
+          }
+        }
+      }
+    },
+    "Unable to pause this task because it is no longer active.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to pause this task because it is no longer active."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法暂停此任务，因为它已不再活跃。"
+          }
+        }
+      }
+    },
+    "Unable to prepare this creation for sharing. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to prepare this creation for sharing. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法准备此创作内容用于分享，请重试。"
+          }
+        }
+      }
+    },
+    "Unable to present the system share sheet. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to present the system share sheet. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法显示系统分享面板，请重试。"
+          }
+        }
+      }
+    },
+    "Unable to restart this task. Review access and try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to restart this task. Review access and try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法重新开始此任务。请检查访问权限后重试。"
+          }
+        }
+      }
+    },
+    "Unable to resume this task because it is no longer active.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to resume this task because it is no longer active."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法恢复此任务，因为它已不再处于活动状态。"
+          }
+        }
+      }
+    },
+    "Unable to retry this narrative report.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to retry this narrative report."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法重试此叙事报告。"
+          }
+        }
+      }
+    },
+    "Unable to save this feeling. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to save this feeling. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法保存这条感受，请重试。"
+          }
+        }
+      }
+    },
+    "Unable to show the next memory. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to show the next memory. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法显示下一条记忆，请重试。"
+          }
+        }
+      }
+    },
+    "Unable to start narrative report generation.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to start narrative report generation."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法启动叙事报告生成。"
+          }
+        }
+      }
+    },
+    "Unable to update narrative report scheduling.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to update narrative report scheduling."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新叙事报告调度。"
+          }
+        }
+      }
+    },
+    "Unable to update this feeling. Please try again.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to update this feeling. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新这条感受，请重试。"
+          }
+        }
+      }
+    },
+    "Unknown artist": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown artist"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未知艺人"
+          }
+        }
+      }
+    },
+    "Unsupported saved task": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unsupported saved task"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不支持的已保存任务"
+          }
+        }
+      }
+    },
     "Use external version": {
       "extractionState": "manual",
       "localizations": {
@@ -5148,6 +7530,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "使用外部版本"
+          }
+        }
+      }
+    },
+    "Use the actions to open, advance, or record a feeling": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use the actions to open, advance, or record a feeling"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用操作来打开、切换或记录感受"
           }
         }
       }
@@ -5339,6 +7737,22 @@
         }
       }
     },
+    "Waiting": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待中"
+          }
+        }
+      }
+    },
     "When off, background tasks keep running in Low Power Mode and may use more battery.": {
       "extractionState": "manual",
       "localizations": {
@@ -5356,6 +7770,54 @@
         }
       }
     },
+    "While Using access is enabled. Allow background location separately for terminated-app awakening.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "While Using access is enabled. Allow background location separately for terminated-app awakening."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许使用 App 时访问位置。若要在 App 终止后唤醒，请另行允许后台定位。"
+          }
+        }
+      }
+    },
+    "Yearly reports": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yearly reports"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "年度报告"
+          }
+        }
+      }
+    },
+    "You can optionally ask HealthKit for HRV read access. Echo cannot inspect the read authorization choice.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can optionally ask HealthKit for HRV read access. Echo cannot inspect the read authorization choice."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你可以选择请求 HealthKit 的 HRV 读取权限。Echo 无法检查你的读取授权选择。"
+          }
+        }
+      }
+    },
     "Your consent could not be saved. Restart Echo to try again.": {
       "extractionState": "manual",
       "localizations": {
@@ -5369,6 +7831,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的同意未能保存。请重启 Echo 重试。"
+          }
+        }
+      }
+    },
+    "Your description is used for creation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your description is used for creation."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创作将优先使用你填写的描述。"
+          }
+        }
+      }
+    },
+    "Your memories, always within reach.\\nMemories from special places, past moments, and meaningful days will appear here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your memories, always within reach.\nMemories from special places, past moments, and meaningful days will appear here."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的记忆，随时触手可及。\n来自特别的地方、过去的时刻和有意义的日子的记忆将显示在这里。"
           }
         }
       }
@@ -5424,376 +7920,34 @@
         }
       }
     },
-    "v4.6": {
-      "extractionState": "manual",
+    "memories from this month": {
       "localizations": {
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "v4.6"
+            "value": "memories from this month"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "v4.6"
+            "value": "这个月的记忆"
           }
         }
       }
     },
-    "Confirm": {
-      "extractionState": "manual",
+    "moments that made me smile": {
       "localizations": {
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Confirm"
+            "value": "moments that made me smile"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "确认"
-          }
-        }
-      }
-    },
-    "Details": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Details"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "详情"
-          }
-        }
-      }
-    },
-    "🔮 Preview": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🔮 Preview"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🔮 预览"
-          }
-        }
-      }
-    },
-    "🔗 MemoryID:…2222": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🔗 MemoryID:…2222"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🔗 记忆ID:…2222"
-          }
-        }
-      }
-    },
-    "Echo is getting ready…": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo is getting ready…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo 正在准备中…"
-          }
-        }
-      }
-    },
-    "Photos, videos, notes and voice — all offline on your device.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photos, videos, notes and voice — all offline on your device."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "照片、视频、备忘录和语音——全部离线存储在你的设备上。"
-          }
-        }
-      }
-    },
-    "Clear": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clear"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "清除"
-          }
-        }
-      }
-    },
-    "Reset": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reset"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重置"
-          }
-        }
-      }
-    },
-    "Loading settings...": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading settings..."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在加载设置…"
-          }
-        }
-      }
-    },
-    "Deleting Echo data will erase all indices, vectors, settings and feedback. Your original photos, videos, and files in system apps will NOT be affected. A 24-hour cooling period applies before data is permanently removed.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deleting Echo data will erase all indices, vectors, settings and feedback. Your original photos, videos, and files in system apps will NOT be affected. A 24-hour cooling period applies before data is permanently removed."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除 Echo 数据将清除所有索引、向量、设置和反馈。你在系统应用中的原始照片、视频和文件不受影响。数据永久删除前有 24 小时冷却期。"
-          }
-        }
-      }
-    },
-    "Echo · 回响 — Your memories, always within reach. All AI processing runs locally on your device. No data ever leaves your phone.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo · 回响 — Your memories, always within reach. All AI processing runs locally on your device. No data ever leaves your phone."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo · 回响 — 你的记忆，永远触手可及。所有 AI 处理均在设备本地完成，没有任何数据离开你的手机。"
-          }
-        }
-      }
-    },
-    "Geofence push resets on exit+re-enter. Anniversary delivery is attempted at the earliest eligible system opportunity each day. Emotion analysis caches results for 24 hours and uses 30-second debounce for new queries/feelings. Auditing records all awakening activity for 30 days (viewable in Audit Log).": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geofence push resets on exit+re-enter. Anniversary delivery is attempted at the earliest eligible system opportunity each day. Emotion analysis caches results for 24 hours and uses 30-second debounce for new queries/feelings. Auditing records all awakening activity for 30 days (viewable in Audit Log)."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "地理围栏推送在退出并重新进入时重置。纪念日投递会在系统每天首次允许的时机尝试。情绪分析缓存结果 24 小时，并对新查询或感受使用 30 秒防抖。审计记录所有唤醒活动 30 天（可在审计日志中查看）。"
-          }
-        }
-      }
-    },
-    "%lld active task": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld active task"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 个进行中任务"
-          }
-        }
-      }
-    },
-    "%lld active tasks": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld active tasks"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 个进行中任务"
-          }
-        }
-      }
-    },
-    "Your memories, always within reach.\\nMemories from special places, past moments, and meaningful days will appear here.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your memories, always within reach.\nMemories from special places, past moments, and meaningful days will appear here."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的记忆，随时触手可及。\n来自特别的地方、过去的时刻和有意义的日子的记忆将显示在这里。"
-          }
-        }
-      }
-    },
-    "Unable to generate a response in your language. Please try again later.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to generate a response in your language. Please try again later."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂时无法生成符合您语言的回应，请稍后重试。"
-          }
-        }
-      }
-    },
-    "A memory from %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A memory from %@"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来自 %@ 的记忆"
-          }
-        }
-      }
-    },
-    "A bright moment from the past": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A bright moment from the past"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来自过去的美好时刻"
-          }
-        }
-      }
-    },
-    "A quiet moment to reflect": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A quiet moment to reflect"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一个安静反思的时刻"
-          }
-        }
-      }
-    },
-    "Memories from years past on this day": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memories from years past on this day"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这一天的往日记忆"
-          }
-        }
-      }
-    },
-    "Echo Memory": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo Memory"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo 记忆"
+            "value": "让我微笑的时刻"
           }
         }
       }
@@ -5832,1952 +7986,69 @@
         }
       }
     },
-    "Importing photos…": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Importing photos…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在导入照片…"
-          }
-        }
-      }
-    },
-    "%@ items indexed — tap to re-sync": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ items indexed — tap to re-sync"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ 项已索引 — 轻点以重新同步"
-          }
-        }
-      }
-    },
-    "%lld items indexed — tap to re-sync": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld items indexed — tap to re-sync"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 项已索引 — 轻点以重新同步"
-          }
-        }
-      }
-    },
-    "Not authorized — tap to grant access": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not authorized — tap to grant access"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未授权 — 轻点以授权访问"
-          }
-        }
-      }
-    },
-    "Waiting": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Waiting"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "等待中"
-          }
-        }
-      }
-    },
-    "Loading": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "加载中"
-          }
-        }
-      }
-    },
-    "Ready": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ready"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已就绪"
-          }
-        }
-      }
-    },
-    "Connect a memory source": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connect a memory source"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "连接记忆来源"
-          }
-        }
-      }
-    },
-    "From your connected sources": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "From your connected sources"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来自已连接的数据源"
-          }
-        }
-      }
-    },
-    "No memories yet": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No memories yet"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "还没有记忆"
-          }
-        }
-      }
-    },
-    "Recent memories": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recent memories"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近的记忆"
-          }
-        }
-      }
-    },
-    "Review data sources in Settings to start importing memories.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Review data sources in Settings to start importing memories."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请在设置中检查数据源授权，以开始导入记忆。"
-          }
-        }
-      }
-    },
-    "Scanning your memories (%lld of %lld)": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scanning your memories (%1$lld of %2$lld)"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在扫描记忆（%1$lld/%2$lld）"
-          }
-        }
-      }
-    },
-    "Share a note or voice memo to Echo to begin.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Share a note or voice memo to Echo to begin."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将备忘录或语音备忘录分享到 Echo 即可开始。"
-          }
-        }
-      }
-    },
-    "Ask Echo": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ask Echo"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "问问 Echo"
-          }
-        }
-      }
-    },
-    "Explore your memories with an offline search": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explore your memories with an offline search"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通过离线搜索探索你的记忆"
-          }
-        }
-      }
-    },
-    "Memories from this month": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memories from this month"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这个月的记忆"
-          }
-        }
-      }
-    },
-    "memories from this month": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "memories from this month"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这个月的记忆"
-          }
-        }
-      }
-    },
-    "Moments that made me smile": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moments that made me smile"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "让我微笑的时刻"
-          }
-        }
-      }
-    },
-    "moments that made me smile": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "moments that made me smile"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "让我微笑的时刻"
-          }
-        }
-      }
-    },
-    "Open Search and run this query": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open Search and run this query"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开搜索并执行此查询"
-          }
-        }
-      }
-    },
-    "Memory unavailable": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memory unavailable"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "记忆不可用"
-          }
-        }
-      }
-    },
-    "The original source is no longer available or authorized.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The original source is no longer available or authorized."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "原始来源已不可用或不再获得授权。"
-          }
-        }
-      }
-    },
-    "Next memory": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next memory"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下一条记忆"
-          }
-        }
-      }
-    },
-    "Record feeling": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Record feeling"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "记录感受"
-          }
-        }
-      }
-    },
-    "Open memory": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open memory"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开记忆"
-          }
-        }
-      }
-    },
-    "Use the actions to open, advance, or record a feeling": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use the actions to open, advance, or record a feeling"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用操作来打开、切换或记录感受"
-          }
-        }
-      }
-    },
-    "Suggestion": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Suggestion"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音乐建议"
-          }
-        }
-      }
-    },
-    "Open": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开"
-          }
-        }
-      }
-    },
-    "Next": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下一张"
-          }
-        }
-      }
-    },
-    "Match device music": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Match device music"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "匹配此设备音乐"
-          }
-        }
-      }
-    },
-    "This moment": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This moment"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此刻"
-          }
-        }
-      }
-    },
-    "How do you feel?": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "How do you feel?"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你此刻有什么感受？"
-          }
-        }
-      }
-    },
-    "Earlier feelings": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Earlier feelings"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "之前的感受"
-          }
-        }
-      }
-    },
-    "Delete feeling": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete feeling"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除感受"
-          }
-        }
-      }
-    },
-    "Unknown artist": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unknown artist"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未知艺人"
-          }
-        }
-      }
-    },
-    "Interaction unavailable": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Interaction unavailable"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "操作暂不可用"
-          }
-        }
-      }
-    },
-    "Unable to show the next memory. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to show the next memory. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法显示下一条记忆，请重试。"
-          }
-        }
-      }
-    },
-    "This memory is no longer available.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This memory is no longer available."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这条记忆已不可用。"
-          }
-        }
-      }
-    },
-    "Unable to save this feeling. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to save this feeling. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法保存这条感受，请重试。"
-          }
-        }
-      }
-    },
-    "Unable to update this feeling. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to update this feeling. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法更新这条感受，请重试。"
-          }
-        }
-      }
-    },
-    "Unable to delete this feeling. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to delete this feeling. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法删除这条感受，请重试。"
-          }
-        }
-      }
-    },
-    "Unable to open this memory. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to open this memory. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法打开这条记忆，请重试。"
-          }
-        }
-      }
-    },
-    "Failed": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "失败"
-          }
-        }
-      }
-    },
-    "Saving your consent...": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Saving your consent..."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在保存你的同意…"
-          }
-        }
-      }
-    },
-    "Consent was not saved": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Consent was not saved"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未能保存同意"
-          }
-        }
-      }
-    },
-    "Echo has not requested access to any protected data. Retry to continue.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo has not requested access to any protected data. Retry to continue."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Echo 尚未请求访问任何受保护数据。请重试后继续。"
-          }
-        }
-      }
-    },
-    "Allow Background Location": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allow Background Location"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "允许后台定位"
-          }
-        }
-      }
-    },
-    "In-app awakening cards remain available. Enable notifications only for system delivery.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In-app awakening cards remain available. Enable notifications only for system delivery."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "应用内唤醒卡片仍然可用。仅在需要系统投递时启用通知。"
-          }
-        }
-      }
-    },
-    "Local notification delivery is optional and independent from in-app awakening cards.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Local notification delivery is optional and independent from in-app awakening cards."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本地通知投递是可选项，与应用内唤醒卡片相互独立。"
-          }
-        }
-      }
-    },
-    "While Using access is enabled. Allow background location separately for terminated-app awakening.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "While Using access is enabled. Allow background location separately for terminated-app awakening."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已允许使用 App 时访问位置。若要在 App 终止后唤醒，请另行允许后台定位。"
-          }
-        }
-      }
-    },
-    "Location access enables geofence awakening.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Location access enables geofence awakening."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "位置权限可启用地理围栏唤醒。"
-          }
-        }
-      }
-    },
-    "Health data is unavailable on this device.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Health data is unavailable on this device."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此设备上的健康数据不可用。"
-          }
-        }
-      }
-    },
-    "You can optionally ask HealthKit for HRV read access. Echo cannot inspect the read authorization choice.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You can optionally ask HealthKit for HRV read access. Echo cannot inspect the read authorization choice."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你可以选择请求 HealthKit 的 HRV 读取权限。Echo 无法检查你的读取授权选择。"
-          }
-        }
-      }
-    },
-    "Readable HRV samples are available for local emotion context.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Readable HRV samples are available for local emotion context."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已有可读取的 HRV 样本，可用于本地情绪情境。"
-          }
-        }
-      }
-    },
-    "No readable HRV samples are available. Echo uses local query and feeling history instead.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No readable HRV samples are available. Echo uses local query and feeling history instead."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "当前没有可读取的 HRV 样本。Echo 将改用本地查询和感受历史。"
-          }
-        }
-      }
-    },
-    "HealthKit could not complete the request. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "HealthKit could not complete the request. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "HealthKit 无法完成请求，请重试。"
-          }
-        }
-      }
-    },
-    "Recovering interrupted task": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recovering interrupted task"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在恢复中断的任务"
-          }
-        }
-      }
-    },
-    "Task recovery is not available.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Task recovery is not available."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "任务恢复当前不可用。"
-          }
-        }
-      }
-    },
-    "This saved task type is not supported by this app version.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This saved task type is not supported by this app version."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此 App 版本不支持该已保存任务类型。"
-          }
-        }
-      }
-    },
-    "Unable to cancel this task because it is no longer active.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to cancel this task because it is no longer active."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法取消此任务，因为它已不再活跃。"
-          }
-        }
-      }
-    },
-    "Unable to continue this task. Review access and try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to continue this task. Review access and try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法继续此任务。请检查访问权限后重试。"
-          }
-        }
-      }
-    },
-    "Unable to resume this task because it is no longer active.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to resume this task because it is no longer active."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法恢复此任务，因为它已不再处于活动状态。"
-          }
-        }
-      }
-    },
-    "Unable to pause this task because it is no longer active.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to pause this task because it is no longer active."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法暂停此任务，因为它已不再活跃。"
-          }
-        }
-      }
-    },
-    "Unable to restart this task. Review access and try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to restart this task. Review access and try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法重新开始此任务。请检查访问权限后重试。"
-          }
-        }
-      }
-    },
-    "Unsupported saved task": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unsupported saved task"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不支持的已保存任务"
-          }
-        }
-      }
-    },
-    "Notification services are unavailable.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notification services are unavailable."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通知服务当前不可用。"
-          }
-        }
-      }
-    },
-    "Excluded items cleaned up": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Excluded items cleaned up"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已清理无效排除项"
-          }
-        }
-      }
-    },
-    "%lld excluded item references were removed because their original Photo Library items no longer exist.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld excluded item references were removed because their original Photo Library items no longer exist."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "由于照片图库中的原始项目已不存在，已移除 %lld 条无效排除记录。"
-          }
-        }
-      }
-    },
-    "Unable to Load Excluded Items": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to Load Excluded Items"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法加载已排除项目"
-          }
-        }
-      }
-    },
-    "The original source is not currently available for deletion.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The original source is not currently available for deletion."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "当前无法删除原始来源。"
-          }
-        }
-      }
-    },
-    "The original was not deleted. Your Echo memory was kept.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The original was not deleted. Your Echo memory was kept."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "原始项目未被删除，Echo 记忆已保留。"
-          }
-        }
-      }
-    },
-    "Deletion could not be confirmed. Echo kept the memory and will check again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deletion could not be confirmed. Echo kept the memory and will check again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂时无法确认删除结果。Echo 已保留记忆，稍后会再次核对。"
-          }
-        }
-      }
-    },
-    "Unable to delete the original source. Your Echo memory was kept.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to delete the original source. Your Echo memory was kept."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法删除原始来源，Echo 记忆已保留。"
-          }
-        }
-      }
-    },
-    "MemoryID: %@": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MemoryID: %@"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "记忆 ID：%@"
-          }
-        }
-      }
-    },
-    "No source for part or all of this paragraph": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No source for part or all of this paragraph"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此段落的部分或全部内容没有来源"
-          }
-        }
-      }
-    },
-    "The share was presented, but its audit record is pending retry.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The share was presented, but its audit record is pending retry."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "分享面板已显示，但审计记录仍待重试。"
-          }
-        }
-      }
-    },
-    "Unable to present the system share sheet. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to present the system share sheet. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法显示系统分享面板，请重试。"
-          }
-        }
-      }
-    },
-    "Unable to prepare this creation for sharing. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to prepare this creation for sharing. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法准备此创作内容用于分享，请重试。"
-          }
-        }
-      }
-    },
-    "Open source memory citation": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open source memory citation"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开来源记忆引用"
-          }
-        }
-      }
-    },
-    "Source available": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source available"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来源可用"
-          }
-        }
-      }
-    },
-    "Source currently unavailable": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source currently unavailable"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来源当前不可用"
-          }
-        }
-      }
-    },
-    "The current privacy policy no longer permits opening this source.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The current privacy policy no longer permits opening this source."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "当前隐私策略已不允许打开此来源。"
-          }
-        }
-      }
-    },
-    "This source memory is currently unavailable.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This source memory is currently unavailable."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此来源记忆当前不可用。"
-          }
-        }
-      }
-    },
-    "Narrative reports": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Narrative reports"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "叙事报告"
-          }
-        }
-      }
-    },
-    "Monthly and yearly reports are generated on device after a period ends.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monthly and yearly reports are generated on device after a period ends."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每个周期结束后，月报和年报会在设备端生成。"
-          }
-        }
-      }
-    },
-    "Monthly reports": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monthly reports"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "月度报告"
-          }
-        }
-      }
-    },
-    "Yearly reports": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yearly reports"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "年度报告"
-          }
-        }
-      }
-    },
-    "Loading narrative reports…": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading narrative reports…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在载入叙事报告…"
-          }
-        }
-      }
-    },
-    "Reports unavailable": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reports unavailable"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "报告不可用"
-          }
-        }
-      }
-    },
-    "Generation needs your retry.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Generation needs your retry."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要你手动重试生成。"
-          }
-        }
-      }
-    },
-    "Delete narrative report": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete narrative report"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除叙事报告"
-          }
-        }
-      }
-    },
-    "Unable to load narrative reports. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to load narrative reports. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法载入叙事报告，请重试。"
-          }
-        }
-      }
-    },
-    "Narrative report scheduling is unavailable.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Narrative report scheduling is unavailable."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "叙事报告调度当前不可用。"
-          }
-        }
-      }
-    },
-    "Unable to update narrative report scheduling.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to update narrative report scheduling."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法更新叙事报告调度。"
-          }
-        }
-      }
-    },
-    "Narrative report is unavailable.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Narrative report is unavailable."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "叙事报告当前不可用。"
-          }
-        }
-      }
-    },
-    "Unable to open this narrative report.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to open this narrative report."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法打开此叙事报告。"
-          }
-        }
-      }
-    },
-    "Unable to delete this narrative report.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to delete this narrative report."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法删除此叙事报告。"
-          }
-        }
-      }
-    },
-    "Unable to retry this narrative report.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to retry this narrative report."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法重试此叙事报告。"
-          }
-        }
-      }
-    },
-    "Check for completed periods": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check for completed periods"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "检查已结束的周期"
-          }
-        }
-      }
-    },
-    "Unable to start narrative report generation.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unable to start narrative report generation."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法启动叙事报告生成。"
-          }
-        }
-      }
-    },
-    "Delete narrative report?": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete narrative report?"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除叙事报告？"
-          }
-        }
-      }
-    },
-    "Delete report": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Delete report"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除报告"
-          }
-        }
-      }
-    },
-    "This report cannot be regenerated in this version.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This report cannot be regenerated in this version."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此版本无法重新生成该报告。"
-          }
-        }
-      }
-    },
-    "%lld intermediate paragraphs omitted": {
+    "v4.6": {
       "extractionState": "manual",
       "localizations": {
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld intermediate paragraphs omitted"
+            "value": "v4.6"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "省略了 %lld 段中间摘要"
+            "value": "v4.6"
           }
         }
       }
     },
-    "%lld source memories omitted by generation limits": {
+    "🔗 MemoryID:…2222": {
       "extractionState": "manual",
       "localizations": {
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld source memories omitted by generation limits"
+            "value": "🔗 MemoryID:…2222"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "受生成限额限制，省略了 %lld 条来源记忆"
+            "value": "🔗 记忆ID:…2222"
           }
         }
       }
     },
-    "AI Creation uses saved text, not photo pixels. Return to the memory details and add a description, or choose a memory with text.": {
+    "🔮 Preview": {
       "extractionState": "manual",
       "localizations": {
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "AI Creation uses saved text, not photo pixels. Return to the memory details and add a description, or choose a memory with text."
+            "value": "🔮 Preview"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "AI 创作以保存的文字为依据，暂不识别照片画面。请返回记忆详情添加描述，或选择已有文字的记忆。"
+            "value": "🔮 预览"
           }
         }
       }
     },
-    "Back to memories": {
-      "extractionState": "manual",
+    "Wait for photo understanding, or add a description in memory details, before generating.": {
       "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Back to memories"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "返回记忆"
+            "value": "请等待图片理解完成，或在记忆详情中填写描述后再生成。"
           }
-        }
-      }
-    },
-    "Generation inputs or settings changed. Restart is required.": {
-      "extractionState": "manual",
-      "localizations": {
+        },
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Generation inputs or settings changed. Restart is required."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生成输入或设置已变化，需要重新开始。"
-          }
-        }
-      }
-    },
-    "Some source categories are not included.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Some source categories are not included."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "部分来源类别未包含在报告中。"
-          }
-        }
-      }
-    },
-    "This memory needs text for creation": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This memory needs text for creation"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这条记忆需要文字才能创作"
-          }
-        }
-      }
-    },
-    "This report covers part of the period.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This report covers part of the period."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本报告仅覆盖该周期的一部分。"
-          }
-        }
-      }
-    },
-    "Generation reached the time limit on this device. Try a shorter memory.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Generation reached the time limit on this device. Try a shorter memory."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生成在此设备上超时，请选择更短的记忆再试。"
-          }
-        }
-      }
-    },
-    "This device does not have enough available memory for generation.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This device does not have enough available memory for generation."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此设备当前没有足够的可用内存来生成内容。"
-          }
-        }
-      }
-    },
-    "This memory is too long for generation. Choose a shorter memory.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This memory is too long for generation. Choose a shorter memory."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这条记忆超出生成长度上限，请选择更短的记忆。"
-          }
-        }
-      }
-    },
-    "The model could not produce a complete response in your selected language. Please try again.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The model could not produce a complete response in your selected language. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "模型未能以你选择的语言生成完整回答，请重试。"
-          }
-        }
-      }
-    },
-    "The source or its permissions changed. Return to search and select the memory again.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The source or its permissions changed. Return to search and select the memory again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来源内容或权限已变更，请返回搜索重新选择记忆。"
-          }
-        }
-      }
-    },
-    "Another creation is being generated. Wait for it to finish, then try again.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Another creation is being generated. Wait for it to finish, then try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "另一项创作正在生成，请等待完成后再试。"
-          }
-        }
-      }
-    },
-    "The generated text did not follow the selected template. Please try again.": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The generated text did not follow the selected template. Please try again."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生成内容未符合所选模板，请重试。"
-          }
-        }
-      }
-    },
-    "Source memory": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source memory"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来源记忆"
-          }
-        }
-      }
-    },
-    "Source memory %lld": {
-      "localizations": {
-        "en-US": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source memory %lld"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "来源记忆 %lld"
+            "value": "Wait for photo understanding, or add a description in memory details, before generating."
           }
         }
       }

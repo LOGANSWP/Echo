@@ -1,0 +1,199 @@
+{
+  "productionApproval": "pending",
+  "files": [
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "ae9a13456708557871320dd1cf54a182507d46b239ef759afb3cf1c6b28fac38",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/coremldata.bin",
+      "sizeBytes": 2566,
+      "sha256": "133612ba70c9396a6f1f998ca1237a4217f5a3f271e5e88c02633f255c6b073c",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/metadata.json",
+      "sizeBytes": 19324,
+      "sha256": "11bca977aab841edb5ecafb6e8f7edbc1af819f92c00d350b60467723cdba080",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/model.mil",
+      "sizeBytes": 615112,
+      "sha256": "90d78d0a83ef72105b908cf645b2dbb364de7ca0fb1b02d1ffeaad42c48e81d0",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolDecoder1024.mlmodelc/weights/weight.bin",
+      "sizeBytes": 326339648,
+      "sha256": "1f5dbf99b4518801ad414defee0ce0b5352b9c22b031fcb4b928bf4834625011",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/analytics/coremldata.bin",
+      "sizeBytes": 243,
+      "sha256": "5d3d454de517cf7ee127a749d009ca7797054378c5977cf8b178dceca87d8f25",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/coremldata.bin",
+      "sizeBytes": 564,
+      "sha256": "c668b84402a2746ca58a202a3773b824d5f5f90152ee7fe3a9acf97e60b266c4",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/metadata.json",
+      "sizeBytes": 2734,
+      "sha256": "a11a055a6933ed9d94c0d7dfc89b85a0d17a146e6023a1c06ea4bf25c6fd007b",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/model.mil",
+      "sizeBytes": 146515,
+      "sha256": "450eeccaca665079127be4bccfef43ad0b10d0dc7febbfab3e84c037f17f8e60",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/compiled-v1/SmolVision512.mlmodelc/weights/weight.bin",
+      "sizeBytes": 187035776,
+      "sha256": "533311567f769e8222de8dc324b06c4f6dadc1502ea7dc7e37215521711e3fbb",
+      "group": "compiled"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/.gitattributes",
+      "sizeBytes": 1519,
+      "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/README.md",
+      "sizeBytes": 16400,
+      "sha256": "0b687c656b2587d84cb85003825746f8b3a08497dff4ed51b54b1090719fa512",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/added_tokens.json",
+      "sizeBytes": 4739,
+      "sha256": "74135b8664b56088c0006f1c8e848d79a8eba003411f72ebf1dc2ee96227be3a",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/chat_template.json",
+      "sizeBytes": 429,
+      "sha256": "a68ad1a42681ae44eacd109ff8dd56a840f761c03d72f4ff4c515d092f882168",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/config.json",
+      "sizeBytes": 7353,
+      "sha256": "b70fb4bfde88df9eeebc9d8ff523733b8bf70d6c9b06c610325960e06ae9db52",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/generation_config.json",
+      "sizeBytes": 136,
+      "sha256": "067a2a54e5f87162ecac6e0e911cc4665fc8f7f3324794ecbac0f76badb56636",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/merges.txt",
+      "sizeBytes": 466391,
+      "sha256": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/model.safetensors",
+      "sizeBytes": 513028808,
+      "sha256": "74dea5904032e5ae99a2e0eef5179e6ac0f1dedc3ab0c7c2a5d4d387c843203e",
+      "verifiedAgainst": "upstreamLfsSha256",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/preprocessor_config.json",
+      "sizeBytes": 486,
+      "sha256": "6cb6e36d6fcb88ca1502c4a26750715dc3e7dedddc9a8f17b27d8d167d1457e7",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/processor_config.json",
+      "sizeBytes": 68,
+      "sha256": "e7bff42da73ae9eec9042ef20e066e11f1ee20f025358ff79131e3c0fb549b46",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/special_tokens_map.json",
+      "sizeBytes": 1069,
+      "sha256": "aa0ff906077086dfa9734a7f97f68c825877a48f9468807be65504495cdeef09",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/tokenizer.json",
+      "sizeBytes": 3548256,
+      "sha256": "5ece781dc8d2b2f3e2f289ca0ae50b17cfc27dd27bfe7971bb8241e0b964331a",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/tokenizer_config.json",
+      "sizeBytes": 28249,
+      "sha256": "36c6fd44d07d10fd8180ee6b46dcccf69fb7c06753968ff0d7e17b8bfe17b777",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/source/vocab.json",
+      "sizeBytes": 800662,
+      "sha256": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79",
+      "verifiedAgainst": "gitBlobId",
+      "group": "source"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolVision512.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "sizeBytes": 137320,
+      "sha256": "34933c25e60f6beb93dd5a0a384079ca77a0ebcbb2917597adb6c774da4fedeb",
+      "group": "converted"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolVision512.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "sizeBytes": 187035776,
+      "sha256": "533311567f769e8222de8dc324b06c4f6dadc1502ea7dc7e37215521711e3fbb",
+      "group": "converted"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolVision512.mlpackage/Manifest.json",
+      "sizeBytes": 617,
+      "sha256": "83f100158d4e8633527e94bf01f5ab9c04755bfd59d59c9971b5961f14a444d2",
+      "group": "converted"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolDecoder1024.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "sizeBytes": 610168,
+      "sha256": "911b190be27be29e49946b810985973246fc2661efa1c0636cca65c6264d75db",
+      "group": "converted"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolDecoder1024.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "sizeBytes": 326339648,
+      "sha256": "1f5dbf99b4518801ad414defee0ce0b5352b9c22b031fcb4b928bf4834625011",
+      "group": "converted"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion-2/SmolDecoder1024.mlpackage/Manifest.json",
+      "sizeBytes": 617,
+      "sha256": "c2f943d7ad62f69a0a482abd107da997cdf9a226382ffa4844beea34b52ee7c1",
+      "group": "converted"
+    }
+  ]
+}

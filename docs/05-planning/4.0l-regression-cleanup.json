@@ -1,0 +1,86 @@
+{
+  "scope": "task-owned completed failed test bundles only",
+  "removed": [
+    {
+      "path": "/tmp/echo-4.0l-asset-version-red.xcresult",
+      "bytes": 63784778,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-asset-version-red.json",
+      "summarySHA256": "0b9bcd682fe7fb8e6806d886c3c0a1c54b814d2c8ae426673eec00a0de722b76",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-boundary-regression.xcresult",
+      "bytes": 57183866,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-boundary-regression.json",
+      "summarySHA256": "4c4efd866a04f9f5929997918d2d83ce41bc0f06b40de4fbadd1a1b94a66d8d9",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-photo-month-red.xcresult",
+      "bytes": 57904419,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-photo-month-red.json",
+      "summarySHA256": "855a0c9364dfa4ec0a08076b92d9c893b6a53f532714f3da083107b5e1b8aae7",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-photo-production-authorized.xcresult",
+      "bytes": 57116411,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-photo-production-authorized.json",
+      "summarySHA256": "6daeca0f8be25fdeeab120b963db6ef22674b7ad367e72d7bf2eeee231550495",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-photo-production-callback.xcresult",
+      "bytes": 56588884,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-photo-production-callback.json",
+      "summarySHA256": "e48aabee69a45bfebd3df40eccf518570f12599bd79394953d1ba77f0f8dd41a",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-photo-production-red.xcresult",
+      "bytes": 64352882,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-photo-production-red.json",
+      "summarySHA256": "707903787013845b80d7f28c96b5e7aafc1eead8285892ebe6796d7705aaf1e6",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-publication-stability-red.xcresult",
+      "bytes": 57544665,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-publication-stability-red.json",
+      "summarySHA256": "27669a8fd4f7f5ac6cc8993da8af773becde70f745f9d1811f701fa33d7cd434",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-report-red.xcresult",
+      "bytes": 62458358,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-report-red.json",
+      "summarySHA256": "e9f03ef1a7e3d4b0a66dbb0bd7a81aca1bf912bc13284645c0e725bd14c7fbda",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-report-source-red.xcresult",
+      "bytes": 64640927,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-report-source-red.json",
+      "summarySHA256": "e6c1c58612cd422aa47f411aef8cb23863df9e2ae72500506405574eca84f125",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    },
+    {
+      "path": "/tmp/echo-4.0l-resource-red2.xcresult",
+      "bytes": 60597270,
+      "summary": "docs/05-planning/4.0l-regression-summaries/echo-4.0l-resource-red2.json",
+      "summarySHA256": "3419bf9d41f14df30e2a70bbda6d2bd5ff4df727ce5a902b39aaa3ce314eb71c",
+      "reason": "failed-run summary and command log retained; duplicate diagnostic bundle removed"
+    }
+  ],
+  "reclaimedBytes": 602172460,
+  "additionalCleanup": [
+    {
+      "path": "/tmp/echo-4.0l-generation-ordering-green.xcresult",
+      "bytes": 58308254
+    },
+    {
+      "path": "/tmp/echo-4.0l-upgrade-audit-red.xcresult",
+      "bytes": 57257891
+    }
+  ]
+}

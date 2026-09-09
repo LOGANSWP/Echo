@@ -1,0 +1,23 @@
+{
+  "taskId": "4.0l",
+  "researchOnly": true,
+  "productionApproval": "pending",
+  "source": {
+    "revision": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "manifestSha256": "2dca32c6266462807e8486fb8b40e5c0b133810237cea7f0a806c25011aeb1e7"
+  },
+  "converterSha256": "86a774b726e07ef458acb07ea8317ccffa47de9b821774fec66b67a73ac73da0",
+  "startedAtUnix": 1788967232.22969,
+  "context": 1024,
+  "imageTokens": 64,
+  "kvBytes": 23592960,
+  "scope": "Two controlled square in-memory images; numerical execution parity, not description precision or iOS acceptance",
+  "tools": {
+    "torch": "2.12.1",
+    "transformers": "5.13.0",
+    "coremltools": "9.0"
+  },
+  "status": "failed",
+  "error": "Traceback (most recent call last):\n  File \"/Users/logansu/Documents/Dev/SwiftProjects/Echo/Scripts/Research/convert_photo_research.py\", line 248, in main\n    convert(report, save)\n    ~~~~~~~^^^^^^^^^^^^^^\n  File \"/Users/logansu/Documents/Dev/SwiftProjects/Echo/Scripts/Research/convert_photo_research.py\", line 137, in convert\n    vision, decoder = wrappers(official)\n                      ~~~~~~~~^^^^^^^^^^\n  File \"/Users/logansu/Documents/Dev/SwiftProjects/Echo/Scripts/Research/convert_photo_research.py\", line 121, in wrappers\n    return Vision().eval(), Decoder().eval()\n                            ~~~~~~~^^\n  File \"/Users/logansu/Documents/Dev/SwiftProjects/Echo/Scripts/Research/convert_photo_research.py\", line 72, in __init__\n    cfg.num_hidden_layers, cfg.head_dim, cfg.rope_theta) == (576, 9, 3, 30, 64, 100000)\n                                         ^^^^^^^^^^^^^^\n  File \"/opt/anaconda3/lib/python3.13/site-packages/transformers/configuration_utils.py\", line 454, in __getattribute__\n    return super().__getattribute__(key)\n           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^\nAttributeError: 'LlamaConfig' object has no attribute 'rope_theta'\n",
+  "endedAtUnix": 1788967240.303398
+}

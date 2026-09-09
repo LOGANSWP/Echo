@@ -1,0 +1,89 @@
+{
+  "files": [
+    {
+      "path": "Scripts/Research/PhotoTokenizer.swift",
+      "sizeBytes": 7908,
+      "sha256": "15717d3200933ba25725c63c42fc91fbd5e79c25c978ba5c0de33faab64b23d3"
+    },
+    {
+      "path": "Scripts/Research/PhotoImagePreprocessor.swift",
+      "sizeBytes": 3966,
+      "sha256": "0d0fd2d21afc5a01116c0b74a8c81e07b956eaefbf99bd553cb592dee38a5cb0"
+    },
+    {
+      "path": "Scripts/Research/PhotoFunctionalProbe.swift",
+      "sizeBytes": 10405,
+      "sha256": "3efa5fe2494843c35ba3e906ac59a35691c53933bc61461ee9832573750b929b"
+    },
+    {
+      "path": "Scripts/Research/GenerationMemory.swift",
+      "sizeBytes": 1516,
+      "sha256": "a49c18684d8eb5007bb22fe93fecda90d9bf556827c132ace8eabe93d474c016"
+    },
+    {
+      "path": "Scripts/Research/PhotoImageProbe.swift",
+      "sizeBytes": 4534,
+      "sha256": "9173e97fe5dd1c31eff8be7e1ad9d205654cfffb133c71314e422b0e40ecd497"
+    },
+    {
+      "path": "Scripts/Research/PhotoTokenizerProbe.swift",
+      "sizeBytes": 2262,
+      "sha256": "b1a05f08105b54a90401a48d08e82ce76d24afa4bb908e39fb140bedb8be75e4"
+    },
+    {
+      "path": "Scripts/Research/convert_photo_research.py",
+      "sizeBytes": 13604,
+      "sha256": "22f7489750fe1be11cf816c507ea3975c5196bb1976e9e2f30f5992292684338"
+    },
+    {
+      "path": "Scripts/Research/run_photo_functional_probe.py",
+      "sizeBytes": 4739,
+      "sha256": "fc03fdf966469ebc7d4e5a48102601ea4cd10f45e1e05f42ed0658712e08ae86"
+    },
+    {
+      "path": "Scripts/Research/photo_generation_bridge.py",
+      "sizeBytes": 5723,
+      "sha256": "d879eb409b4cd12e60733aebf303715b85d3fe00bc1487e5d6c10748c2d72309"
+    },
+    {
+      "path": "Scripts/Research/build_photo_approval_packet.py",
+      "sizeBytes": 11011,
+      "sha256": "a857a6fa18470e772efecd983ac1fbc49d671c5facbef874faecdabfcbccf044"
+    },
+    {
+      "path": "PinnedModels/photo-understanding-evaluation/smolvlm-256m/photo-functional-probe",
+      "sizeBytes": 240344,
+      "sha256": "da7ebd9e32c2ea49b5e65953f8c6906205b9d38696f13f42b09ae28aae7f13e3"
+    },
+    {
+      "path": "Scripts/Research/prepare_photo_tokenizer_cases.py",
+      "sizeBytes": 2080,
+      "sha256": "27399363fb3cd1aa4378e286e961577d3140cdbc543b5e62091287b7ebca5a6c"
+    }
+  ],
+  "nativeLibraries": [
+    "/usr/lib/libSystem.B.dylib",
+    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+    "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+    "/System/Library/Frameworks/CoreML.framework/Versions/A/CoreML",
+    "/System/Library/Frameworks/CryptoKit.framework/Versions/A/CryptoKit",
+    "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+    "/System/Library/Frameworks/ImageIO.framework/Versions/A/ImageIO",
+    "/usr/lib/libobjc.A.dylib",
+    "/usr/lib/swift/libswiftCore.dylib",
+    "/usr/lib/swift/libswiftCoreFoundation.dylib",
+    "/usr/lib/swift/libswiftDispatch.dylib",
+    "/usr/lib/swift/libswiftIOKit.dylib",
+    "/usr/lib/swift/libswiftMetal.dylib",
+    "/usr/lib/swift/libswiftObjectiveC.dylib",
+    "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+    "/usr/lib/swift/libswiftXPC.dylib",
+    "/usr/lib/swift/libswift_Builtin_float.dylib",
+    "/usr/lib/swift/libswift_Concurrency.dylib"
+  ],
+  "toolchain": {
+    "xcode": "Xcode 26.5\nBuild version 17F42",
+    "swift": "Apple Swift version 6.3.2 (swiftlang-6.3.2.1.108 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "scope": "Pinned source to two FP16 Core ML graphs to iOS18 compiled models; first-party Swift ImageIO/ByteLevel/stateful decoder prototype. Production adapters and final App SBOM remain to be built."
+}

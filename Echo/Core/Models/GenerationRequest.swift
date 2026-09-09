@@ -21,6 +21,21 @@ nonisolated public enum GenerationRuntimeError: Error, Sendable, Equatable {
     }
 }
 
+/// User-approved local simulator allowance; automatic reports retain the standard budget.
+nonisolated public enum GenerationExecutionScope: Sendable, Equatable {
+    case standard, manualCreation
+
+    public var callSeconds: Double {
+        #if DEBUG && targetEnvironment(simulator)
+        self == .manualCreation ? 120 : 60
+        #else
+        60
+        #endif
+    }
+
+    public var requestSeconds: Double { callSeconds * 2 }
+}
+
 nonisolated public enum GenerationOutputForm: Sendable {
     case prose, poem
 }
@@ -35,6 +50,7 @@ nonisolated public struct GenerationRequest: Sendable {
     public let preferredLanguage: String
     public let traceID: String
     public let executionDeadline: Double
+    public let executionScope: GenerationExecutionScope
 
     public init(
         system: String,
@@ -45,7 +61,8 @@ nonisolated public struct GenerationRequest: Sendable {
         traceID: String,
         executionDeadline: Double,
         outputForm: GenerationOutputForm = .prose,
-        referenceEncoding: GenerationReferenceEncoding = .memoryUUID
+        referenceEncoding: GenerationReferenceEncoding = .memoryUUID,
+        executionScope: GenerationExecutionScope = .standard
     ) {
         self.system = system
         self.user = user
@@ -54,6 +71,7 @@ nonisolated public struct GenerationRequest: Sendable {
         self.preferredLanguage = preferredLanguage
         self.traceID = traceID
         self.executionDeadline = executionDeadline
+        self.executionScope = executionScope
         self.outputForm = outputForm
         self.referenceEncoding = referenceEncoding
     }
@@ -70,7 +88,8 @@ nonisolated public struct GenerationRequest: Sendable {
             traceID: traceID,
             executionDeadline: executionDeadline,
             outputForm: outputForm,
-            referenceEncoding: referenceEncoding
+            referenceEncoding: referenceEncoding,
+            executionScope: executionScope
         )
     }
 }

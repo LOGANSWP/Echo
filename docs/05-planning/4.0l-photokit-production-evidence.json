@@ -1,0 +1,11 @@
+{
+  "caption" : "In this image there is a red circle.",
+  "citationCount" : 1,
+  "handwrittenDescription" : false,
+  "paragraphs" : [
+    "There is a red circle in the image."
+  ],
+  "persistedMonthlyReports" : 1,
+  "scope" : "PhotoKit-production-ingest-real-model-creation-and-export-authorization",
+  "systemSharePresented" : false
+}
