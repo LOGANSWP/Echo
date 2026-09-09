@@ -2,7 +2,7 @@
   "_description": "Echo 项目延期/暂缓条目追踪。仅记录当前确实无法解决的任务。与 task-status.json 同级维护。",
   "_rule": "每次 Phase 集成测试时必须扫描本文件，检查延期任务是否已被顺带解决或当前可解决。",
   "_version": "1.4.1",
-  "_last_updated": "2026-09-08T00:35:22Z",
+  "_last_updated": "2026-09-09T14:35:55Z",
   "deferred_to_phase_4": [
     {
       "id": "DEF-001",
@@ -137,6 +137,27 @@
       "resolved_at": "2026-09-03T23:17:58Z",
       "resolved_by_task": "4.0e",
       "source_pr": 38
+    },
+    {
+      "id": "DEF-79-003",
+      "pr": 79,
+      "title": "Manual generation renders unbounded source text before checking input budget",
+      "severity": "🟡",
+      "location": "Echo/Core/Services/StructuredGeneration.swift:50",
+      "reason": "Fixed with SQL byte-bounded conditional projection, aggregate manual input budgets, pre-serialization escaped JSON/source-reference bounds, and bounded source revalidation. Sources are not truncated; tokenizer/output budgets remain authoritative.",
+      "defer_to": "Current PR #79 before merge: bound source reads and aggregate/escaped prompt construction; add targeted rejection-before-serialization tests.",
+      "deferred_at": "2026-09-09T02:35:10.164115+00:00",
+      "last_checked_at": "2026-09-09T14:35:55Z",
+      "tracking_status": "resolved",
+      "target_tasks": [
+        "4.0k"
+      ],
+      "recheck_trigger": "PR #79 fix review, required CI and Phase 4 integration",
+      "review_report": "docs/05-planning/4.0k-pr79-review.md",
+      "resolved_at": "2026-09-09T03:47:28.229410+00:00",
+      "resolution": "GenerationInputBudgetTests covers oversized raw/aggregate/Unicode/escaping inputs, four persisted text fields, lossless small inputs, and zero tokenizer/model calls on aggregate overflow. Seven focused Swift suites pass; SwiftLint has zero violations. Fix commit 340a089efe180380a1b60e56a6807a9bc2f54113 passed required CI run 34308577985 and was delivered by PR #79.",
+      "resolved_by_task": "4.0k",
+      "merge_commit": "ecf52fa9805bd88b8f2de0982e2d1b527d665cc8"
     }
   ],
   "phase_integration_scan_rules": {
@@ -1484,7 +1505,7 @@
       "reason": "PR #78 review confirmed resolveLLMProvider() returns nil and the model provenance register contains no approved bundled generative LLM artifact. The scheduler and persistence seam is real, but StubNarrativeGenerator only proves unit behavior and cannot satisfy US-SYN-004 automatic production generation or the true bounded batch/layer aggregation path. ADR-022 narrows 4.0j accordingly and requires generator absence to fail closed before materialization/claim without L2 noise; task 4.0k owns the real hierarchical generator and actual aggregation-layer evidence. ADR-023 specifies the execution and evidence contract without resolving this finding: concrete human artifact approval, runtime integration, token-bounded lineage-preserving generation, non-publishing language fallback, checkpoint-preserving replay and real-device evidence remain required.",
       "defer_to": "4.0k approved offline generation runtime and narrative report production closure",
       "deferred_at": "2026-09-07T22:16:52Z",
-      "last_checked_at": "2026-09-09T01:47:13.401043+00:00",
+      "last_checked_at": "2026-09-09T14:35:55Z",
       "owners": [
         "On-device ML Lead",
         "Model Legal and Privacy Approver"
@@ -1503,7 +1524,7 @@
       "tracking_status": "open",
       "recheck_trigger": "4.0k review or Phase 4 integration scan",
       "research_evidence": "docs/05-planning/4.0k-generation-evaluation.md; docs/05-planning/4.0k-approval-packet/README.md; docs/05-planning/4.0k-acceptance-corpus-review.json; docs/05-planning/4.0k-production-implementation-map.md; docs/05-planning/4.0k-approval-packet/approval.json",
-      "research_status": "Original exact artifact integration approved and default provider/hierarchical reports now pass simulator engineering E2E. Current v12 Chinese poetry still fails precise factual-grounding regressions; 110 development outputs on seven scenarios did not establish a safe replacement. Larger cached model also remains unqualified. New Qwen3.5-0.8B source download is awaiting explicit authorization after automatic approval review rejected its disk/scope impact; no download or App replacement occurred. Full human quality, device/Release resource and coverage gates remain unpassed. Original artifact approval is valid; physical-device work remains deferred per user. See 4.0k-poem-grounding-followup.md and 4.0k-next-candidate-research-request.md. User priority update: “先不需要关心模型生成内容的质量问题，现在要紧的是功能流程的打通”. Active work is simulator functional verification; content-quality tuning, new-model download research and physical-device work are deferred. Existing quality assertions and final acceptance gates remain unchanged, with their failures explicitly outstanding. Functional-only regression passed 58 tests / 9 suites / 1.768 seconds; both normal simulators verified clipboard and four system-share handoffs (PDF, Markdown, Notes entry, Share/Print), with real presentation audits and result retention on dismissal. No production code or model changes in this follow-up. See 4.0k-functional-flow-review.md. Draft PR #79 provides the simulator functional checkpoint and clean-export fix; full quality/device/coverage acceptance remains outstanding, so this finding remains open."
+      "research_status": "Original exact artifact integration approved and default provider/hierarchical reports now pass simulator engineering E2E. Current v12 Chinese poetry still fails precise factual-grounding regressions; 110 development outputs on seven scenarios did not establish a safe replacement. Larger cached model also remains unqualified. New Qwen3.5-0.8B source download is awaiting explicit authorization after automatic approval review rejected its disk/scope impact; no download or App replacement occurred. Full human quality, device/Release resource and coverage gates remain unpassed. Original artifact approval is valid; physical-device work remains deferred per user. See 4.0k-poem-grounding-followup.md and 4.0k-next-candidate-research-request.md. User priority update: “先不需要关心模型生成内容的质量问题，现在要紧的是功能流程的打通”. Active work is simulator functional verification; content-quality tuning, new-model download research and physical-device work are deferred. Existing quality assertions and final acceptance gates remain unchanged, with their failures explicitly outstanding. Functional-only regression passed 58 tests / 9 suites / 1.768 seconds; both normal simulators verified clipboard and four system-share handoffs (PDF, Markdown, Notes entry, Share/Print), with real presentation audits and result retention on dismissal. No production code or model changes in this follow-up. See 4.0k-functional-flow-review.md. Draft PR #79 provides the simulator functional checkpoint and clean-export fix; full quality/device/coverage acceptance remains outstanding, so this finding remains open. Post-merge scan: PR #79 merged at ecf52fa9805bd88b8f2de0982e2d1b527d665cc8; simulator functionality is delivered, but outstanding quality/device/Release-resource/coverage qualification keeps this finding open."
     },
     {
       "id": "DEF-79-001",
@@ -1514,7 +1535,7 @@
       "reason": "User Live Review identified a missing functional input boundary: images have no canonical text, OCR is indexed without a creation-text path, and the approved runtime accepts text only. Manual descriptions and successful text generation do not prove automatic photo understanding.",
       "defer_to": "4.0l on-device photo understanding and direct creation/report inputs before Phase 4 validation/RC",
       "deferred_at": "2026-09-09T01:59:43.986313+00:00",
-      "last_checked_at": "2026-09-09T01:59:43.986313+00:00",
+      "last_checked_at": "2026-09-09T14:35:55Z",
       "tracking_status": "open",
       "owners": [
         "On-device ML Lead"
@@ -1531,7 +1552,8 @@
         "中英输出与 UI 状态/可访问等价动作；模型预算和最终实机资源/质量/覆盖率资格单独记录，模拟器功能通过不替代发布门禁。"
       ],
       "recheck_trigger": "4.0l review and Phase 4 integration; preserve existing 4.0k quality/device gates",
-      "decision_reference": "docs/decisions/ADR-025-photo-understanding-creation.md"
+      "decision_reference": "docs/decisions/ADR-025-photo-understanding-creation.md",
+      "post_merge_review": "PR #79 is merged; task 4.0l is dependency-ready, with no photo-understanding implementation or new model approval implied. This finding remains open."
     },
     {
       "id": "DEF-79-002",
@@ -1542,7 +1564,7 @@
       "reason": "User explicitly declined publishing model artifacts and authorized skipping only the related CI tests on 2026-09-08. The two real-generation suites are disabled only by a dedicated CI test-host flag; local defaults and assertions remain enabled. Provisioning is not fixed or claimed passed.",
       "defer_to": "After explicit artifact-distribution approval: provision and verify frozen model resources in CI, remove the dedicated deferral flag, and rerun the six real-model parameter cases.",
       "deferred_at": "2026-09-09T02:35:10.164115+00:00",
-      "last_checked_at": "2026-09-09T03:47:28.229410+00:00",
+      "last_checked_at": "2026-09-09T14:35:55Z",
       "tracking_status": "deferred",
       "target_tasks": [
         "4.0k"
@@ -1550,27 +1572,8 @@
       "recheck_trigger": "PR #79 fix review, required CI and Phase 4 integration",
       "review_report": "docs/05-planning/4.0k-pr79-review.md",
       "user_decision": "先不发布，CI可以先跳过这相关的",
-      "verification": "CI-style xctestrun: 26 executed Swift tests passed; three parameterized test declarations (six cases) explicitly skipped with DEF-79-002 reason. No artifact published."
-    },
-    {
-      "id": "DEF-79-003",
-      "pr": 79,
-      "title": "Manual generation renders unbounded source text before checking input budget",
-      "severity": "🟡",
-      "location": "Echo/Core/Services/StructuredGeneration.swift:50",
-      "reason": "Fixed with SQL byte-bounded conditional projection, aggregate manual input budgets, pre-serialization escaped JSON/source-reference bounds, and bounded source revalidation. Sources are not truncated; tokenizer/output budgets remain authoritative.",
-      "defer_to": "Current PR #79 before merge: bound source reads and aggregate/escaped prompt construction; add targeted rejection-before-serialization tests.",
-      "deferred_at": "2026-09-09T02:35:10.164115+00:00",
-      "last_checked_at": "2026-09-09T03:47:28.229410+00:00",
-      "tracking_status": "resolved",
-      "target_tasks": [
-        "4.0k"
-      ],
-      "recheck_trigger": "PR #79 fix review, required CI and Phase 4 integration",
-      "review_report": "docs/05-planning/4.0k-pr79-review.md",
-      "resolved_at": "2026-09-09T03:47:28.229410+00:00",
-      "resolution": "GenerationInputBudgetTests covers oversized raw/aggregate/Unicode/escaping inputs, four persisted text fields, lossless small inputs, and zero tokenizer/model calls on aggregate overflow. Seven focused Swift suites pass; SwiftLint has zero violations."
+      "verification": "CI-style xctestrun: 26 executed Swift tests passed; three parameterized test declarations (six cases) explicitly skipped with DEF-79-002 reason. No artifact published. Required CI run 34308577985 passed on the merged PR head with the explicit six-case deferral. Model artifact distribution and provisioning remain deferred."
     }
   ],
-  "last_updated": "2026-09-09T02:35:10.164115+00:00"
+  "last_updated": "2026-09-09T14:35:55Z"
 }
