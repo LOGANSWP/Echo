@@ -144,7 +144,7 @@
     "check_deferred": "逐条检查 deferred_to_phase_* 数组中的每个条目——dependencies 是否已 done？是否被顺带覆盖？blocker 是否已消除？",
     "if_resolvable": "创建/扩展 task-status.json 任务 → 移至 resolved_deferred 数组",
     "if_still_blocked": "保持原条目不变，更新 last_checked_at 时间戳",
-    "check_pr_review_deferred": "Scan deferred_from_pr_review at every Phase integration test; DEF-52-001 (LanguageAligner fallback strings) defer_to=3F.10; DEF-53-001 (evidence-index markdownlint MD024/MD058) defer_to=markdownlint-gate introduction; DEF-54-001 (SigLIP2 model-dependent tests skip in CI) defer_to=model-approved-for-release; DEF-55-001/002/003 (Whisper bridge per-transcribe checksum/init perf, hash duplication) defer_to=3F.5 production ingestion + single-source hash; DEF-58-001 (RET-005 AC-3 LLM rewrite) defer_to=on-device generative model; DEF-58-002 (RET-005 AC-1 FIFO history + AC-2 memoryIds injection) defer_to=3F.7 search wiring or Phase 4; DEF-58-003 (feedback generation binds active route not result generation) defer_to=3F.7; DEF-58-004 (SubjectiveScorer ignores queryText) defer_to=3F.7 real CLIP scorer; DEF-58-005 (SearchResultItem subjectiveMatch field) defer_to=3F.7/3F.10; DEF-58-006 (parse async throws unused) & DEF-58-007 (regex hoist) defer_to=Phase 4 simplification window; DEF-59-001/002/003 (migration import TaskQueueActor enqueue / AC-5 补导 / vector-FTS row-level integrity) defer_to=US-SRC-007 migration import surface wiring; DEF-59-004 (exportPackage PrivacyCheckpoint, PrivacyActor Files-外) defer_to=PrivacyActor-owning task; DEF-59-005 (staging atomic publication) defer_to=migration import surface; DEF-59-006 (canonical repo composition singleton, AppDelegate Files-外) defer_to=dependency-graph convergence; DEF-59-007 (streaming decrypt) defer_to=large-package support DEF-60-001/002 (PR #60: i18n 文案 → 3F.10; bare VectorStoreActor → Phase 4); DEF-63-001/002 RESOLVED (2026-08-12, PR #63 review-fix: validator per-file required-reason 噪声已抑制、used_reason_apis 已剥离注释); DEF-55-004 RESOLVED (2026-08-12, PR #63 review-fix: test_promptEditorConfirm waitForNonExistence 加固); DEF-78-001 (production generative provider/artifact absent) defer_to=4.0k"
+    "check_pr_review_deferred": "Scan deferred_from_pr_review at every Phase integration test; DEF-52-001 (LanguageAligner fallback strings) defer_to=3F.10; DEF-53-001 (evidence-index markdownlint MD024/MD058) defer_to=markdownlint-gate introduction; DEF-54-001 (SigLIP2 model-dependent tests skip in CI) defer_to=model-approved-for-release; DEF-55-001/002/003 (Whisper bridge per-transcribe checksum/init perf, hash duplication) defer_to=3F.5 production ingestion + single-source hash; DEF-58-001 (RET-005 AC-3 LLM rewrite) defer_to=on-device generative model; DEF-58-002 (RET-005 AC-1 FIFO history + AC-2 memoryIds injection) defer_to=3F.7 search wiring or Phase 4; DEF-58-003 (feedback generation binds active route not result generation) defer_to=3F.7; DEF-58-004 (SubjectiveScorer ignores queryText) defer_to=3F.7 real CLIP scorer; DEF-58-005 (SearchResultItem subjectiveMatch field) defer_to=3F.7/3F.10; DEF-58-006 (parse async throws unused) & DEF-58-007 (regex hoist) defer_to=Phase 4 simplification window; DEF-59-001/002/003 (migration import TaskQueueActor enqueue / AC-5 补导 / vector-FTS row-level integrity) defer_to=US-SRC-007 migration import surface wiring; DEF-59-004 (exportPackage PrivacyCheckpoint, PrivacyActor Files-外) defer_to=PrivacyActor-owning task; DEF-59-005 (staging atomic publication) defer_to=migration import surface; DEF-59-006 (canonical repo composition singleton, AppDelegate Files-外) defer_to=dependency-graph convergence; DEF-59-007 (streaming decrypt) defer_to=large-package support DEF-60-001/002 (PR #60: i18n 文案 → 3F.10; bare VectorStoreActor → Phase 4); DEF-63-001/002 RESOLVED (2026-08-12, PR #63 review-fix: validator per-file required-reason 噪声已抑制、used_reason_apis 已剥离注释); DEF-55-004 RESOLVED (2026-08-12, PR #63 review-fix: test_promptEditorConfirm waitForNonExistence 加固); DEF-78-001 (production generative provider/artifact absent) defer_to=4.0k; DEF-79-001 (direct photo creation) -> 4.0l; DEF-79-002/003 (CI generation resources, bounded manual prompt construction) -> current PR #79 / 4.0k before merge"
   },
   "deferred_from_pr_review": [
     {
@@ -1532,7 +1532,41 @@
       ],
       "recheck_trigger": "4.0l review and Phase 4 integration; preserve existing 4.0k quality/device gates",
       "decision_reference": "docs/decisions/ADR-025-photo-understanding-creation.md"
+    },
+    {
+      "id": "DEF-79-002",
+      "pr": 79,
+      "title": "Required CI does not provision the generation bundles",
+      "severity": "🔴",
+      "location": "Echo/App/AppComposition.swift:141",
+      "reason": "Six real-model CI cases fail with invalidArtifact because the ignored generation bundle is not provisioned by the required model-preparation lane. Recorded by the requested architecture review; not repaired or waived in this review-only pass.",
+      "defer_to": "Current PR #79 before merge: controlled approved artifact provisioning, integrity verification and passing required CI.",
+      "deferred_at": "2026-09-09T02:35:10.164115+00:00",
+      "last_checked_at": "2026-09-09T02:35:10.164115+00:00",
+      "tracking_status": "open",
+      "target_tasks": [
+        "4.0k"
+      ],
+      "recheck_trigger": "PR #79 fix review, required CI and Phase 4 integration",
+      "review_report": "docs/05-planning/4.0k-pr79-review.md"
+    },
+    {
+      "id": "DEF-79-003",
+      "pr": 79,
+      "title": "Manual generation renders unbounded source text before checking input budget",
+      "severity": "🟡",
+      "location": "Echo/Core/Services/StructuredGeneration.swift:50",
+      "reason": "Production prompt-construction probe accepts 1,000,000-byte source and materializes 1,000,333-byte prompt before the tokenizer byte guard. No early source/aggregate bound protects serialization. Recorded by the requested architecture review; not repaired or waived in this review-only pass.",
+      "defer_to": "Current PR #79 before merge: bound source reads and aggregate/escaped prompt construction; add targeted rejection-before-serialization tests.",
+      "deferred_at": "2026-09-09T02:35:10.164115+00:00",
+      "last_checked_at": "2026-09-09T02:35:10.164115+00:00",
+      "tracking_status": "open",
+      "target_tasks": [
+        "4.0k"
+      ],
+      "recheck_trigger": "PR #79 fix review, required CI and Phase 4 integration",
+      "review_report": "docs/05-planning/4.0k-pr79-review.md"
     }
   ],
-  "last_updated": "2026-09-09T01:59:43.986313+00:00"
+  "last_updated": "2026-09-09T02:35:10.164115+00:00"
 }
