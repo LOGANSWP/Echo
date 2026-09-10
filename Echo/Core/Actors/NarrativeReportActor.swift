@@ -12,6 +12,7 @@
 // Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
+// PR #80 review / US-SYN-004: bounded candidate pages preserve usable input and omitted coverage.
 import Foundation
 
 nonisolated public protocol NarrativeReportGenerating: Sendable {
@@ -663,8 +664,52 @@ public actor NarrativeReportActor {
                 omittedPartitions: omittedPartitions
             )
         }
+        var preparedRows: [[String: DBValue]] = []
+        var waitingPhotos = false
+        var offset = 0
+        var eligibleCount: DBValue = .int(0)
+        // Page through candidates without letting unprepared photos consume the
+        // existing 256-source input bound. Each page and the retained input are bounded.
+        while preparedRows.count < NarrativeReportLimits.maximumSources {
+            try Task.checkCancellation()
+            let rows = try await readReportCandidatePage(period: period, allowedTypes: allowedTypes, offset: offset)
+            if offset == 0 { eligibleCount = rows.first?["eligibleSourceCount"] ?? .int(0) }
+            guard !rows.isEmpty else { break }
+            offset += rows.count
+            for var row in rows {
+                if row["sourceType"]?.stringValue == "photo",
+                    let raw = row["memoryId"]?.stringValue, let id = UUID(uuidString: raw) {
+                    let source = try await sourceRepository.loadCreationSource(
+                        memoryID: id,
+                        maximumTextBytes: GenerationInputBudget.maximumBytes
+                    )
+                    let text = source?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    if text.isEmpty { waitingPhotos = true; continue }
+                    row["canonicalText"] = .text(String(String.UnicodeScalarView(text.unicodeScalars.prefix(512))))
+                    row["updatedAt"] = .double(source?.revision ?? 0)
+                }
+                row["eligibleSourceCount"] = eligibleCount
+                preparedRows.append(row)
+                if preparedRows.count == NarrativeReportLimits.maximumSources { break }
+            }
+            if rows.count < NarrativeReportLimits.maximumSources { break }
+        }
+        if preparedRows.isEmpty, waitingPhotos { throw NarrativeReportError.resourceDeferred }
+        return NarrativeReportAggregator.prepare(
+            period: period,
+            rows: preparedRows,
+            authorizedSourceTypes: policy.authorizedSourceTypes,
+            omittedPartitions: omittedPartitions
+        )
+    }
+
+    private func readReportCandidatePage(
+        period: NarrativeReportPeriod,
+        allowedTypes: [String],
+        offset: Int
+    ) async throws -> [[String: DBValue]] {
         let placeholders = Array(repeating: "?", count: allowedTypes.count).joined(separator: ",")
-        let rows = try await database.executeQuery(
+        return try await database.executeQuery(
             sql: """
                 SELECT memoryId, substr(canonicalText, 1, 512) AS canonicalText, sourceType, updatedAt,
                        COALESCE(originalTimestamp, createdAt) AS memoryTimestamp,
@@ -678,35 +723,13 @@ public actor NarrativeReportActor {
                   AND (sourceType = 'photo' OR length(trim(COALESCE(canonicalText, ''))) > 0)
                   AND NOT EXISTS (SELECT 1 FROM ExcludedAssets e WHERE e.assetId = Memory.sourceLocator)
                 ORDER BY sourceType ASC, memoryTimestamp ASC, memoryId ASC
-                LIMIT 256
+                LIMIT ? OFFSET ?
                 """,
             bindings: [
                 .double(period.coverageStart.timeIntervalSince1970),
                 .double(period.endInstant.timeIntervalSince1970),
             ] + allowedTypes.map(DBBinding.text)
-        )
-        var preparedRows: [[String: DBValue]] = []
-        var waitingPhotos = false
-        for var row in rows {
-            if row["sourceType"]?.stringValue == "photo",
-                let raw = row["memoryId"]?.stringValue, let id = UUID(uuidString: raw) {
-                let source = try await sourceRepository.loadCreationSource(
-                    memoryID: id,
-                    maximumTextBytes: GenerationInputBudget.maximumBytes
-                )
-                let text = source?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                if text.isEmpty { waitingPhotos = true; continue }
-                row["canonicalText"] = .text(String(String.UnicodeScalarView(text.unicodeScalars.prefix(512))))
-                row["updatedAt"] = .double(source?.revision ?? 0)
-            }
-            preparedRows.append(row)
-        }
-        if preparedRows.isEmpty, waitingPhotos { throw NarrativeReportError.resourceDeferred }
-        return NarrativeReportAggregator.prepare(
-            period: period,
-            rows: preparedRows,
-            authorizedSourceTypes: policy.authorizedSourceTypes,
-            omittedPartitions: omittedPartitions
+                + [.int(Int64(NarrativeReportLimits.maximumSources)), .int(Int64(offset))]
         )
     }
 

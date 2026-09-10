@@ -29,8 +29,8 @@ private actor PhotoReportProbe: NarrativeReportGenerating {
 
 @Suite("4.0l Photo Report", .serialized)
 struct PhotoReportTests {
-    @Test("AC-8: pending photos wait and ready photo material publishes", arguments: [false, true])
-    func test_AC8_pendingIsNotNoData(ready: Bool) async throws {
+    @Test("AC-8: pending photos wait and ready photo material publishes", arguments: [0, 1, 257])
+    func test_AC8_pendingIsNotNoData(count: Int) async throws {
         let path = FileManager.default.temporaryDirectory.appendingPathComponent("photo-report-\(UUID()).sqlite")
         defer {
             for suffix in ["", "-wal", "-shm"] { try? FileManager.default.removeItem(atPath: path.path + suffix) }
@@ -64,7 +64,15 @@ struct PhotoReportTests {
                 .double(baseline.timeIntervalSince1970 + 100),
             ]
         )
-        if ready {
+        if count == 257 {
+            for index in 0..<256 {
+                try await db.executeWrite(
+                    sql: "INSERT INTO Memory (memoryId, sourceLocator, sourceType, createdAt, updatedAt) VALUES (?, ?, 'photo', ?, 1)",
+                    bindings: [.text(UUID().uuidString), .text("photo:pending-\(index)"), .double(baseline.timeIntervalSince1970 + Double(index) / 10)]
+                )
+            }
+        }
+        if count > 0 {
             try await db.executeWrite(
                 sql: "INSERT INTO Representation VALUES (?, ?, 'visionDense', 'siglip2-v1', 'source-v1')",
                 bindings: [.text(UUID().uuidString), .text(id.uuidString)]
@@ -90,6 +98,7 @@ struct PhotoReportTests {
                 try await Task.sleep(for: .milliseconds(10))
             }
             #expect(await generator.requests.first?.sources.first?.text == "A red circle")
+            #expect(await generator.requests.first?.coverage.truncatedSourceCount == (count == 257 ? 256 : 0))
             #expect(try await db.executeQuery(sql: "SELECT 1 FROM NarrativeReport", bindings: []).count == 1)
             #expect(try await db.executeQuery(sql: "SELECT 1 FROM PendingOperations", bindings: []).isEmpty)
             await db.close()

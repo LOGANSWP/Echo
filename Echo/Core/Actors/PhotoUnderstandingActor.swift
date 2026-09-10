@@ -3,6 +3,7 @@
 // Spec: US-ING-004 AC-6/7/8; US-SYN-003 AC-7; ADR-025
 // Task: 4.0l - Durable bounded photo preparation
 // Architecture: PrivacyCheckpoint, TaskQueue, versioned values and SQLite publication
+// PR #80 review: queue ownership distinguishes resource deferral from active preparation.
 // Generated: 2026-09-09
 // ==========================================
 
@@ -121,6 +122,13 @@ public actor PhotoUnderstandingActor {
         guard let row = try await database.photoJobRow(memoryID: memoryID) else { return .unprepared }
         let item = try await currentItem(memoryID)
         guard Self.matches(row, item) else { return .unprepared }
+        if row["state"]?.stringValue == "queued",
+            !scheduling.contains(memoryID), !(await queue.ownedTaskIDs()).contains(Self.taskID(memoryID)),
+            try await progress.load(taskId: Self.taskID(memoryID)) == nil {
+            // Resource deferral has unwound and discarded its checkpoint. A selected-photo
+            // access or explicit retry can enqueue it again; reads never start inference.
+            return .unprepared
+        }
         return PhotoUnderstandingStatus(rawValue: row["state"]?.stringValue ?? "") ?? .unavailable
     }
 
