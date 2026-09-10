@@ -23,7 +23,7 @@ nonisolated struct CreationLibraryRequest: Codable, Sendable, Equatable {
 }
 
 nonisolated enum CreationLibraryState: String, Codable, Sendable {
-    case submitting, queued, running, completed, failed, cancelled, interrupted
+    case submitting, queued, running, completed, failed, cancelled, interrupted, deferred
 }
 
 nonisolated struct CreationLibraryRecord: Identifiable, Sendable, Equatable {

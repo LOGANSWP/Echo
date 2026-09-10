@@ -108,6 +108,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
         case idle
         /// 生成中 — ProgressView
         case generating
+        case waitingForResources
         /// 生成完成 — 展示内容 + 操作按钮
         case generated
         /// 空态 — 无匹配源记忆
@@ -659,6 +660,10 @@ final class CreationViewModel: CreationSharePresentationReporting {
                         : "Generation is currently unavailable. Please try again."))
                     return
 
+                case .deferred:
+                    viewState = .waitingForResources
+                    return
+
                 case .completed: break
                 }
                 try await Task.sleep(for: .seconds(1))
@@ -1052,7 +1057,9 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     /// 重试 (L2 恢复路径) — error → generating; empty → generating。
     func retry() {
-        guard case .error = viewState else { return }
+        if viewState != .waitingForResources {
+            guard case .error = viewState else { return }
+        }
         if let creationLibrary, let libraryRequestID {
             viewState = .generating
             generateTask?.cancel()

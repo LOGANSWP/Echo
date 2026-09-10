@@ -193,6 +193,20 @@ struct CreationView: View {
         case .idle:
             idleState
 
+        case .waitingForResources:
+            VStack(spacing: EchoSpacingToken.normal.points) {
+                Text("Waiting for device resources")
+                Text("Generation is paused for device resources. Continue when the device is ready.")
+                    .foregroundStyle(.secondary)
+                Button("Continue") { viewModel.retry() }
+                    .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                    .accessibilityIdentifier("creation-continue-resources")
+                Button("View Creation Library") {
+                    if returnsToLibrary { dismiss() } else { isLibraryPresented = true }
+                }
+            }
+            .padding()
+
         case .generating:
             generatingState
 

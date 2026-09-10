@@ -2,6 +2,7 @@
 // Spec: docs/01-spec/用户故事与验收标准规格书.md -> US-SYN-003 AC-8/9/10; ADR-026
 // Task: 4.0m - Application-owned creation queue
 // Architecture: PrivacyCheckpoint, typed queue jobs and durable publication
+// PR #81: same-ID delete barrier, honest resource deferral (AC-8/9/10).
 // Generated: 2026-09-09
 import Foundation
 
@@ -12,6 +13,7 @@ actor CreationLibraryActor {
     private let repository: CanonicalMemoryRepositoryActor
     private let pipeline: CreativePipeline
     private var reservations: Set<UUID> = []
+    private var deletingIDs: Set<UUID> = []
 
     init(
         database: DatabaseManager,
@@ -43,7 +45,7 @@ actor CreationLibraryActor {
     func submit(id: UUID, template: CreativeTemplate, sourceIDs: [UUID]) async throws {
         let checkpoint = await privacy.validate(operation: .search, traceID: id.uuidString)
         guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
-        guard reservations.insert(id).inserted else { return }
+        guard !deletingIDs.contains(id), reservations.insert(id).inserted else { return }
         defer { reservations.remove(id) }
         if try await list().contains(where: { $0.id == id }) { return }
         let policy = await privacy.getPolicy()
@@ -54,10 +56,10 @@ actor CreationLibraryActor {
     func retry(id: UUID) async throws {
         let checkpoint = await privacy.validate(operation: .search, traceID: id.uuidString)
         guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
-        guard reservations.insert(id).inserted else { return }
+        guard !deletingIDs.contains(id), reservations.insert(id).inserted else { return }
         defer { reservations.remove(id) }
         guard let record = try await list().first(where: { $0.id == id }),
-            [.failed, .cancelled, .interrupted].contains(record.state)
+            [.failed, .cancelled, .interrupted, .deferred].contains(record.state)
         else { throw GenerationRuntimeError.invalidRequest }
         if record.errorCode == "model-unavailable" { try await pipeline.retryRuntime(traceID: id.uuidString) }
         let policy = await privacy.getPolicy()
@@ -77,7 +79,16 @@ actor CreationLibraryActor {
 
     func delete(id: UUID) async throws {
         let checkpoint = await privacy.validate(operation: .delete, traceID: id.uuidString)
-        guard checkpoint.isAllowed, try await list().contains(where: { $0.id == id }) else { throw GenerationRuntimeError.privacyDenied }
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        guard deletingIDs.insert(id).inserted else { throw GenerationRuntimeError.busy }
+        defer { deletingIDs.remove(id) }
+        // Block new submissions/retries and let an already accepted reservation finish.
+        // Cancellation then sees its actual queue ownership before the row is removed.
+        while reservations.contains(id) { try await Task.sleep(for: .milliseconds(10)) }
+        let final = await privacy.validate(operation: .delete, traceID: id.uuidString)
+        guard final.isAllowed, try await list().contains(where: { $0.id == id }) else {
+            throw GenerationRuntimeError.privacyDenied
+        }
         _ = await queue.cancel(taskId: Self.taskID(id))
         try await database.executeWrite(sql: "DELETE FROM CreationLibrary WHERE id=?", bindings: [.text(id.uuidString)])
     }
@@ -142,6 +153,10 @@ actor CreationLibraryActor {
     }
 
     private func recordFailure(_ request: CreationLibraryRequest, error: Error) async throws {
+        if error as? NarrativeReportError == .resourceDeferred {
+            try await database.updateCreationState(id: request.id, state: .deferred)
+            return
+        }
         let code: String
         switch error {
         case GenerationRuntimeError.deadline: code = "deadline"

@@ -32,7 +32,7 @@ final class CreationLibraryViewModel {
         records.filter {
             switch filter {
             case .all: true
-            case .active: [.submitting, .queued, .running].contains($0.state)
+            case .active: [.submitting, .queued, .running, .deferred].contains($0.state)
             case .completed: $0.state == .completed
             case .failed: [.failed, .cancelled, .interrupted].contains($0.state)
             }
@@ -195,8 +195,8 @@ struct CreationLibraryView: View {
                         if let code = record.errorCode { Text(errorLabel(code)).font(.caption) }
                     }
                 }
-                if [.failed, .cancelled, .interrupted].contains(record.state) {
-                    Button("Retry") { Task { await model.retry(record.id) } }
+                if [.failed, .cancelled, .interrupted, .deferred].contains(record.state) {
+                    Button(record.state == .deferred ? "Continue" : "Retry") { Task { await model.retry(record.id) } }
                         .buttonStyle(.borderless)
                         .accessibilityIdentifier("creation-library-retry-\(record.id)")
                         .disabled(model.loading || model.deletingIDs.contains(record.id))
@@ -226,6 +226,7 @@ struct CreationLibraryView: View {
 
     private func stateLabel(_ state: CreationLibraryState) -> LocalizedStringKey {
         switch state {
+        case .deferred: "Waiting for device resources"
         case .submitting: "Submitting"
         case .queued: "Queued"
         case .running: "Creating"

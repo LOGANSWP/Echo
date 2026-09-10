@@ -8512,6 +8512,38 @@
           }
         }
       }
+    },
+    "Waiting for device resources": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for device resources"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待设备资源"
+          }
+        }
+      }
+    },
+    "Generation is paused for device resources. Continue when the device is ready.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generation is paused for device resources. Continue when the device is ready."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "因设备资源限制，创作已暂缓。设备就绪后可继续。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

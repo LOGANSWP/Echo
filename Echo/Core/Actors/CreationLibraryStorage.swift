@@ -2,6 +2,7 @@
 // Spec: docs/01-spec/用户故事与验收标准规格书.md -> US-SYN-003 AC-8/9/10; ADR-026
 // Task: 4.0m - Atomic creation persistence and deletion
 // Architecture: DatabaseManager isolation and current policy transactions
+// PR #81 / AC-10: normalize supported aliases at the policy boundary.
 // Generated: 2026-09-09
 import Foundation
 
@@ -105,7 +106,7 @@ extension DatabaseManager {
         }
         for id in request.sourceIDs {
             guard let row = try executeQuery(sql: "SELECT sourceType FROM Memory m WHERE memoryId=? AND NOT EXISTS(SELECT 1 FROM ExcludedAssets e WHERE e.assetId=m.sourceLocator)", bindings: [.text(id.uuidString)]).first,
-                let type = row["sourceType"]?.stringValue, allowed.contains(type)
+                let type = row["sourceType"]?.stringValue, allowed.contains(SearchPipeline.normalizeSourceType(type))
             else { throw GenerationRuntimeError.privacyDenied }
         }
     }
