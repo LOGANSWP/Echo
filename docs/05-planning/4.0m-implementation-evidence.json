@@ -1,6 +1,6 @@
 {
   "task": "4.0m",
-  "updatedAt": "2026-09-10T01:03:05.506650+00:00",
+  "updatedAt": "2026-09-10T01:06:21.875536+00:00",
   "baselineCommit": "0ec541d",
   "baselinePR": "https://github.com/logan-suu/Echo/pull/80",
   "status": "review",
@@ -184,7 +184,7 @@
       "reopenedResultSnapshot": 655
     },
     "qualityFollowUp": "Sparse red-object output has repeated lines. This new functional regression does not impose distinct-line quality; all existing subject checks retain their previous assertions.",
-    "limits": "Same approved artifacts and budgets; no new download. Functional simulator evidence only, no full quality/device/release acceptance. Current changes uncommitted.",
+    "limits": "Same approved artifacts and budgets; no new download. Functional simulator evidence only, no full quality/device/release acceptance. Included in draft PR #81.",
     "cleanup": {
       "removedIntermediateResults": [
         {
@@ -242,7 +242,7 @@
       "completedCreationsRetained": 3,
       "result": "passed"
     },
-    "limits": "Report deletion and active-job deletion tested in isolated fixtures; actual simulator deletion exercised a cancelled test creation. No full phase/coverage or release acceptance. Uncommitted."
+    "limits": "Report deletion and active-job deletion tested in isolated fixtures; actual simulator deletion exercised a cancelled test creation. No full phase/coverage or release acceptance. Included in draft PR #81."
   },
   "precommit": {
     "at": "2026-09-10T01:03:05.506650+00:00",
@@ -255,5 +255,15 @@
     "fullCoverageMeasured": false,
     "basePR": 80,
     "deliveryAuthorization": "User explicitly invoked commit-pr-echo"
+  },
+  "delivery": {
+    "implementationCommit": "468f597",
+    "pr": 81,
+    "url": "https://github.com/logan-suu/Echo/pull/81",
+    "base": "dev-1.0",
+    "draft": true,
+    "dependencyPR": 80,
+    "ci": "Build, Lint & Test triggered; not yet complete",
+    "merged": false
   }
 }
