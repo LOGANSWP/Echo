@@ -20,6 +20,8 @@ private actor PreparationCaptionProvider: PhotoCaptionGenerating {
     private(set) var callCount = 0
     private var held = false
     private var fails = false
+    private var defers = false
+    func setDeferred(_ value: Bool) { defers = value }
     func hold() { held = true }
     func release(failing: Bool = false) {
         held = false
@@ -28,6 +30,7 @@ private actor PreparationCaptionProvider: PhotoCaptionGenerating {
     func describe(imageData: Data, traceID: String) async throws -> PhotoCaptionOutput {
         callCount += 1
         while held { try await Task.sleep(for: .milliseconds(10)) }
+        if defers { throw NarrativeReportError.resourceDeferred }
         if fails { throw GenerationRuntimeError.outputLimit }
         return PhotoCaptionOutput(text: "A red circle", language: "en-US", outputTokenCount: 4)
     }
@@ -147,6 +150,57 @@ struct PhotoPreparationQueueTests {
             _ = try await preparation.schedule(memoryID: id, traceID: "no-automatic-replay")
             #expect(await provider.callCount == (interruption == .queuedRevoked ? 0 : 1))
         }
+        await db.close()
+    }
+
+    @Test("AC-8: resource deferral becomes selectable for explicit recovery")
+    @MainActor func test_AC8_resourceRecovery() async throws {
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent("photo-resource-\(UUID()).sqlite")
+        defer {
+            for suffix in ["", "-wal", "-shm"] { try? FileManager.default.removeItem(atPath: path.path + suffix) }
+        }
+        let db = DatabaseManager(databaseURL: path)
+        try await db.open()
+        let privacy = PrivacyActor(db: db)
+        try await privacy.updatePolicy(UserPolicy(preferredLanguage: "en-US", authorizedSourceTypes: ["photo"]))
+        let progress = ProgressActor(db: db)
+        let queue = TaskQueueActor(progressActor: progress)
+        let provider = PreparationCaptionProvider()
+        await provider.setDeferred(true)
+        let service = PhotoUnderstandingActor(
+            database: db, privacy: privacy, queue: queue, progress: progress,
+            pixelSource: PreparationPixelSource(), provider: provider, ocr: PreparationOCR()
+        )
+        let id = UUID()
+        try await db.executeWrite(
+            sql: "INSERT INTO Memory (memoryId, sourceLocator, sourceType, createdAt, updatedAt) VALUES (?, 'photo:resource', 'photo', 1, 1)",
+            bindings: [.text(id.uuidString)]
+        )
+        try await db.executeWrite(
+            sql: "INSERT INTO Representation VALUES (?, ?, 'visionDense', 'siglip2-v1', 'source-v1')",
+            bindings: [.text(UUID().uuidString), .text(id.uuidString)]
+        )
+        let model = PhotoPreparationViewModel(memoryID: id, service: service)
+        await model.prepareOnAccess()
+        for _ in 0..<200 {
+            if await queue.ownedTaskIDs().isEmpty { break }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        await model.refresh()
+        #expect(model.state == .completed(.unprepared))
+        #expect(try await progress.loadAll().isEmpty)
+        #expect(try await db.executeQuery(sql: "SELECT 1 FROM PendingOperations", bindings: []).isEmpty)
+        #expect(await provider.callCount == 1)
+        await provider.setDeferred(false)
+        await model.prepare()
+        for _ in 0..<200 {
+            if await queue.ownedTaskIDs().isEmpty { break }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        await model.refresh()
+        #expect(model.state == .completed(.ready))
+        #expect(model.canCreate)
+        #expect(await provider.callCount == 2)
         await db.close()
     }
 

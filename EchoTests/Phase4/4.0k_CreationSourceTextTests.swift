@@ -74,8 +74,11 @@ struct CreationSourceTextTests {
             for _ in 0..<100 where model.viewState == .generating {
                 try await Task.sleep(for: .milliseconds(10))
             }
-            #expect(model.viewState == .empty)
-            #expect(model.requiresSourceText)
+            // ADR-025: missing photo material keeps template selection open and generation disabled.
+            #expect(model.viewState == .idle)
+            #expect(!model.canGenerate)
+            #expect(!model.photoMaterialsReady)
+            #expect(await provider.requests.isEmpty)
 
         case .description:
             let output = try await pipeline.generate(template: .report, sources: [source], traceID: "photo-description")
