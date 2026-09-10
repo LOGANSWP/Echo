@@ -1535,7 +1535,7 @@
       "reason": "User Live Review identified a missing functional input boundary: images have no canonical text, OCR is indexed without a creation-text path, and the approved runtime accepts text only. Manual descriptions and successful text generation do not prove automatic photo understanding.",
       "defer_to": "4.0l on-device photo understanding and direct creation/report inputs before Phase 4 validation/RC",
       "deferred_at": "2026-09-09T01:59:43.986313+00:00",
-      "last_checked_at": "2026-09-09T19:08:57.980935+00:00",
+      "last_checked_at": "2026-09-10T01:02:35.945828+00:00",
       "tracking_status": "open",
       "owners": [
         "On-device ML Lead"
@@ -1555,7 +1555,7 @@
       "recheck_trigger": "4.0l review and Phase 4 integration; preserve existing 4.0k quality/device gates",
       "decision_reference": "docs/decisions/ADR-025-photo-understanding-creation.md",
       "post_merge_review": "PR #79 is merged; task 4.0l is dependency-ready, with no photo-understanding implementation or new model approval implied. This finding remains open.",
-      "research_status": "Exact CPU supplement approved (ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367); 20 files / 844124058 bytes verified. Real PhotoKit no-text photo passed ingestion, local caption, creation, source/export authorization and persisted monthly report. Normal iOS 26 App also passed source navigation, exact body-only copy and PDF presentation audit. iOS 18 limited-picker selection and automatic duplicate-notification scheduling verification remain outstanding; retain open. See 4.0l-implementation-evidence.json and 4.0l-live-functional-review.json. Latest user revision delivered: only detail/selected creation requests photo understanding. iOS18 upgrade removed 14 legacy queued jobs while retaining 39 photos/23 materials; opening the synthetic red-circle detail queued exactly one onDemand job and completed. 7 related tests passed. See 4.0l-on-demand-evidence.json; full dual-device sharing/qualification remains separate."
+      "research_status": "Exact CPU supplement approved (ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367); 20 files / 844124058 bytes verified. Real PhotoKit no-text photo passed ingestion, local caption, creation, source/export authorization and persisted monthly report. Normal iOS 26 App also passed source navigation, exact body-only copy and PDF presentation audit. iOS 18 limited-picker selection and automatic duplicate-notification scheduling verification remain outstanding; retain open. See 4.0l-implementation-evidence.json and 4.0l-live-functional-review.json. Latest user revision delivered: only detail/selected creation requests photo understanding. iOS18 upgrade removed 14 legacy queued jobs while retaining 39 photos/23 materials; opening the synthetic red-circle detail queued exactly one onDemand job and completed. 7 related tests passed. See 4.0l-on-demand-evidence.json; full dual-device sharing/qualification remains separate. Task 4.0m follow-up: iOS18 real dog letter/poem and red-object poem now complete and persist without a handwritten description; source navigation and restart readback verified. The red-object output-budget failure was traced to JSON formatting whitespace and fixed by compact decoding. See 4.0m-implementation-evidence.json redCircleFunctionalFix. Keep open for the remaining complete dual-device photo/share acceptance and PR #80 review; this commit does not claim all deferred acceptance evidence."
     },
     {
       "id": "DEF-79-002",

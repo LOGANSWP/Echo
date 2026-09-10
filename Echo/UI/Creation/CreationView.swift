@@ -47,17 +47,22 @@ struct CreationView: View {
 
     @State private var viewModel: CreationViewModel
     @State private var reportPendingDeletion: UUID?
+    @State private var isLibraryPresented = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @Environment(\.echoDesignProfile) private var designProfile
 
-    init(viewModel: CreationViewModel? = nil) {
+    private let returnsToLibrary: Bool
+
+    init(viewModel: CreationViewModel? = nil, returnsToLibrary: Bool = false) {
+        self.returnsToLibrary = returnsToLibrary
         _viewModel = State(
             initialValue: viewModel
                 ?? CreationViewModel(
                     creativePipeline: AppComposition.shared.creativePipeline,
                     exportCoordinator: LiveAppAdapters.makeCreationExportCoordinator(),
-                    narrativeReportActor: AppComposition.shared.narrativeReportActor
+                    narrativeReportActor: AppComposition.shared.narrativeReportActor,
+                    creationLibrary: AppComposition.shared.creationLibraryActor
                 )
         )
     }
@@ -85,6 +90,16 @@ struct CreationView: View {
         }
         .sheet(isPresented: $viewModel.isPromptEditorPresented) {
             PromptEditorSheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $isLibraryPresented) {
+            NavigationStack {
+                CreationLibraryView()
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { isLibraryPresented = false }
+                        }
+                    }
+            }
         }
         // 导出格式选择 (US-SYN-003 AC-3)
         .confirmationDialog(
@@ -373,7 +388,7 @@ struct CreationView: View {
                             : EchoColorToken.secondaryText.color
                     )
 
-                Text(template.displayName)
+                Text(LocalizedStringKey(template.displayName))
                     .font(EchoTypographyToken.body.font)
                     .foregroundStyle(EchoColorToken.primaryText.color)
 
@@ -429,10 +444,21 @@ struct CreationView: View {
                 .font(EchoTypographyToken.metadata.font)
                 .foregroundStyle(EchoColorToken.secondaryText.color)
 
+            if viewModel.libraryRequestID != nil {
+                Text("You can browse Echo while this creation continues.")
+                    .font(.footnote)
+                if returnsToLibrary {
+                    Button("View Creation Library") { dismiss() }
+                        .accessibilityIdentifier("creation-library-return")
+                } else {
+                    Button("View Creation Library") { isLibraryPresented = true }
+                        .accessibilityIdentifier("creation-library-open-from-creation")
+                }
+            }
             Spacer().frame(height: 80)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .accessibilityLabel("Generating creation")
+        .accessibilityElement(children: .contain)
     }
 
     // MARK: - Generated Content

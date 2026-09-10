@@ -54,6 +54,7 @@ struct BackgroundTaskModel: Identifiable, Sendable, Equatable {
         case .modelLoad:      return "Loading AI model"
         case .narrativeReport: return "Creating narrative report"
         case .photoUnderstanding: return "Preparing photo material"
+        case .manualCreation: return "Creating"
         case .unknown:        return "Unsupported saved task"
         }
     }
@@ -70,6 +71,7 @@ struct BackgroundTaskModel: Identifiable, Sendable, Equatable {
         case .modelLoad:      return "cpu"
         case .narrativeReport: return "book.pages"
         case .photoUnderstanding: return "photo.badge.checkmark"
+        case .manualCreation: return "square.and.pencil"
         case .unknown:        return "exclamationmark.triangle"
         }
     }

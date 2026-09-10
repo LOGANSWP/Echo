@@ -165,18 +165,26 @@ public actor BundledGenerationActor: StructuredLLMProvider {
                 executionScope: request.executionScope
             )
             let referenceMap = GenerationReferenceMap(memoryIDs: request.allowedMemoryIDs)
+            let compactPoem = request.outputForm == .poem && request.executionScope == .manualCreation && request.preferredLanguage == "zh-Hans"
             let grammar = request.referenceEncoding == .requestAliasV1
                 ? try GenerationEnvelopeGrammar(
-                    allowedAliases: referenceMap.aliases, requiresPoem: request.outputForm == .poem)
+                    allowedAliases: referenceMap.aliases, requiresPoem: request.outputForm == .poem, compactPoem: compactPoem)
                 : try GenerationEnvelopeGrammar(
                     allowedIDs: request.allowedMemoryIDs.map { $0.uuidString.lowercased() },
-                    requiresPoem: request.outputForm == .poem
+                    requiresPoem: request.outputForm == .poem,
+                    compactPoem: compactPoem
                 )
             var decoder = GenerationGrammarDecoder(
                 grammar: grammar,
                 tokenBytes: tokenizer.bytesByToken.filter { $0.key < 151_643 },
                 eosIDs: [151_645, 151_643]
             )
+            defer {
+                let whitespaceBytes = decoder.output.filter { [9, 10, 13, 32].contains($0) }.count
+                Logger(subsystem: "com.echo.Echo", category: "GenerationTiming").notice(
+                    "Generation structure: bytes=\(decoder.output.count, privacy: .public) whitespaceBytes=\(whitespaceBytes, privacy: .public) complete=\(decoder.ended, privacy: .public) compactPoem=\(compactPoem, privacy: .public)"
+                )
+            }
             try checkMemory()
             // All non-Sendable Core ML objects stay on this actor. Synchronous prediction
             // has an SDK-supported state overload; no unsafe conformance or actor escape.

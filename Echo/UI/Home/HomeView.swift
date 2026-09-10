@@ -198,6 +198,12 @@ struct HomeView: View {
         .navigationBarTitleDisplayMode(.large)
         .modifier(DisableLargeTitleScroll())
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                NavigationLink { CreationLibraryView() } label: {
+                    Label("Creation Library", systemImage: "books.vertical")
+                }
+                .accessibilityIdentifier("creation-library-open")
+            }
             // 后台任务面板入口 (US-SYS-001 AC-1: 顶部状态栏实时显示活跃任务)
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

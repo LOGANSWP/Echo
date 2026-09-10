@@ -24,7 +24,7 @@ import Foundation
 // MARK: - Grounded Creation Types
 
 /// 创作模板类型 (US-SYN-003 AC-1: 信件/报告/诗歌/时间线)。
-public enum CreativeTemplate: String, Sendable, Equatable {
+public enum CreativeTemplate: String, Sendable, Equatable, Codable {
     case letter
     case report
     case poem
@@ -67,7 +67,7 @@ nonisolated public struct CreativeSource: Sendable, Equatable {
 }
 
 /// 溯源锚点 — `[🔗 MemoryID:xxx]` (US-SYN-002 AC-1)。
-nonisolated public struct SourceAnchor: Sendable, Equatable {
+nonisolated public struct SourceAnchor: Sendable, Equatable, Codable {
     /// 源记忆 ID
     nonisolated public let memoryID: UUID
     /// Canonical source type is carried internally for current-policy revalidation.
@@ -101,7 +101,7 @@ nonisolated public enum GroundingStatus: String, Sendable, Codable, Equatable {
 }
 
 /// grounded 生成段落 — AI 生成文本 + 溯源锚点 (US-SYN-002/003 AC-2)。
-nonisolated public struct GroundedParagraph: Sendable, Equatable, Identifiable {
+nonisolated public struct GroundedParagraph: Sendable, Equatable, Identifiable, Codable {
     /// 段落唯一标识（确定性）
     nonisolated public let id: UUID
     /// 段落文本
@@ -125,7 +125,7 @@ nonisolated public struct GroundedParagraph: Sendable, Equatable, Identifiable {
 }
 
 /// grounded 创作输出 — 含 source anchors (ADR-013 决策 3)。
-nonisolated public struct CreativeOutput: Sendable, Equatable {
+nonisolated public struct CreativeOutput: Sendable, Equatable, Codable {
     /// 选中的创作模板
     nonisolated public let template: CreativeTemplate
     /// 结果标题（叙事报告含周期, US-SYN-004 AC-5）

@@ -34,7 +34,29 @@ struct CreationPoemIntegrationTests {
         try await verifyPoem(language: "zh-Hans", subject: subject, sourceText: sourceText)
     }
 
-    private func verifyPoem(language: String, subject: String, sourceText: String) async throws {
+    @Test("AC-1/2: compact manual Chinese poem completes with the approved budget")
+    func test_AC1_manualPhotoPoem() async throws {
+        try await verifyPoem(
+            language: "zh-Hans", subject: "dog",
+            sourceText: "In this image we can see a dog standing on the sand. In the background there are mountains.",
+            scope: .manualCreation)
+    }
+
+    @Test("AC-1/2: a minimal synthetic red-object caption completes manual creation")
+    func test_AC1_manualRedObjectPoem() async throws {
+        try await verifyPoem(
+            language: "zh-Hans", subject: "red-object",
+            sourceText: "Photo\nIn this image there is a red color object.",
+            scope: .manualCreation, checksDistinctLines: false)
+    }
+
+    private func verifyPoem(
+        language: String,
+        subject: String,
+        sourceText: String,
+        scope: GenerationExecutionScope = .standard,
+        checksDistinctLines: Bool = true
+    ) async throws {
         let database = DatabaseManager(databaseURL: FileManager.default.temporaryDirectory
             .appendingPathComponent("real-poem-\(UUID().uuidString).sqlite"))
         try await database.open()
@@ -52,12 +74,13 @@ struct CreationPoemIntegrationTests {
             ],
             sourceTypes: ["photo"],
             context: .init(language: language, traceID: "synthetic-poem",
-                           deadline: ProcessInfo.processInfo.systemUptime + 60, terminology: TerminologyTable(entries: [:])))
+                           deadline: ProcessInfo.processInfo.systemUptime + scope.callSeconds,
+                           terminology: TerminologyTable(entries: [:]), executionScope: scope))
         let result = try await runtime.generate(request: request)
         let paragraphs = try CreativePipeline.parseParagraphs(
             from: result.envelope,
             allowedMemoryIDs: [id], sourceTypes: [id: "photo"])
-        #expect(paragraphs.count == 4)
+        #expect(paragraphs.count == (scope == .manualCreation ? 3 : 4))
         let body = paragraphs.map(\.text).joined(separator: "\n")
         #expect(CreativeGenerationLimits.poemLineRange.contains(body.split(whereSeparator: \.isNewline).count),
                 "Synthetic poem envelope: \(result.envelope)")
@@ -67,7 +90,9 @@ struct CreationPoemIntegrationTests {
             // A regression for this visual subject, not an automatic literary-quality score.
             // The test metadata must not replace the image's subject in the poem.
             #expect(!body.contains("测试") && !body.contains("合成"), "Synthetic poem: \(body)")
-            #expect(Set(paragraphs.map(\.text)).count == paragraphs.count)
+            if checksDistinctLines {
+                #expect(Set(paragraphs.map(\.text)).count == paragraphs.count)
+            }
             #expect(!body.contains("叶尖") && !body.contains("绿意"), "Demonstration leaked into poem: \(body)")
             if subject == "rain" {
                 #expect(!body.contains("雨停"), "The source does not record the rain stopping: \(body)")

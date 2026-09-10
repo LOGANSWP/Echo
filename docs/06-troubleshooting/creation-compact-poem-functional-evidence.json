@@ -1,0 +1,10 @@
+{
+  "detected": "uncertain",
+  "elapsed": 70.04619054167415,
+  "envelope": "{\"paragraphs\":[{\"text\":\"狗站在沙地上，背景是山脉。\",\"sourceMemoryIDs\":[\"AA8FF0CC-2736-573D-A190-FC7FFB943844\"]},{\"text\":\"沙地上站着一只狗，背景是山脉。\",\"sourceMemoryIDs\":[\"AA8FF0CC-2736-573D-A190-FC7FFB943844\"]},{\"text\":\"狗在沙地上站立，背景是山脉。\",\"sourceMemoryIDs\":[\"AA8FF0CC-2736-573D-A190-FC7FFB943844\"]},{\"text\":\"沙地上有一只狗，背景是山脉。\",\"sourceMemoryIDs\":[\"AA8FF0CC-2736-573D-A190-FC7FFB943844\"]}],\"schemaVersion\":1}",
+  "inputTokens": 163,
+  "language": "zh-Hans",
+  "matches": true,
+  "outputTokens": 94,
+  "scope": "Synthetic test only. Four cited Chinese paragraphs, repetitive descriptive prose; literary quality not passed."
+}

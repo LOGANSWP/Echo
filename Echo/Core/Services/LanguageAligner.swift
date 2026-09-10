@@ -145,15 +145,29 @@ public actor LanguageAligner {
             with: "",
             options: .regularExpression
         ).trimmingCharacters(in: .whitespacesAndNewlines)
-        guard sample.unicodeScalars.contains(where: CharacterSet.letters.contains),
-            detectLanguage(sample) == language
-        else { return false }
+        guard sample.unicodeScalars.contains(where: CharacterSet.letters.contains) else { return false }
+        let detected = detectLanguage(sample)
+        // AGENTS.md 6.2: an uncertain detector result may use Unicode evidence.
+        // Keep confident mismatches and all non-Han letters outside this fallback.
+        let hanOnlyFallback = language == zhHans && detected == "uncertain"
+            && isUnambiguousHanBody(sample)
+        guard detected == language || hanOnlyFallback else { return false }
         if language == zhHans {
             guard let simplified = sample.applyingTransform(StringTransform("Traditional-Simplified"), reverse: false),
                 simplified == sample
             else { return false }
         }
         return true
+    }
+
+    nonisolated private static func isUnambiguousHanBody(_ text: String) -> Bool {
+        let letters = text.unicodeScalars.filter { CharacterSet.letters.contains($0) }
+        guard letters.count >= 2 else { return false }
+        return letters.allSatisfy { scalar in
+            (0x3400...0x4DBF).contains(scalar.value)
+                || (0x4E00...0x9FFF).contains(scalar.value)
+                || (0x20000...0x2FA1F).contains(scalar.value)
+        }
     }
 
     /// 检测文本语言，返回 zh-Hans / en-US / uncertain。

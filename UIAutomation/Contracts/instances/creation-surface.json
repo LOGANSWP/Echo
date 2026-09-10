@@ -11,7 +11,8 @@
     "preferredLanguage": "UserPolicy.preferredLanguage (zh-Hans | en-US) — output language",
     "promptDraft": "Personalized System Prompt draft (US-SYN-005) — editable, confirm/reset",
     "reportSchedule": "Persisted monthly/yearly switches, eligibleFrom baselines and honest eligible/claimed/retryRequired/completed/noData/invalidated state from NarrativeReportActor; new-install defaults are on but no historical backfill precedes the baseline. An unavailable production generator is reported before materialization/claim and is not an L2 retry.",
-    "persistedReports": "Versioned bounded NarrativeReport records and current source availability projected by a thin adapter; fixture reports are Preview/test-only"
+    "persistedReports": "Versioned bounded NarrativeReport records and current source availability projected by a thin adapter; fixture reports are Preview/test-only",
+    "creationTask": "Application-owned durable manual job. Leaving the page stops observation only; results are read from CreationLibraryActor."
   },
   "outputs": {
     "visibleContent": "Template picker, generation progress, provenance-labelled source anchors, NoSource/partial-NoSource warnings, copy/export/share/Save to Notes handoff actions, persisted monthly/yearly report rows, separate schedule switches, period status and honest error states. Allow-list membership is labelled Source memory, never Verified fact. Copy and export preparation revalidate current UserPolicy + PrivacyCheckpoint; revoked sources block derived-body handoff. Successful share-controller presentation callback writes creationSharePresented with structured sharePresented=true; Echo does not record activityType, target App, completion, content or source locators.",
@@ -33,5 +34,5 @@
     "error",
     "share-handoff"
   ],
-  "version": "1.4.0"
+  "version": "1.5.0"
 }

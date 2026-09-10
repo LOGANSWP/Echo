@@ -161,3 +161,7 @@
 - 4.0l 工件与证据：[候选研究历史](05-planning/4.0l-photo-understanding-evaluation.md)、[原始审批包](05-planning/4.0l-approval-packet/README.md)、[已批准 CPU 增补](05-planning/4.0l-cpu-approval-supplement/README.md)、[实现与 TDD 映射](05-planning/4.0l-implementation-map.md)。真实 PhotoKit、创作/月报与按需触发已取得本地功能证据；[当前证据](05-planning/4.0l-on-demand-evidence.json)记录 7 tests/5 suites 通过和 iOS 18 单张触发。双设备完整创作分享、质量/实机/发布资格分别追踪，冻结研究材料不作为当前状态账本。
 
 - 待明确范围的新需求：[4.0m 统一创作库与页面无关的生成任务方案](05-planning/4.0m-creation-library-proposal.md)，供用户查看手动作品及月/年报告、离开创作页后取回结果；尚未实现。
+
+- [ADR-026：统一创作库](decisions/ADR-026-creation-library.md)：持久手动作品、页面无关任务和 D-005；4.0m 实现中。
+
+- [Live 创作失败排查（2026-09-09）](06-troubleshooting/creation-live-failure-diagnosis-2026-09-09.md)：短简体中文 uncertain 误拒的真实模型对照与独立诗歌超时；本轮仅诊断，修复未完成。

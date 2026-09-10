@@ -69,6 +69,7 @@ public final class AppComposition {
     public let creationExportCoordinator: CreationExportCoordinator
     public let narrativeReportActor: NarrativeReportActor
     public let generationProvider: BundledGenerationActor
+    let creationLibraryActor: CreationLibraryActor
     public let photoUnderstandingActor: PhotoUnderstandingActor
     public let creativePipeline: CreativePipeline
     public let taskRecoveryRegistry: TaskRecoveryRegistry
@@ -165,6 +166,7 @@ public final class AppComposition {
             canonicalRepository: canonicalRepository
         )
         self.creativePipeline = creativePipeline
+        self.creationLibraryActor = CreationLibraryActor(database: databaseManager, privacy: privacyActor, queue: taskQueue, repository: canonicalRepository, pipeline: creativePipeline)
         self.focusSourceLifecycleActor = FocusSourceLifecycleActor(
             repository: canonicalRepository,
             database: databaseManager,

@@ -1,0 +1,23 @@
+{
+  "zh-Hans": {
+    "detected": "uncertain",
+    "elapsed": 40.54667587499716,
+    "envelope": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"一只狗站在沙地上，背景有山。\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+    "inputTokens": 248,
+    "language": "zh-Hans",
+    "matches": false,
+    "outputTokens": 59
+  },
+  "en-US": {
+    "detected": "en-US",
+    "elapsed": 26.907561041669396,
+    "envelope": "{\"schemaVersion\":1,\"paragraphs\":[{\"text\":\"A dog is standing on the sand, with mountains in the background.\",\"sourceMemoryIDs\":[\"aa8ff0cc-2736-573d-a190-fc7ffb943844\"]}]}",
+    "inputTokens": 229,
+    "language": "en-US",
+    "matches": true,
+    "outputTokens": 64
+  },
+  "scope": "Synthetic caption, real bundled model, production letter prompt and LanguageAligner; iPhone17Pro iOS26.5. Not raw output recovered from the user failed jobs.",
+  "live16": "Database: one failed poem/deadline, one failed letter/language, one cancelled letter. Recent complete calls: 58.559212/62.688322 seconds and 88.426795/69.984426 seconds.",
+  "test": "Two parameter cases; Chinese assertion failed, English passed; 71.677s. /tmp/echo-language-diagnosis.log"
+}
