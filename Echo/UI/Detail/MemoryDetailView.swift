@@ -320,6 +320,30 @@ struct MemoryDetailView: View {
 
                 // grouped metadata
                 metadataGroup(memory)
+                if !viewModel.isFixtureBacked, memory.sourceType == "photo" {
+                    PhotoPreparationView(memoryID: memory.id, service: AppComposition.shared.photoUnderstandingActor)
+                    Button("Create from this photo") {
+                        let composition = AppComposition.shared
+                        let model = CreationViewModel(
+                            creativePipeline: composition.creativePipeline,
+                            exportCoordinator: composition.creationExportCoordinator,
+                            narrativeReportActor: composition.narrativeReportActor
+                        )
+                        model.loadSourceMemories([
+                            CreativeSource(
+                                memoryID: memory.id,
+                                assetID: "",
+                                sourceType: memory.sourceType,
+                                text: memory.originalText,
+                                timestamp: memory.timestamp.timeIntervalSince1970
+                            ),
+                        ])
+                        creationViewModel = model
+                        isShowingCreation = true
+                    }
+                    .buttonStyle(EchoActionButtonStyle(role: .recovery))
+                    .accessibilityIdentifier("memory-create-from-photo")
+                }
 
                 #if DEBUG
                 // Deterministic creation preview is restricted to explicit fixture journeys.
@@ -795,10 +819,13 @@ private struct FocusMediaUnavailableView: View {
         switch kind {
         case .image:
             "This local photo could not be resolved with the current permission."
+
         case .video:
             "Video playback is unavailable until the local source is connected."
+
         case .audio:
             "Audio playback is unavailable until the local source is connected."
+
         case .none:
             "This memory has no media attachment."
         }

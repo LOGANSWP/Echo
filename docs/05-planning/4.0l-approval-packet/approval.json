@@ -1,0 +1,8 @@
+{
+  "status": "approved",
+  "approvedBy": "human user",
+  "approvedAt": "2026-09-09T16:03:31+00:00",
+  "userInstruction": "批准",
+  "packetManifestSha256": "625d3457c9e632b29bd2fe2e40467ba116079f935a4b303ebb3f7dee577117a7",
+  "scope": "Local App engineering integration of this exact candidate under the functional-first plan; no distribution, release, signing change or final qualification approval."
+}

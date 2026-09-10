@@ -1,0 +1,7 @@
+{
+  "Scripts/Research/convert_photo_research.py": "22f7489750fe1be11cf816c507ea3975c5196bb1976e9e2f30f5992292684338",
+  "Scripts/Research/photo_understanding_probe.py": "f87e7429c254e921979569c8ea7e871721d4c877d8415eb748bed512538d9ae3",
+  "Scripts/Research/PhotoTokenizer.swift": "15717d3200933ba25725c63c42fc91fbd5e79c25c978ba5c0de33faab64b23d3",
+  "Scripts/Research/PhotoImagePreprocessor.swift": "0d0fd2d21afc5a01116c0b74a8c81e07b956eaefbf99bd553cb592dee38a5cb0",
+  "Scripts/Research/GenerationMemory.swift": "a49c18684d8eb5007bb22fe93fecda90d9bf556827c132ace8eabe93d474c016"
+}

@@ -1,0 +1,35 @@
+{
+  "updatedAt": "2026-09-09T18:35:36.714463+00:00",
+  "scope": "Normal App semantic UI and real presentation callback audit; no screenshots or videos",
+  "iPhone17Pro_iOS26_5": {
+    "syntheticInput": "512x256 white PNG with red circle; added through simctl to actual PhotoKit library",
+    "handwrittenDescription": false,
+    "normalObserverImported": true,
+    "photoPreparation": "Real model ready after explicit prepare. Duplicate-notification auto-preparation defect subsequently reproduced and fixed; real PhotoKit regression passed (4 tests/3 suites), normal UI was not rerun after this fix.",
+    "creationBody": "在图像中有一个红色圆圈。",
+    "sourceNavigation": "Returned to same Sep 9 synthetic Photo memory",
+    "clipboardExact": "在图像中有一个红色圆圈。",
+    "clipboardIncludesMemoryID": false,
+    "pdf": {
+      "bytes": 10415,
+      "header": "%PDF-1.3",
+      "sharePresentedAudit": true,
+      "success": true,
+      "auditTimestamp": 1788978719.467369
+    },
+    "semanticHashes": {
+      "ready": "0rvpxsc",
+      "creation": "0xwijdz",
+      "source": "0yuivps",
+      "pdfChoice": "07daft3"
+    },
+    "systemShareControls": "Not exposed by runtime snapshot while remote share sheet is presented; presentation verified by actual callback-backed audit, no receiver selected"
+  },
+  "iPhone16Pro_iOS18_2": {
+    "status": "awaiting manual selection of only synthetic photo in system limited-library picker; automation snapshot exposes background App instead of picker",
+    "syntheticPhotoTime": "2026-09-09 13:11 local"
+  },
+  "humanVisualApproval": false,
+  "dualDeviceAcceptance": false,
+  "releaseQualified": false
+}

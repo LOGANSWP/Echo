@@ -225,6 +225,8 @@
 
 The simulator-first engineering artifact uses the same approved INT8 weights and tokenizer, with 113 RMS operations promoted to FP32. Its separate closed inventory is `4.0k-simulator-artifact-manifest.json`; identity `5a605e013f9bd0e2cfed9d7c44b99bc396628f82088c4aadd61865b1005a7a7f`, model ID `qwen3-0.6b-simulator-rms-fp32-v1`. This is not a second device/release-approved artifact. Debug simulator selects it; device and Release exclude it. Prompt v4 gives explicit Simplified Chinese instructions instead of relying on the locale code alone. Prompt version remains part of the recovery identity.
 
-## 4.0l 视觉理解候选状态（ADR-025，2026-09-08）
+## 4.0l 本地视觉工件状态（ADR-025，2026-09-09）
 
-照片自动画面描述所需的视觉生成模型/运行时尚未选定、未登记为获批工件。4.0k 的文本生成批准及 SigLIP2 检索编码器登记都不能代替该批准。本轮仅新增产品合同和任务，无新下载、无模型替换、无 App bundle 变更；候选材料须按 ADR-009/023 冻结来源、完整文件身份/许可证和实际预算，再取得确切工件审批。
+SmolVLM-256M 的原始本地 App 审批包和 CPU 兼容增补均已获用户批准。当前本地 App 使用 CPU 增补 manifest SHA256 `ddbdbe735c47c7346e62c0ef456f9f2e0442dd9615fd57f7f239a10592ec6367`，20 文件共 844,124,058 bytes，模块预算 900MB；完整许可、NOTICE、SBOM 与固定文件身份见 [增补包](4.0l-cpu-approval-supplement/README.md)及其中 approval.json。此范围为本地 App/双模拟器功能验证，不授权公开分发、签名变更或实机/Release 资格。
+
+运行时只在用户打开所选照片详情或选择其进行创作时使用；导入/同步/前台/自动报告不触发全相册理解。当前功能证据见 [按需验证](4.0l-on-demand-evidence.json)。模型登记不替代原始人类批准；冻结审批与历史研究文件保持不变。

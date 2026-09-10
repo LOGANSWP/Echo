@@ -1,0 +1,19 @@
+{
+  "mode": "generate",
+  "exitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 7.730221249999886,
+  "sampledProcessTreeRSSPeakBytes": 1000062976,
+  "sampledResearchDiskPeakBytes": 1593016958,
+  "pollIntervalSeconds": 0.5,
+  "executableSHA256": "da7ebd9e32c2ea49b5e65953f8c6906205b9d38696f13f42b09ae28aae7f13e3",
+  "sources": {
+    "PhotoFunctionalProbe.swift": "3efa5fe2494843c35ba3e906ac59a35691c53933bc61461ee9832573750b929b",
+    "PhotoTokenizer.swift": "15717d3200933ba25725c63c42fc91fbd5e79c25c978ba5c0de33faab64b23d3",
+    "PhotoImagePreprocessor.swift": "0d0fd2d21afc5a01116c0b74a8c81e07b956eaefbf99bd553cb592dee38a5cb0",
+    "GenerationMemory.swift": "a49c18684d8eb5007bb22fe93fecda90d9bf556827c132ace8eabe93d474c016"
+  },
+  "log": "",
+  "productionApproval": "pending",
+  "sourceAndPackageIntegrityBeforeAfter": true
+}

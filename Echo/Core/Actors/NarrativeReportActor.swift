@@ -12,6 +12,7 @@
 // Traceability: US-SYN-001/004 and ADR-023; device/quality qualification remains pending.
 // ==========================================
 
+// PR #80 review / US-SYN-004: bounded candidate pages preserve usable input and omitted coverage.
 import Foundation
 
 nonisolated public protocol NarrativeReportGenerating: Sendable {
@@ -48,6 +49,7 @@ public actor NarrativeReportActor {
     private let pendingOps: PendingOpsActor
     private var generator: (any NarrativeReportGenerating)?
     private let omittedPartitions: [String]
+    private let sourceRepository: CanonicalMemoryRepositoryActor
 
     public init(
         database: DatabaseManager = .shared,
@@ -55,7 +57,8 @@ public actor NarrativeReportActor {
         taskQueue: TaskQueueActor = .shared,
         pendingOps: PendingOpsActor = .shared,
         generator: (any NarrativeReportGenerating)? = nil,
-        omittedPartitions: [String] = ["healthKit", "people"]
+        omittedPartitions: [String] = ["healthKit", "people"],
+        sourceRepository: CanonicalMemoryRepositoryActor? = nil
     ) {
         self.database = database
         self.privacyActor = privacyActor
@@ -63,6 +66,7 @@ public actor NarrativeReportActor {
         self.pendingOps = pendingOps
         self.generator = generator
         self.omittedPartitions = omittedPartitions.sorted()
+        self.sourceRepository = sourceRepository ?? CanonicalMemoryRepositoryActor(db: database, privacyActor: privacyActor)
     }
 
     public func attachGenerator(
@@ -286,6 +290,9 @@ public actor NarrativeReportActor {
             )
             try await taskQueue.enqueue(job)
             return .enqueued(taskID: taskID, periodKey: period.periodKey)
+        } catch NarrativeReportError.resourceDeferred {
+            try await releaseClaimForResource(taskID: taskID, traceID: traceID)
+            return .deferredForResources
         } catch is CancellationError {
             try await releaseClaimForResource(taskID: taskID, traceID: traceID)
             throw CancellationError()
@@ -603,6 +610,11 @@ public actor NarrativeReportActor {
             guard finalCheckpoint.isAllowed, finalCheckpoint.policyVersion == sourceCheckpoint.policyVersion else {
                 throw GenerationRuntimeError.privacyDenied
             }
+            try await GenerationSourceValidation(
+                repository: sourceRepository,
+                sources: prepared.request.sources.filter { contributingIDs.contains($0.memoryID) },
+                excerptScalarLimit: 512
+            ).validate()
             let audit = try await privacyActor.prepareNarrativeReportAuditPayload(
                 checkpoint: finalCheckpoint,
                 period: period,
@@ -652,8 +664,52 @@ public actor NarrativeReportActor {
                 omittedPartitions: omittedPartitions
             )
         }
+        var preparedRows: [[String: DBValue]] = []
+        var waitingPhotos = false
+        var offset = 0
+        var eligibleCount: DBValue = .int(0)
+        // Page through candidates without letting unprepared photos consume the
+        // existing 256-source input bound. Each page and the retained input are bounded.
+        while preparedRows.count < NarrativeReportLimits.maximumSources {
+            try Task.checkCancellation()
+            let rows = try await readReportCandidatePage(period: period, allowedTypes: allowedTypes, offset: offset)
+            if offset == 0 { eligibleCount = rows.first?["eligibleSourceCount"] ?? .int(0) }
+            guard !rows.isEmpty else { break }
+            offset += rows.count
+            for var row in rows {
+                if row["sourceType"]?.stringValue == "photo",
+                    let raw = row["memoryId"]?.stringValue, let id = UUID(uuidString: raw) {
+                    let source = try await sourceRepository.loadCreationSource(
+                        memoryID: id,
+                        maximumTextBytes: GenerationInputBudget.maximumBytes
+                    )
+                    let text = source?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    if text.isEmpty { waitingPhotos = true; continue }
+                    row["canonicalText"] = .text(String(String.UnicodeScalarView(text.unicodeScalars.prefix(512))))
+                    row["updatedAt"] = .double(source?.revision ?? 0)
+                }
+                row["eligibleSourceCount"] = eligibleCount
+                preparedRows.append(row)
+                if preparedRows.count == NarrativeReportLimits.maximumSources { break }
+            }
+            if rows.count < NarrativeReportLimits.maximumSources { break }
+        }
+        if preparedRows.isEmpty, waitingPhotos { throw NarrativeReportError.resourceDeferred }
+        return NarrativeReportAggregator.prepare(
+            period: period,
+            rows: preparedRows,
+            authorizedSourceTypes: policy.authorizedSourceTypes,
+            omittedPartitions: omittedPartitions
+        )
+    }
+
+    private func readReportCandidatePage(
+        period: NarrativeReportPeriod,
+        allowedTypes: [String],
+        offset: Int
+    ) async throws -> [[String: DBValue]] {
         let placeholders = Array(repeating: "?", count: allowedTypes.count).joined(separator: ",")
-        let rows = try await database.executeQuery(
+        return try await database.executeQuery(
             sql: """
                 SELECT memoryId, substr(canonicalText, 1, 512) AS canonicalText, sourceType, updatedAt,
                        COALESCE(originalTimestamp, createdAt) AS memoryTimestamp,
@@ -664,20 +720,16 @@ public actor NarrativeReportActor {
                   AND CASE sourceType WHEN 'text' THEN 'note'
                       WHEN 'video_frame' THEN 'video' WHEN 'video_audio' THEN 'video'
                       ELSE sourceType END IN (\(placeholders))
-                  AND length(trim(COALESCE(canonicalText, ''))) > 0
+                  AND (sourceType = 'photo' OR length(trim(COALESCE(canonicalText, ''))) > 0)
+                  AND NOT EXISTS (SELECT 1 FROM ExcludedAssets e WHERE e.assetId = Memory.sourceLocator)
                 ORDER BY sourceType ASC, memoryTimestamp ASC, memoryId ASC
-                LIMIT 256
+                LIMIT ? OFFSET ?
                 """,
             bindings: [
                 .double(period.coverageStart.timeIntervalSince1970),
                 .double(period.endInstant.timeIntervalSince1970),
             ] + allowedTypes.map(DBBinding.text)
-        )
-        return NarrativeReportAggregator.prepare(
-            period: period,
-            rows: rows,
-            authorizedSourceTypes: policy.authorizedSourceTypes,
-            omittedPartitions: omittedPartitions
+                + [.int(Int64(NarrativeReportLimits.maximumSources)), .int(Int64(offset))]
         )
     }
 

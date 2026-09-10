@@ -1,0 +1,1544 @@
+{
+  "schemaVersion": 1,
+  "productionApproval": "not_granted",
+  "scope": "Current installed tool dependency metadata and preserved legal texts, not historical wheel attestation or App SBOM.",
+  "pythonVersion": "3.13.5",
+  "components": [
+    {
+      "name": "anyio",
+      "version": "4.7.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "files": [
+        {
+          "sourcePath": "anyio-4.7.0.dist-info/LICENSE",
+          "packetPath": "licenses/anyio-5361ac9dc58f-LICENSE",
+          "sha256": "5361ac9dc58f2ef5fd2e9b09c68297c17f04950909bbc8023bdb82eacf22c2b0",
+          "sizeBytes": 1081
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "anyio-4.7.0.dist-info/METADATA",
+          "sha256": "b5509b3573fcb3aa292b5302b50ba2e20b2d5e9d1d1715abd6852edc658f9e40"
+        },
+        {
+          "path": "anyio-4.7.0.dist-info/RECORD",
+          "sha256": "1ecc006e35af9c93d7814609b9acc42055e2445c761dd6aba1b89b915b6af89d"
+        },
+        {
+          "path": "anyio-4.7.0.dist-info/WHEEL",
+          "sha256": "227f454cdc5e3fad0a9d3906c3bc24ea624f61dfdd4128c46665dd05d30223ef"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0",
+      "declaredLicenseExpression": "MIT",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "attrs-26.1.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/attrs-882115c95dfc-LICENSE",
+          "sha256": "882115c95dfc2af1eeb6714f8ec6d5cbcabf667caff8729f42420da63f714e9f",
+          "sizeBytes": 1109
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "attrs-26.1.0.dist-info/METADATA",
+          "sha256": "4cd40e690f23bf37cbcad34efd6758e062df1df07c86833f7e3ce95bf1fa38cc"
+        },
+        {
+          "path": "attrs-26.1.0.dist-info/RECORD",
+          "sha256": "d5e36b4e3a4f8f4eef148e133178740d9291a00515eb59ad678ade2474f85d30"
+        },
+        {
+          "path": "attrs-26.1.0.dist-info/WHEEL",
+          "sha256": "41c708c5adba6e097513ab8ccb9f1d7865a2fb469e22491a9e01dcc64da459fc"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "cattrs",
+      "version": "26.1.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "files": [
+        {
+          "sourcePath": "cattrs-26.1.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/cattrs-f5fb9d1ede37-LICENSE",
+          "sha256": "f5fb9d1ede37a88ca47f420c499dca0f4a05bc993e12c77d23520aad291c01bf",
+          "sizeBytes": 1074
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "cattrs-26.1.0.dist-info/METADATA",
+          "sha256": "77de10b9d43480cd19cbf28d3ed2fb9f680479aeecf958abdade3facb0f8ccb0"
+        },
+        {
+          "path": "cattrs-26.1.0.dist-info/RECORD",
+          "sha256": "929fd81195b9b40d37cc5fefae69035788afeab6d5760d80a6b837f7995c9261"
+        },
+        {
+          "path": "cattrs-26.1.0.dist-info/WHEEL",
+          "sha256": "58b82a17209f9bf2804afe161f2632d0fde933f9bb2792fd936b2474a2e2ac2f"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "09962c1dc23fac80a0e5a88b2eb7051b74a6443a568ca2a045a4ec2fb82aeee5",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
+      ],
+      "files": [
+        {
+          "sourcePath": "certifi-2026.7.22.dist-info/LICENSE",
+          "packetPath": "licenses/certifi-e93716da6b9c-LICENSE",
+          "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7",
+          "sizeBytes": 989
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "certifi-2026.7.22.dist-info/METADATA",
+          "sha256": "53ffb7fe51a63bf68a4b72a0ff408467fc176d95ae5f56a20f945c182ddca2d4"
+        },
+        {
+          "path": "certifi-2026.7.22.dist-info/RECORD",
+          "sha256": "01669f281440b2d587b6098c3c5908b8a543f183c8d3f36f4a0ec6a4066d1072"
+        },
+        {
+          "path": "certifi-2026.7.22.dist-info/WHEEL",
+          "sha256": "227f454cdc5e3fad0a9d3906c3bc24ea624f61dfdd4128c46665dd05d30223ef"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "click",
+      "version": "8.4.2",
+      "declaredLicenseExpression": "BSD-3-Clause",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "click-8.4.2.dist-info/licenses/LICENSE.txt",
+          "packetPath": "licenses/click-9a8ad106a394-LICENSE.txt",
+          "sha256": "9a8ad106a394e853bfe21f42f4e72d592819a22805d991b5f3275029292b658d",
+          "sizeBytes": 1475
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "click-8.4.2.dist-info/METADATA",
+          "sha256": "194c9dd81d567f9081f026c7e401060fbafa7bc147c8e0a58b3668b40a64c031"
+        },
+        {
+          "path": "click-8.4.2.dist-info/RECORD",
+          "sha256": "a3302f444093a9a689a42c5a1bb54555232684fa0ddfd2132e365b2c3e4fbba7"
+        },
+        {
+          "path": "click-8.4.2.dist-info/WHEEL",
+          "sha256": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "coremltools",
+      "version": "9.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "49d9777da612e1f4e9269fa9f93ea324a66f9dcc7722ad812de124ef3f266d93",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "coremltools-9.0.dist-info/licenses/LICENSE.txt",
+          "packetPath": "licenses/coremltools-d467a35319f2-LICENSE.txt",
+          "sha256": "d467a35319f25bd5310100d06ac8be62f880d1cb425181f1ec2b8333a1000afa",
+          "sizeBytes": 1492
+        },
+        {
+          "sourcePath": "coremltools-9.0.dist-info/licenses/NOTICE.txt",
+          "packetPath": "licenses/coremltools-bd460ed8dc6e-NOTICE.txt",
+          "sha256": "bd460ed8dc6e2033c2cf6b7b901a43fec6d0d5414a2ea7b72ab09c277f01f4c9",
+          "sizeBytes": 5216
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "coremltools-9.0.dist-info/METADATA",
+          "sha256": "f492b3b2f954f8737078175a9ccaacad327eb7ff0993ee267df736331b1773d4"
+        },
+        {
+          "path": "coremltools-9.0.dist-info/RECORD",
+          "sha256": "740f228cbc09815b2fad6d32938f45b20558e751a222840e8bbf6300ec5543ea"
+        },
+        {
+          "path": "coremltools-9.0.dist-info/WHEEL",
+          "sha256": "ec7914f4a8e353bd2c33cfa59eaa06d522e34782350f8350f48e76f99f9d8286"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "filelock",
+      "version": "3.17.0",
+      "declaredLicenseExpression": "Unlicense",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: The Unlicense (Unlicense)"
+      ],
+      "files": [
+        {
+          "sourcePath": "filelock-3.17.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/filelock-88d9b4eb6057-LICENSE",
+          "sha256": "88d9b4eb60579c191ec391ca04c16130572d7eedc4a86daa58bf28c6e14c9bcd",
+          "sizeBytes": 1210
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "filelock-3.17.0.dist-info/METADATA",
+          "sha256": "810ab37e4d89269ceb04075ea37d45e993a6fc13d900d7daec083030f2a55dd3"
+        },
+        {
+          "path": "filelock-3.17.0.dist-info/RECORD",
+          "sha256": "37013471ecb5d711a77909c0206d928c91e7433d14fd50a8eadd9ea60c1ac6e6"
+        },
+        {
+          "path": "filelock-3.17.0.dist-info/WHEEL",
+          "sha256": "aad0b0a12256807936d52d4a6f88a1773236ae527564a688bab4e3fe780e8724"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "fsspec",
+      "version": "2024.12.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "c03b1c97bf1e47e8f003ac479ba4cd9d2860827d340db50746b79ca5d3e921ca",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "fsspec-2024.12.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/fsspec-2dc35496ce53-LICENSE",
+          "sha256": "2dc35496ce53a7307915c008a844aad53e772b49b34cdd00445067691407ec94",
+          "sizeBytes": 1513
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "fsspec-2024.12.0.dist-info/METADATA",
+          "sha256": "6d9452c4c553ee81ce5217894040ccb0284116e6f2d694e0f1651b9cb6004eb7"
+        },
+        {
+          "path": "fsspec-2024.12.0.dist-info/RECORD",
+          "sha256": "178fc96dbf3372635f3a0e573d4aee9550fc0e5c6cee5a73eef64613a85d2d5a"
+        },
+        {
+          "path": "fsspec-2024.12.0.dist-info/WHEEL",
+          "sha256": "aad0b0a12256807936d52d4a6f88a1773236ae527564a688bab4e3fe780e8724"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "files": [
+        {
+          "sourcePath": "h11-0.16.0.dist-info/licenses/LICENSE.txt",
+          "packetPath": "licenses/h11-37db5bb85926-LICENSE.txt",
+          "sha256": "37db5bb85926db28a427a25867f10b1232003aea1be69ccb851138adb8e6f361",
+          "sizeBytes": 1124
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "h11-0.16.0.dist-info/METADATA",
+          "sha256": "28f326098ac09fcba79b8f180f96087c841fe2456215cb7b872a9c7d5cd19d64"
+        },
+        {
+          "path": "h11-0.16.0.dist-info/RECORD",
+          "sha256": "156655bc3c60bd15dd0004517826bfa535e5eeb00391df4be45895b3811215c2"
+        },
+        {
+          "path": "h11-0.16.0.dist-info/WHEEL",
+          "sha256": "95353a07a7887d8a224094d935cf9fc9a47a0692fa7a14f3537c466319f69fc9"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "hf-xet",
+      "version": "1.5.1",
+      "declaredLicenseExpression": "Apache-2.0",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: Apache Software License"
+      ],
+      "files": [
+        {
+          "sourcePath": "hf_xet-1.5.1.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/hf-xet-c71d239df917-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "sizeBytes": 11357
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "hf_xet-1.5.1.dist-info/METADATA",
+          "sha256": "360dcd22eacb566b317c7ad0cc1d2156995459d7c38f23e0381d6f578df353db"
+        },
+        {
+          "path": "hf_xet-1.5.1.dist-info/RECORD",
+          "sha256": "eb46d996812fac111398174a7b17b86aae116da3bcfb452ab5527d1f2e414716"
+        },
+        {
+          "path": "hf_xet-1.5.1.dist-info/WHEEL",
+          "sha256": "ea5405702d47c7d5323a2a1a6d8d00b8dd7b4bb9e94f90420378831cf79ecbdc"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9",
+      "declaredLicenseExpression": "BSD-3-Clause",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "httpcore-1.0.9.dist-info/licenses/LICENSE.md",
+          "packetPath": "licenses/httpcore-fdcb59154c74-LICENSE.md",
+          "sha256": "fdcb59154c74cbaba16a11242f7740bea9f23d6feb5547917d8c5f94a80392a5",
+          "sizeBytes": 1518
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "httpcore-1.0.9.dist-info/METADATA",
+          "sha256": "fe2d4fda6199128978779e0cf27f3c045c531863fcdd987eacc74f3a18d41c21"
+        },
+        {
+          "path": "httpcore-1.0.9.dist-info/RECORD",
+          "sha256": "ee9728af4796762fc67bba837286bce9db43f2cc7ca3107594161dd7e4d241a6"
+        },
+        {
+          "path": "httpcore-1.0.9.dist-info/WHEEL",
+          "sha256": "aad0b0a12256807936d52d4a6f88a1773236ae527564a688bab4e3fe780e8724"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1",
+      "declaredLicenseExpression": "BSD-3-Clause",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "httpx-0.28.1.dist-info/licenses/LICENSE.md",
+          "packetPath": "licenses/httpx-4ec59d544f12-LICENSE.md",
+          "sha256": "4ec59d544f12b5f539a3a716fd321ac58ccd8030b465221f2c880200cdf28d8d",
+          "sizeBytes": 1508
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "httpx-0.28.1.dist-info/METADATA",
+          "sha256": "b8c5c999f4c028b9e58635a7468b9a8170ae0796fb017586e6c42ec48adeb9d8"
+        },
+        {
+          "path": "httpx-0.28.1.dist-info/RECORD",
+          "sha256": "8a83a28ff5ad12e6ed08130df426930416e8a26a6a7b6e2acc7e1b8bc6e936ac"
+        },
+        {
+          "path": "httpx-0.28.1.dist-info/WHEEL",
+          "sha256": "aad0b0a12256807936d52d4a6f88a1773236ae527564a688bab4e3fe780e8724"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "huggingface-hub",
+      "version": "1.22.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "2af71558e438db0b73a20beab92dc278a94e1bbe974c00c1a33e3ab62d53a608",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: Apache Software License"
+      ],
+      "files": [
+        {
+          "sourcePath": "huggingface_hub-1.22.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/huggingface-hub-c71d239df917-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "sizeBytes": 11357
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "huggingface_hub-1.22.0.dist-info/METADATA",
+          "sha256": "62456710abd7d886c97b802a3b9073b6931704daab5917168df3f4ae048df4c5"
+        },
+        {
+          "path": "huggingface_hub-1.22.0.dist-info/RECORD",
+          "sha256": "b84c2f0602a0d31ae7d9534ac6695d64f9ffbcb0f6d89b6c3293fe504b565338"
+        },
+        {
+          "path": "huggingface_hub-1.22.0.dist-info/WHEEL",
+          "sha256": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "idna",
+      "version": "3.7",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "idna-3.7.dist-info/LICENSE.md",
+          "packetPath": "licenses/idna-a59f0b0ef363-LICENSE.md",
+          "sha256": "a59f0b0ef3635874109a4461ca44ff7a70d50696e814767bfaf721d4c9b0db0f",
+          "sizeBytes": 1541
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "idna-3.7.dist-info/METADATA",
+          "sha256": "3a2c4293e74a2d990fcbe31fbe23a688fbf02753b62bff2ba82ac58c2feec72e"
+        },
+        {
+          "path": "idna-3.7.dist-info/RECORD",
+          "sha256": "75bea6db682a80ed536c444f00aa7989de973cfa877814ac134054fe0f14d3a6"
+        },
+        {
+          "path": "idna-3.7.dist-info/WHEEL",
+          "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "jinja2",
+      "version": "3.1.6",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "jinja2-3.1.6.dist-info/LICENSE.txt",
+          "packetPath": "licenses/jinja2-3b49dcee4105-LICENSE.txt",
+          "sha256": "3b49dcee4105eb37bac10faf1be260408fe85d252b8e9df2e0979fc1e094437b",
+          "sizeBytes": 1475
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "jinja2-3.1.6.dist-info/METADATA",
+          "sha256": "f6d14c416015a2abd9cdb8ecf6f3529792530d86a25d967a776b19757d8da708"
+        },
+        {
+          "path": "jinja2-3.1.6.dist-info/RECORD",
+          "sha256": "29e16e0c48bf598f31bfca49caa901ae7af06a793a15a35b5377ea3b4e0d0246"
+        },
+        {
+          "path": "jinja2-3.1.6.dist-info/WHEEL",
+          "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "markupsafe",
+      "version": "3.0.2",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "MarkupSafe-3.0.2.dist-info/LICENSE.txt",
+          "packetPath": "licenses/markupsafe-489a8e110850-LICENSE.txt",
+          "sha256": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea",
+          "sizeBytes": 1475
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "MarkupSafe-3.0.2.dist-info/METADATA",
+          "sha256": "f61a915239e8aafe061627b8b7625a50e7000005005fe41361ff7b621607a5c6"
+        },
+        {
+          "path": "MarkupSafe-3.0.2.dist-info/RECORD",
+          "sha256": "6539d2ef55e982eb497c74fa271d11110387bbd3d0caa40515ef92da2ed6f4ef"
+        },
+        {
+          "path": "MarkupSafe-3.0.2.dist-info/WHEEL",
+          "sha256": "cc4c2b10cde61ffa8e510f6e9376992390cc39a51aa3dfded46f7898ab47ad36"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "mpmath",
+      "version": "1.3.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "49d9777da612e1f4e9269fa9f93ea324a66f9dcc7722ad812de124ef3f266d93",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "mpmath-1.3.0.dist-info/LICENSE",
+          "packetPath": "licenses/mpmath-c26cae81da45-LICENSE",
+          "sha256": "c26cae81da4508e5e249985777a33821f183223ebb74d7f8cfbf90fe7eef2fb7",
+          "sizeBytes": 1537
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "mpmath-1.3.0.dist-info/METADATA",
+          "sha256": "5ec479018cf41deb761730c351e4ab160d5f280d461cce5d045e716fc3254241"
+        },
+        {
+          "path": "mpmath-1.3.0.dist-info/RECORD",
+          "sha256": "37c844a3f74a015b009a569ffb2e8e258feff0fa2ce5b673c6b176e20beda9cc"
+        },
+        {
+          "path": "mpmath-1.3.0.dist-info/WHEEL",
+          "sha256": "195f5a3138703ffe28342b6f102d9e737a9462eb6059e033925ae8ff49b85894"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "networkx",
+      "version": "3.4.2",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "networkx-3.4.2.dist-info/LICENSE.txt",
+          "packetPath": "licenses/networkx-5b433b90f755-LICENSE.txt",
+          "sha256": "5b433b90f755eb9bbd06feff1d1a4f5f232c5208a185694199e45fa95d762792",
+          "sizeBytes": 1763
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "networkx-3.4.2.dist-info/METADATA",
+          "sha256": "c68e17726a1967702630cd230fa251d6232a3ed4553e517b06e90c9a9b718812"
+        },
+        {
+          "path": "networkx-3.4.2.dist-info/RECORD",
+          "sha256": "4f413808b25920c8d218e43e8d8512645f1c619eeaa53500be5d0bbb897bb214"
+        },
+        {
+          "path": "networkx-3.4.2.dist-info/WHEEL",
+          "sha256": "195f5a3138703ffe28342b6f102d9e737a9462eb6059e033925ae8ff49b85894"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "numpy",
+      "version": "2.1.3",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "b1ab1d1a7d2d474a9989aab3eae8bd7d829432c316c6c094a15635e332e0f014",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "numpy-2.1.3.dist-info/LICENSE.txt",
+          "packetPath": "licenses/numpy-01fb016849aa-LICENSE.txt",
+          "sha256": "01fb016849aa427edb1bbbbd55f91c26ca6cadb32a5b20e7f000655dd05b0760",
+          "sizeBytes": 1543
+        },
+        {
+          "sourcePath": "numpy/_core/include/numpy/random/LICENSE.txt",
+          "packetPath": "licenses/numpy-fbc539f47d0c-LICENSE.txt",
+          "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+          "sizeBytes": 1018
+        },
+        {
+          "sourcePath": "numpy/ma/LICENSE",
+          "packetPath": "licenses/numpy-05f3b8835198-LICENSE",
+          "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+          "sizeBytes": 1593
+        },
+        {
+          "sourcePath": "numpy/random/LICENSE.md",
+          "packetPath": "licenses/numpy-103166b62b80-LICENSE.md",
+          "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+          "sizeBytes": 3511
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "numpy-2.1.3.dist-info/METADATA",
+          "sha256": "b5ea2fdd59cc0002606dec9ec496b6304066ad3ce7e55d82abe4be2cb119ea27"
+        },
+        {
+          "path": "numpy-2.1.3.dist-info/RECORD",
+          "sha256": "2523e0aac1407d32299162da5b77e6f341b23b31e0c64440581d1113e561e734"
+        },
+        {
+          "path": "numpy-2.1.3.dist-info/WHEEL",
+          "sha256": "7cc7972b52914a3596e56fddb585b7c73f6164255f2a2b85e90fcbf1e85f0f1d"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "packaging",
+      "version": "24.2",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: Apache Software License",
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "packaging-24.2.dist-info/LICENSE",
+          "packetPath": "licenses/packaging-cad1ef5bd340-LICENSE",
+          "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
+          "sizeBytes": 197
+        },
+        {
+          "sourcePath": "packaging-24.2.dist-info/LICENSE.APACHE",
+          "packetPath": "licenses/packaging-0d542e0c8804-LICENSE.APACHE",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+          "sizeBytes": 10174
+        },
+        {
+          "sourcePath": "packaging-24.2.dist-info/LICENSE.BSD",
+          "packetPath": "licenses/packaging-b70e7e9b742f-LICENSE.BSD",
+          "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5",
+          "sizeBytes": 1344
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "packaging-24.2.dist-info/METADATA",
+          "sha256": "74857e6adfd1a2250aa9e1a9098ca6462bc9afc7a0b2c2dfcca6bc9e2f39b04e"
+        },
+        {
+          "path": "packaging-24.2.dist-info/RECORD",
+          "sha256": "a4d40ed8fab62065d5f855488331127f33f1ca304f9f8ed18d23af1786bd5f5e"
+        },
+        {
+          "path": "packaging-24.2.dist-info/WHEEL",
+          "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "pillow",
+      "version": "11.1.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "3855f83eee504691f6f2d0eb2097e49d2568479d4fa3e2b9160a013d2b9eb2a5",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: CMU License (MIT-CMU)"
+      ],
+      "files": [
+        {
+          "sourcePath": "pillow-11.1.0.dist-info/LICENSE",
+          "packetPath": "licenses/pillow-17f240ae1011-LICENSE",
+          "sha256": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+          "sizeBytes": 1453
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "pillow-11.1.0.dist-info/METADATA",
+          "sha256": "d93f897b5bcc9c86d1c1c7814d4639942decc2330223bc068c78c9dc6a2346d6"
+        },
+        {
+          "path": "pillow-11.1.0.dist-info/RECORD",
+          "sha256": "f96272314d54fed93c79854ef3025981d6af3e586b2ef0e896529f1a59888fab"
+        },
+        {
+          "path": "pillow-11.1.0.dist-info/WHEEL",
+          "sha256": "cc4c2b10cde61ffa8e510f6e9376992390cc39a51aa3dfded46f7898ab47ad36"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "protobuf",
+      "version": "5.29.3",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "15934bcfcb57d72b1b73d913180ce7f86d2773c32725efa41ddb6b14e143cb84",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "protobuf-5.29.3.dist-info/LICENSE",
+          "packetPath": "licenses/protobuf-6e5e117324af-LICENSE",
+          "sha256": "6e5e117324afd944dcf67f36cf329843bc1a92229a8cd9bb573d7a83130fea7d",
+          "sizeBytes": 1732
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "protobuf-5.29.3.dist-info/METADATA",
+          "sha256": "fd8e32d1c9f9389730bee1c5a1c5abee197312ddd097c98e52965b3e1bf25eab"
+        },
+        {
+          "path": "protobuf-5.29.3.dist-info/RECORD",
+          "sha256": "7e209e2189673b24d50d6ee2a9414100a8004d39d33a2472ad93f861b90e8d5d"
+        },
+        {
+          "path": "protobuf-5.29.3.dist-info/WHEEL",
+          "sha256": "a108293b9f639235ada93cdc49f678803fe8909af473d36748c0ae6b282c5408"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "psutil",
+      "version": "5.9.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "49d9777da612e1f4e9269fa9f93ea324a66f9dcc7722ad812de124ef3f266d93",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "psutil-5.9.0.dist-info/LICENSE",
+          "packetPath": "licenses/psutil-24c12984500c-LICENSE",
+          "sha256": "24c12984500caa07ffdce19eebc06396c5e6d244b573bc6c438f4a6ef8e56c1b",
+          "sizeBytes": 1549
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "psutil-5.9.0.dist-info/METADATA",
+          "sha256": "127f26d82c6a8a15f0ba73d130f945c357d24a3b6a6b06114dbe9038fe0358a8"
+        },
+        {
+          "path": "psutil-5.9.0.dist-info/RECORD",
+          "sha256": "1414c4d8b5f4998db66f57c5d2550b0e8de7466e1d55c2bda5c3a2c121153446"
+        },
+        {
+          "path": "psutil-5.9.0.dist-info/WHEEL",
+          "sha256": "2f9633a7721edeace128960ef32c17b597d22126dca57b78f94da1dcfe761e78"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "pyaml",
+      "version": "26.7.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "5b071de62b3ceeab80783b20215c55cd41a0380a2db9affe4afc9e303f590969",
+      "licenseClassifiers": [
+        "License :: Public Domain"
+      ],
+      "files": [
+        {
+          "sourcePath": "pyaml-26.7.0.dist-info/licenses/COPYING",
+          "packetPath": "licenses/pyaml-dc1342cc1cb4-COPYING",
+          "sha256": "dc1342cc1cb49e24c1c9e8a495acc9625ce2e04146c116279af0ab0949cd829c",
+          "sizeBytes": 491
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "pyaml-26.7.0.dist-info/METADATA",
+          "sha256": "99677223daff214efbdaa66491dc643b44f31c4a6fae9eafa82756ca542bbbab"
+        },
+        {
+          "path": "pyaml-26.7.0.dist-info/RECORD",
+          "sha256": "a62777ce8c696a2ed6bdcf33cde0a8afa5cf18a122ced3928509f596e44363a9"
+        },
+        {
+          "path": "pyaml-26.7.0.dist-info/WHEEL",
+          "sha256": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.2",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e5dcffe836b6ec8a58e492419b550e65fb8cbdc308503979e5dacb33ac7ea3b7",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "files": [
+        {
+          "sourcePath": "PyYAML-6.0.2.dist-info/LICENSE",
+          "packetPath": "licenses/pyyaml-8d3928f9dc44-LICENSE",
+          "sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4",
+          "sizeBytes": 1101
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "PyYAML-6.0.2.dist-info/METADATA",
+          "sha256": "f7ea1d141e6c7aee2918f704bfb13c8b2c4d179d7fb8a9da3468cb021cf696da"
+        },
+        {
+          "path": "PyYAML-6.0.2.dist-info/RECORD",
+          "sha256": "49564c5aeeaab3633e266b48aac95d801efa07e3fd50f9ecbfa4727240c06cbd"
+        },
+        {
+          "path": "PyYAML-6.0.2.dist-info/WHEEL",
+          "sha256": "f48883ca68510191a97b374ba2c2684ecd0545516668235f09bacbc298ccdada"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "regex",
+      "version": "2026.6.28",
+      "declaredLicenseExpression": "Apache-2.0 AND CNRI-Python",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "regex-2026.6.28.dist-info/licenses/LICENSE.txt",
+          "packetPath": "licenses/regex-bff55ef4cdcc-LICENSE.txt",
+          "sha256": "bff55ef4cdcc8c14ce259f8e8ab60e264418440d6335f4dc138273fbd506144d",
+          "sizeBytes": 11584
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "regex-2026.6.28.dist-info/METADATA",
+          "sha256": "eedd62bd4a7cbff15d27582b1694f2f0a393207583b54943ee1945e3ea693bc0"
+        },
+        {
+          "path": "regex-2026.6.28.dist-info/RECORD",
+          "sha256": "3dbf2ff20f8113162344e985a4143a78d19c9fa70af2c3484904ebb42ef73bbb"
+        },
+        {
+          "path": "regex-2026.6.28.dist-info/WHEEL",
+          "sha256": "53080396525d876ffa8b503860297eac4dfc30842fd9926e443724f15a0c33ee"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "safetensors",
+      "version": "0.8.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: Apache Software License"
+      ],
+      "files": [
+        {
+          "sourcePath": "safetensors-0.8.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/safetensors-c71d239df917-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "sizeBytes": 11357
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "safetensors-0.8.0.dist-info/METADATA",
+          "sha256": "645be7b8d55e91534f991d144dc9e279581ea8dbea1a8c5b0be14e529d01e345"
+        },
+        {
+          "path": "safetensors-0.8.0.dist-info/RECORD",
+          "sha256": "70ce5f14166b53804d7fa69c32bc9e00515baf43286e61d3a13398c08275116a"
+        },
+        {
+          "path": "safetensors-0.8.0.dist-info/WHEEL",
+          "sha256": "9123281588fe03fb2bd8b121d28a389aa04637964ffefb558be6c7be6ba7bb55"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "setuptools",
+      "version": "72.1.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "files": [
+        {
+          "sourcePath": "setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-ade78d04982d-LICENSE",
+          "sha256": "ade78d04982d69972d444a8e14a94f87a2334dd3855cc80348ea8e240aa0df2d",
+          "sizeBytes": 7634
+        },
+        {
+          "sourcePath": "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-86da0f01aeae-LICENSE",
+          "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+          "sizeBytes": 1023
+        },
+        {
+          "sourcePath": "setuptools/_vendor/importlib_metadata-8.0.0.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-cfc7749b96f6-LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "sizeBytes": 11358
+        },
+        {
+          "sourcePath": "setuptools/_vendor/importlib_resources-6.4.0.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-cfc7749b96f6-LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "sizeBytes": 11358
+        },
+        {
+          "sourcePath": "setuptools/_vendor/inflect-7.3.1.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-86da0f01aeae-LICENSE",
+          "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+          "sizeBytes": 1023
+        },
+        {
+          "sourcePath": "setuptools/_vendor/jaraco.context-5.3.0.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-86da0f01aeae-LICENSE",
+          "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+          "sizeBytes": 1023
+        },
+        {
+          "sourcePath": "setuptools/_vendor/jaraco.functools-4.0.1.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-86da0f01aeae-LICENSE",
+          "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+          "sizeBytes": 1023
+        },
+        {
+          "sourcePath": "setuptools/_vendor/jaraco.text-3.12.1.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-86da0f01aeae-LICENSE",
+          "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+          "sizeBytes": 1023
+        },
+        {
+          "sourcePath": "setuptools/_vendor/more_itertools-10.3.0.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-09f1c8c9e941-LICENSE",
+          "sha256": "09f1c8c9e941af3e584d59641ea9b87d83c0cb0fd007eb5ef391a7e2643c1a46",
+          "sizeBytes": 1053
+        },
+        {
+          "sourcePath": "setuptools/_vendor/packaging-24.1.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-cad1ef5bd340-LICENSE",
+          "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
+          "sizeBytes": 197
+        },
+        {
+          "sourcePath": "setuptools/_vendor/packaging-24.1.dist-info/LICENSE.APACHE",
+          "packetPath": "licenses/setuptools-0d542e0c8804-LICENSE.APACHE",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+          "sizeBytes": 10174
+        },
+        {
+          "sourcePath": "setuptools/_vendor/packaging-24.1.dist-info/LICENSE.BSD",
+          "packetPath": "licenses/setuptools-b70e7e9b742f-LICENSE.BSD",
+          "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5",
+          "sizeBytes": 1344
+        },
+        {
+          "sourcePath": "setuptools/_vendor/platformdirs-4.2.2.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/setuptools-29e0fd62e929-LICENSE",
+          "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6",
+          "sizeBytes": 1089
+        },
+        {
+          "sourcePath": "setuptools/_vendor/tomli-2.0.1.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-b80816b0d530-LICENSE",
+          "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe",
+          "sizeBytes": 1072
+        },
+        {
+          "sourcePath": "setuptools/_vendor/typeguard-4.3.0.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-6163f7987dfb-LICENSE",
+          "sha256": "6163f7987dfb38d6bc320ce2b70b2f02b862bc41126516d552ef1cd43247e758",
+          "sizeBytes": 1130
+        },
+        {
+          "sourcePath": "setuptools/_vendor/typing_extensions-4.12.2.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-3b2f81fe21d1-LICENSE",
+          "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+          "sizeBytes": 13936
+        },
+        {
+          "sourcePath": "setuptools/_vendor/wheel-0.43.0.dist-info/LICENSE.txt",
+          "packetPath": "licenses/setuptools-30c236186791-LICENSE.txt",
+          "sha256": "30c23618679108f3e8ea1d2a658c7ca417bdfc891c98ef1a89fa4ff0c9828654",
+          "sizeBytes": 1107
+        },
+        {
+          "sourcePath": "setuptools/_vendor/zipp-3.19.2.dist-info/LICENSE",
+          "packetPath": "licenses/setuptools-86da0f01aeae-LICENSE",
+          "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+          "sizeBytes": 1023
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "setuptools/_vendor/autocommand-2.2.2.dist-info/METADATA",
+          "sha256": "3800d9b91dceea2065a6ed6279383362e97ac38b8e56b9343f404ee531860099"
+        },
+        {
+          "path": "setuptools/_vendor/autocommand-2.2.2.dist-info/RECORD",
+          "sha256": "822bba66b41526fa547186b80221f85da50d652bee5493dbfe5d14085112f0c3"
+        },
+        {
+          "path": "setuptools/_vendor/autocommand-2.2.2.dist-info/WHEEL",
+          "sha256": "db07a93359e4e034b8785a58ad6d534ea3dca0635f1e184efe2e66e1c3a299ba"
+        },
+        {
+          "path": "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/METADATA",
+          "sha256": "8215c54ead77d9dc5a108a25c6bdc72b5999aa6f62c9499a440359412afa5a51"
+        },
+        {
+          "path": "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/RECORD",
+          "sha256": "258a1f1c849e1175069a55a5d6ce357afdd04e34cd5de27093e4acec7a9d2ce1"
+        },
+        {
+          "path": "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/WHEEL",
+          "sha256": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714"
+        },
+        {
+          "path": "setuptools/_vendor/importlib_metadata-8.0.0.dist-info/METADATA",
+          "sha256": "6a7b90effee1e09d5b484cdf7232016a43e2d9cc9543bcbb8e494b1ec05e1f59"
+        },
+        {
+          "path": "setuptools/_vendor/importlib_metadata-8.0.0.dist-info/RECORD",
+          "sha256": "0d8d3c6eeb9ebbe86cac7d60861552433c329da9ea51248b61d02be2e5e64030"
+        },
+        {
+          "path": "setuptools/_vendor/importlib_metadata-8.0.0.dist-info/WHEEL",
+          "sha256": "9a0b8c95618c5fe5479cca4a3a38d089d228d6cb1194216ee1ae26069cf5b363"
+        },
+        {
+          "path": "setuptools/_vendor/importlib_resources-6.4.0.dist-info/METADATA",
+          "sha256": "83878cd8bb8bd0e89971454d0f4ab00c9529136f603afb4edc148f5d36cef459"
+        },
+        {
+          "path": "setuptools/_vendor/importlib_resources-6.4.0.dist-info/RECORD",
+          "sha256": "967dd56feea143f1d2c4e98ac1f937c055e61c9aa0425146d55f7ad7c82510fa"
+        },
+        {
+          "path": "setuptools/_vendor/importlib_resources-6.4.0.dist-info/WHEEL",
+          "sha256": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714"
+        },
+        {
+          "path": "setuptools/_vendor/inflect-7.3.1.dist-info/METADATA",
+          "sha256": "66030d634580651b3e53cc19895d9231f8d22aa06b327817c8332cfc20303308"
+        },
+        {
+          "path": "setuptools/_vendor/inflect-7.3.1.dist-info/RECORD",
+          "sha256": "5d7834ac1ba2612c6801050fde57a7b98b0f36acf88c3c2d4f376fd8911b3091"
+        },
+        {
+          "path": "setuptools/_vendor/inflect-7.3.1.dist-info/WHEEL",
+          "sha256": "cb8997f92397e1f6089289ec0060393743b2fbcfe0238157c391cd235c6abd68"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.context-5.3.0.dist-info/METADATA",
+          "sha256": "c43b60b897a3d2d37d8845c252fc44261d9aef171e21154111a9012d2afffed6"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.context-5.3.0.dist-info/RECORD",
+          "sha256": "55197b88a78443297bb2d827a75baae740b33896251d872835d4b4c75ec2f57e"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.context-5.3.0.dist-info/WHEEL",
+          "sha256": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.functools-4.0.1.dist-info/METADATA",
+          "sha256": "8b86946900d7fa38dd1102b9c1ebe17a0cb1f09c8b7e29f61f2bda4a4dc51eca"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.functools-4.0.1.dist-info/RECORD",
+          "sha256": "632aa7c04f7c4bcc01c027af5b9bc76fe8958f4a181035b957a3bd3014ba248b"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.functools-4.0.1.dist-info/WHEEL",
+          "sha256": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.text-3.12.1.dist-info/METADATA",
+          "sha256": "03359d9ba56231f0ce3e840c7cb5a7db380141218949ccaa78ddbd4dcb965d52"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.text-3.12.1.dist-info/RECORD",
+          "sha256": "816d945741dca246099388ca3eed74fc0667acbaa36f70b559b2494c3979b1f6"
+        },
+        {
+          "path": "setuptools/_vendor/jaraco.text-3.12.1.dist-info/WHEEL",
+          "sha256": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714"
+        },
+        {
+          "path": "setuptools/_vendor/more_itertools-10.3.0.dist-info/METADATA",
+          "sha256": "0453bdd0ef9f2cd89540ca63ee8212e73b73809514419dd3037d8fe471f737e0"
+        },
+        {
+          "path": "setuptools/_vendor/more_itertools-10.3.0.dist-info/RECORD",
+          "sha256": "77c8e73e018dc0fd7e9ed6c80b05a4404545f641fb085220ce42b368b59aa3d3"
+        },
+        {
+          "path": "setuptools/_vendor/more_itertools-10.3.0.dist-info/WHEEL",
+          "sha256": "ad282afc9a4717d7c7475971e77ab083fd7ed8bca9644fea99cb976d552af78f"
+        },
+        {
+          "path": "setuptools/_vendor/ordered_set-4.1.0.dist-info/METADATA",
+          "sha256": "16a54dfd551325308343ebed9e65eb6e06a90e3722113fb9e2048d278eecae8f"
+        },
+        {
+          "path": "setuptools/_vendor/ordered_set-4.1.0.dist-info/RECORD",
+          "sha256": "9064fe36603ce603dd3d03f68cc19d37ed9a4398227bfd54438400086dcc20fa"
+        },
+        {
+          "path": "setuptools/_vendor/ordered_set-4.1.0.dist-info/WHEEL",
+          "sha256": "8cf311fc3ce47385f889c42d9b3f35967358fe402c7e883baf2eeaa11bd82d7c"
+        },
+        {
+          "path": "setuptools/_vendor/packaging-24.1.dist-info/METADATA",
+          "sha256": "5f7a283b75a709fccd481aea42379f083d4f3801753365922e6b0732042515d9"
+        },
+        {
+          "path": "setuptools/_vendor/packaging-24.1.dist-info/RECORD",
+          "sha256": "38a6898306293627c81e2b2d8a93e5f6857d5f7edb73f0334e8d9a53dad53b6e"
+        },
+        {
+          "path": "setuptools/_vendor/packaging-24.1.dist-info/WHEEL",
+          "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e"
+        },
+        {
+          "path": "setuptools/_vendor/platformdirs-4.2.2.dist-info/METADATA",
+          "sha256": "ce6b227b4d46d4cb57474c2022fe57a557933bb89daf4596bdf9b12ac296b869"
+        },
+        {
+          "path": "setuptools/_vendor/platformdirs-4.2.2.dist-info/RECORD",
+          "sha256": "4c211d76d42ed40efc3acfcc866d8912a718afbca2b7e51849442366d6e99fe8"
+        },
+        {
+          "path": "setuptools/_vendor/platformdirs-4.2.2.dist-info/WHEEL",
+          "sha256": "cc431c46bf4aaf4df1d68cc6c20e6ff4d4012a7de49dda7a2d2a1295583e8e15"
+        },
+        {
+          "path": "setuptools/_vendor/tomli-2.0.1.dist-info/METADATA",
+          "sha256": "ccf0dc78a98fc0918b5ad67292b1e2c4bed65575a6246cd9d63c914f9942a0f2"
+        },
+        {
+          "path": "setuptools/_vendor/tomli-2.0.1.dist-info/RECORD",
+          "sha256": "0cb9f9a451a1e365ac54b4c88662e1da0cb54a72d16a5258fb0abff9d3e1c022"
+        },
+        {
+          "path": "setuptools/_vendor/tomli-2.0.1.dist-info/WHEEL",
+          "sha256": "8cf311fc3ce47385f889c42d9b3f35967358fe402c7e883baf2eeaa11bd82d7c"
+        },
+        {
+          "path": "setuptools/_vendor/typeguard-4.3.0.dist-info/METADATA",
+          "sha256": "cf675c1c0a744f08580855390de87cc77d676b312582e8d4cfdb5bb8fd298d21"
+        },
+        {
+          "path": "setuptools/_vendor/typeguard-4.3.0.dist-info/RECORD",
+          "sha256": "48a51959582478352275428ceecd78ef77d79ac9dae796e39a2eaf2540282552"
+        },
+        {
+          "path": "setuptools/_vendor/typeguard-4.3.0.dist-info/WHEEL",
+          "sha256": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714"
+        },
+        {
+          "path": "setuptools/_vendor/typing_extensions-4.12.2.dist-info/METADATA",
+          "sha256": "05e51021af1c9d86eb8d6c7e37c4cece733d5065b91a6d8389c5690ed440f16d"
+        },
+        {
+          "path": "setuptools/_vendor/typing_extensions-4.12.2.dist-info/RECORD",
+          "sha256": "7710002d81971e632aa6a2fc33dc5d74aaf5d7caae22040a65d3e31503b05ee9"
+        },
+        {
+          "path": "setuptools/_vendor/typing_extensions-4.12.2.dist-info/WHEEL",
+          "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e"
+        },
+        {
+          "path": "setuptools/_vendor/wheel-0.43.0.dist-info/METADATA",
+          "sha256": "59bac22b00a59d3e5608a56b8cf8efc43831a36b72792ee4389c9cd4669c7841"
+        },
+        {
+          "path": "setuptools/_vendor/wheel-0.43.0.dist-info/RECORD",
+          "sha256": "783e654742611af88cd9f00bf01a431a219db536556e63ff981c7bd673070ac9"
+        },
+        {
+          "path": "setuptools/_vendor/wheel-0.43.0.dist-info/WHEEL",
+          "sha256": "1196c6921ec87b83e865f450f08d19b8ff5592537f4ef719e83484e546abe33e"
+        },
+        {
+          "path": "setuptools/_vendor/zipp-3.19.2.dist-info/METADATA",
+          "sha256": "508ae4fe43081c64b0b0a2828588b3a8cc3430c6693d1676662569400b0dfdb1"
+        },
+        {
+          "path": "setuptools/_vendor/zipp-3.19.2.dist-info/RECORD",
+          "sha256": "f316f2e03fd9ade7ebbc0b154706848e2bb8fd568b90935109f0d8e3ce2b9bfe"
+        },
+        {
+          "path": "setuptools/_vendor/zipp-3.19.2.dist-info/WHEEL",
+          "sha256": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "sniffio",
+      "version": "1.3.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "db11fec9946737df39ca3898d9cd8c10ec6f6c3a884a6802b0ad0b81b4e8f23a",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache Software License"
+      ],
+      "files": [
+        {
+          "sourcePath": "sniffio-1.3.0.dist-info/LICENSE",
+          "packetPath": "licenses/sniffio-652c878488d1-LICENSE",
+          "sha256": "652c878488d1456361e08c3f8607fd7ba59892a14103d15cce4ff93c85b5cc8b",
+          "sizeBytes": 185
+        },
+        {
+          "sourcePath": "sniffio-1.3.0.dist-info/LICENSE.APACHE2",
+          "packetPath": "licenses/sniffio-cfc7749b96f6-LICENSE.APACHE2",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "sizeBytes": 11358
+        },
+        {
+          "sourcePath": "sniffio-1.3.0.dist-info/LICENSE.MIT",
+          "packetPath": "licenses/sniffio-3e6dae555eb9-LICENSE.MIT",
+          "sha256": "3e6dae555eb92787fc82d1d48355677f454c7f65aeb38d3f9e72bf9a3daf034b",
+          "sizeBytes": 1046
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "sniffio-1.3.0.dist-info/METADATA",
+          "sha256": "b573fc5ac41109dde37c5fcdb648db99883d7fbf66cd2de6c1137ada7101b404"
+        },
+        {
+          "path": "sniffio-1.3.0.dist-info/RECORD",
+          "sha256": "189b94ca710f4d6c69771a6fd518a82b1690dd1675b24b5916542b4e761f5114"
+        },
+        {
+          "path": "sniffio-1.3.0.dist-info/WHEEL",
+          "sha256": "195f5a3138703ffe28342b6f102d9e737a9462eb6059e033925ae8ff49b85894"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "sympy",
+      "version": "1.13.3",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "49d9777da612e1f4e9269fa9f93ea324a66f9dcc7722ad812de124ef3f266d93",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "files": [
+        {
+          "sourcePath": "sympy-1.13.3.dist-info/AUTHORS",
+          "packetPath": "licenses/sympy-2d4eff597bfe-AUTHORS",
+          "sha256": "2d4eff597bfe2d8c28764510313fd773b9fd05591ca036d17dea17be7dc7aef4",
+          "sizeBytes": 53081
+        },
+        {
+          "sourcePath": "sympy-1.13.3.dist-info/LICENSE",
+          "packetPath": "licenses/sympy-07a5e9819f72-LICENSE",
+          "sha256": "07a5e9819f727b4986ad2829c7a29a6320d42575f720eb24d71b7fef573a0286",
+          "sizeBytes": 7885
+        },
+        {
+          "sourcePath": "sympy/parsing/latex/LICENSE.txt",
+          "packetPath": "licenses/sympy-007bc30a58fa-LICENSE.txt",
+          "sha256": "007bc30a58fa40a996e772047120de4eaf31f5110e4f9c3b5f93fcdfbe2eaca1",
+          "sizeBytes": 1075
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "sympy-1.13.3.dist-info/METADATA",
+          "sha256": "02525863bc752c7b5ec4d86360be7c9aed896047e259400861a8098dbe2f16fb"
+        },
+        {
+          "path": "sympy-1.13.3.dist-info/RECORD",
+          "sha256": "9a02640890b35a26c7b8947423a82671f198a3c3cdffe46abf1ebbda77254c9c"
+        },
+        {
+          "path": "sympy-1.13.3.dist-info/WHEEL",
+          "sha256": "227f454cdc5e3fad0a9d3906c3bc24ea624f61dfdd4128c46665dd05d30223ef"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "tokenizers",
+      "version": "0.22.2",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: Apache Software License"
+      ],
+      "files": [
+        {
+          "sourceURL": "https://raw.githubusercontent.com/huggingface/tokenizers/v0.22.2/LICENSE",
+          "packetPath": "licenses/tokenizers-0.22.2-upstream-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "sizeBytes": 11357,
+          "scope": "upstream tag reference; absent from installed wheel"
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "tokenizers-0.22.2.dist-info/METADATA",
+          "sha256": "15a5ddaf489f592b77e0a934c0eeb46b51130a94064ca129232afdb0a3868efc"
+        },
+        {
+          "path": "tokenizers-0.22.2.dist-info/RECORD",
+          "sha256": "f41308a8d21c22852c8bbed274e68e2cac8289fd93bc208a7d443b650a21b532"
+        },
+        {
+          "path": "tokenizers-0.22.2.dist-info/WHEEL",
+          "sha256": "1c31c34b272f665edc758aee7990e578e1ccb0ffadebff459ad0f7beaa6cea0f"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "torch",
+      "version": "2.12.1",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "118dbcd2d5c9f9b296a9ede9fcc469c5840f7b98ad2c88461055bf2ceda38037",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "torch-2.12.1.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/torch-d51e823c0d27-LICENSE",
+          "sha256": "d51e823c0d27cea2e5c689704194a2f98890869e48832449d225ffde51b239b6",
+          "sizeBytes": 415415
+        },
+        {
+          "sourcePath": "torch-2.12.1.dist-info/licenses/NOTICE",
+          "packetPath": "licenses/torch-c2cc7bf0caec-NOTICE",
+          "sha256": "c2cc7bf0caec7652c2b460a8a470bea1677f241e4ab8e431df34cf17f5a9fec0",
+          "sizeBytes": 23632
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "torch-2.12.1.dist-info/METADATA",
+          "sha256": "a0e493588a0381cc478d848e7f7a334ef7f17e8973c70b657867a5eeadb732df"
+        },
+        {
+          "path": "torch-2.12.1.dist-info/RECORD",
+          "sha256": "0a4a578519565fd615849f2c5d476182df992d9dd2c5f3eea97a3d94a804b9d6"
+        },
+        {
+          "path": "torch-2.12.1.dist-info/WHEEL",
+          "sha256": "fd15a3df61d141169d667516e27b0653f95fe3d75f7bbc18c4dd6a08a2b1cc98"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "tqdm",
+      "version": "4.67.1",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "497716e0cebf8fb1944bbac349083f8ba656e10320c3f9811a955fc8786d0cc1",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)"
+      ],
+      "files": [
+        {
+          "sourcePath": "tqdm-4.67.1.dist-info/LICENCE",
+          "packetPath": "licenses/tqdm-dc33252e8290-LICENCE",
+          "sha256": "dc33252e829015e3b150086fb9b3a40f6ad6fb32c2f4610ce812fa677d35986a",
+          "sizeBytes": 1985
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "tqdm-4.67.1.dist-info/METADATA",
+          "sha256": "3aec3b4978d27bf15fbff84e61979736daf43e20531bea276f7cbba8639cd32b"
+        },
+        {
+          "path": "tqdm-4.67.1.dist-info/RECORD",
+          "sha256": "7f028176e311fd9bba253fdfd215797458e9da23e4d55e21242a4a4969c59d08"
+        },
+        {
+          "path": "tqdm-4.67.1.dist-info/WHEEL",
+          "sha256": "227f454cdc5e3fad0a9d3906c3bc24ea624f61dfdd4128c46665dd05d30223ef"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "transformers",
+      "version": "5.13.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "075e5377ffe49ea3415840cb784d85a27084d48632eff977f849c2892e766840",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "transformers-5.13.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/transformers-77fd4710def9-LICENSE",
+          "sha256": "77fd4710def9ec3c0f6225800e0235f15a425abd4a8b03559127fcd782612049",
+          "sizeBytes": 11418
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "transformers-5.13.0.dist-info/METADATA",
+          "sha256": "32e123b9900bf25aa16aff1f715bb6d02d68910b05b40e2e9a4f716278109da8"
+        },
+        {
+          "path": "transformers-5.13.0.dist-info/RECORD",
+          "sha256": "a79013ba8cd343fcac0fdc16fbd917777da86f16599514a75f7dc5fa9b311865"
+        },
+        {
+          "path": "transformers-5.13.0.dist-info/WHEEL",
+          "sha256": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "typer",
+      "version": "0.9.0",
+      "declaredLicenseExpression": null,
+      "licenseMetadataSHA256": "23759997b3c59884dc4c0ff5320d6301b0e7f63bf0f6483a7b54d7d43bc5ccd1",
+      "licenseClassifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "files": [
+        {
+          "sourcePath": "typer-0.9.0.dist-info/LICENSE",
+          "packetPath": "licenses/typer-58992cebcf8d-LICENSE",
+          "sha256": "58992cebcf8dfb6e40c4e2112ed12126c243666dca3912a3d78b7ecac4859d49",
+          "sizeBytes": 1086
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "typer-0.9.0.dist-info/METADATA",
+          "sha256": "6b195b8d688da2931d86b93c8573e5cc9a058f6a1f748d81301166258d827bb8"
+        },
+        {
+          "path": "typer-0.9.0.dist-info/RECORD",
+          "sha256": "46984d5871e1870567a157b2bdd8c962282465d136cf9ff3203e866f247e3397"
+        },
+        {
+          "path": "typer-0.9.0.dist-info/WHEEL",
+          "sha256": "18b1126fe0223bd4c58db5eb100ed4acd9787705a5917a0a660e8de958343898"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "declaredLicenseExpression": "PSF-2.0",
+      "licenseMetadataSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "licenseClassifiers": [],
+      "files": [
+        {
+          "sourcePath": "typing_extensions-4.16.0.dist-info/licenses/LICENSE",
+          "packetPath": "licenses/typing-extensions-3b2f81fe21d1-LICENSE",
+          "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+          "sizeBytes": 13936
+        }
+      ],
+      "installedMetadataDigests": [
+        {
+          "path": "typing_extensions-4.16.0.dist-info/METADATA",
+          "sha256": "b05084ca1d50879865178d9fff9fabeab61bdfb1f361bfbde95421ffc8f9be46"
+        },
+        {
+          "path": "typing_extensions-4.16.0.dist-info/RECORD",
+          "sha256": "87c5132ed922c2e300fd3c36b828e1b3694f2e2ac38f26f556064c4bf3d9af81"
+        },
+        {
+          "path": "typing_extensions-4.16.0.dist-info/WHEEL",
+          "sha256": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db"
+        }
+      ],
+      "legalApproval": "pending",
+      "packagingScope": "research_tool_only_not_app"
+    }
+  ]
+}

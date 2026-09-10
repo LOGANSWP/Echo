@@ -23,11 +23,14 @@ private final class NarrativeReportBackgroundSession {
     var work: Task<Void, Never>?
     var taskID: String?
     var expirationObserved = false
+
+    deinit {}
 }
 
 /// Echo 应用代理 — 负责后台任务注册与生命周期管理
 /// 后台任务包括：定时扫描、数据同步、索引构建（US-SYS-001）
 final class AppDelegate: NSObject, UIApplicationDelegate {
+    deinit {}
 
     private static let narrativeReportBackgroundIdentifier = "com.echo.narrative-report-processing"
 
@@ -146,7 +149,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
             progressActor: .shared,
             canonicalRepository: canonicalRepository,
             generationRegistry: registry,
-            memoryEditActor: composition.memoryEditActor
+            memoryEditActor: composition.memoryEditActor,
+            photoPreparation: composition.photoUnderstandingActor
         )
         do {
             try await composition.memoryEditActor.attachExternalChangeApplier(
@@ -228,6 +232,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                 switch event {
                 case .enter(let regionId):
                     _ = await pipeline.handleGeofenceEnter(regionId: regionId)
+
                 case .exit(let regionId):
                     _ = await pipeline.handleGeofenceExit(regionId: regionId)
                 }
@@ -333,8 +338,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
                 }
                 return try await composition.narrativeReportActor.listReports()
                     .contains { $0.periodKey == periodKey }
+
             case .retryRequired:
                 return false
+
             case .none, .noData, .deferredForResources, .generationUnavailable:
                 return true
             }
@@ -348,6 +355,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         guard composition.startupState == .ready
                 || composition.startupState == .modelUnavailable
                 || composition.startupState == .indexUnavailable else { return }
+        // Task 4.0l: each foreground opportunity schedules at most eight unprepared photos.
         _ = try? await composition.narrativeReportActor.establishEligibilityIfNeeded()
         _ = try? await composition.narrativeReportActor.scanAndEnqueue(
             calendarContext: .init(timeZoneIdentifier: TimeZone.autoupdatingCurrent.identifier),

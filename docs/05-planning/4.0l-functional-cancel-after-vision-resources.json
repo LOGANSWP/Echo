@@ -1,0 +1,19 @@
+{
+  "mode": "cancel-after-vision",
+  "exitCode": 1,
+  "stopReason": null,
+  "elapsedSeconds": 3.594866416999139,
+  "sampledProcessTreeRSSPeakBytes": 1009893376,
+  "sampledResearchDiskPeakBytes": 1078838837,
+  "pollIntervalSeconds": 0.5,
+  "executableSHA256": "df4e9b20bdf3e902ce641a35fb9aa4c0223d6f16b6837b5a4558aedb19f4d2f8",
+  "sources": {
+    "PhotoFunctionalProbe.swift": "ea74e39a3f67607399ca3c88e81e0b300188886f546b13ce87cd9020bc64aa7f",
+    "PhotoTokenizer.swift": "15717d3200933ba25725c63c42fc91fbd5e79c25c978ba5c0de33faab64b23d3",
+    "PhotoImagePreprocessor.swift": "0d0fd2d21afc5a01116c0b74a8c81e07b956eaefbf99bd553cb592dee38a5cb0",
+    "GenerationMemory.swift": "a49c18684d8eb5007bb22fe93fecda90d9bf556827c132ace8eabe93d474c016"
+  },
+  "log": "Cancelled after one actual vision prediction; no decoder call or caption.\nPhoto native research failed: CancellationError()\n",
+  "productionApproval": "pending",
+  "sourceAndPackageIntegrityBeforeAfter": true
+}

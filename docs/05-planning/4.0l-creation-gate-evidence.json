@@ -1,0 +1,39 @@
+{
+  "task": "4.0l",
+  "recordedAt": "2026-09-09T19:42:36.812760+00:00",
+  "scope": "Photo creation material gate",
+  "rules": [
+    "Navigation remains available",
+    "Every selected photo needs a current caption or nonblank user description",
+    "Title, tags, OCR and original text alone cannot unlock generation",
+    "Canonical material is reloaded before inference; stale ready snapshots cannot bypass the gate",
+    "Readiness never auto-starts generation"
+  ],
+  "validation": {
+    "red": "/tmp/echo-4.0l-gate-red.log",
+    "redResult": "Compilation failed for absent readiness API",
+    "initialGreen": "/tmp/echo-4.0l-gate-green.log",
+    "initialResult": "9 tests in 3 suites passed",
+    "final": "/tmp/echo-4.0l-gate-final.log",
+    "finalResult": "41 tests in 5 suites passed",
+    "localization": "480 keys; 100% bilingual parity",
+    "device": "iPhone 17 Pro simulator; serial tests"
+  },
+  "limits": [
+    "No new model quality or device qualification claim"
+  ],
+  "cleanup": {
+    "removedDuplicateResultBytes": 264266,
+    "retained": "Final xcresult and all text logs"
+  },
+  "liveReviewInstallation": {
+    "device": "iPhone 16 Pro / iOS 18.2",
+    "installedAt": "2026-09-09T19:53:02Z",
+    "authorization": "User requested latest installation for live review",
+    "install": "succeeded",
+    "launch": "succeeded",
+    "screenHash": "01qwpin",
+    "screen": "Home with existing photo memories",
+    "review": "Awaiting user live review"
+  }
+}

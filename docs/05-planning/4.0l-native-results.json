@@ -1,0 +1,83 @@
+{
+  "cases" : [
+    {
+      "eos" : true,
+      "firstTokenTop1" : 533,
+      "generatedIDs" : [
+        533,
+        451,
+        2443,
+        665,
+        314,
+        253,
+        2382,
+        7842,
+        30,
+        49279
+      ],
+      "id" : 0,
+      "inputTokens" : 83,
+      "pixelSHA256" : "c242ebd474033c776e41a16b364282ba3b584741532dbbc4a3ce1fc3925ceed6",
+      "predictionCalls" : 93,
+      "seconds" : 3.9752416666669887,
+      "text" : " In this image there is a red circle."
+    },
+    {
+      "eos" : true,
+      "firstTokenTop1" : 533,
+      "generatedIDs" : [
+        533,
+        451,
+        2443,
+        665,
+        314,
+        253,
+        4461,
+        7842,
+        30,
+        49279
+      ],
+      "id" : 1,
+      "inputTokens" : 83,
+      "pixelSHA256" : "a22f9c37e06354ed68d518a2f013b5a1927bba06d53852ae17e2788107f106cf",
+      "predictionCalls" : 93,
+      "seconds" : 1.6086612083308864,
+      "text" : " In this image there is a blue circle."
+    }
+  ],
+  "compileSeconds" : 0.3720593333346187,
+  "loadSeconds" : 2.0946101666631876,
+  "memory" : [
+    {
+      "kernelPhysicalFootprintPeakBytes" : 6291984,
+      "physicalFootprintBytes" : 6291984,
+      "residentBytes" : 11141120,
+      "residentPeakBytes" : 11141120,
+      "stage" : "before_compile"
+    },
+    {
+      "kernelPhysicalFootprintPeakBytes" : 660129232,
+      "physicalFootprintBytes" : 326485192,
+      "residentBytes" : 585973760,
+      "residentPeakBytes" : 992182272,
+      "stage" : "after_load"
+    },
+    {
+      "kernelPhysicalFootprintPeakBytes" : 775472424,
+      "physicalFootprintBytes" : 699696424,
+      "residentBytes" : 544522240,
+      "residentPeakBytes" : 992182272,
+      "stage" : "case_0_completed"
+    },
+    {
+      "kernelPhysicalFootprintPeakBytes" : 801768744,
+      "physicalFootprintBytes" : 701072680,
+      "residentBytes" : 548421632,
+      "residentPeakBytes" : 992182272,
+      "stage" : "case_1_completed"
+    }
+  ],
+  "operatingSystem" : "Version 26.5 (Build 25F71)",
+  "productionApproval" : "pending",
+  "scope" : "Mac native Swift\/Core ML synthetic-square image-to-caption; pretokenized input, no App\/device qualification"
+}

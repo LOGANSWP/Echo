@@ -1,0 +1,52 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "2789B5D1-D292-4144-A66B-649CE2DF32EC",
+        "deviceName" : "iPhone 17 Pro",
+        "modelName" : "iPhone 17 Pro",
+        "osBuildNumber" : "23F77",
+        "osVersion" : "26.5",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 1,
+      "passedTests" : 2,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "Echo · Built with macOS 26.5",
+  "expectedFailures" : 0,
+  "failedTests" : 1,
+  "finishTime" : 1788975831.804,
+  "passedTests" : 1,
+  "result" : "Failed",
+  "skippedTests" : 0,
+  "startTime" : 1788975716.566,
+  "statistics" : [
+    {
+      "subtitle" : "2 test runs",
+      "title" : "1 test ran with dynamic parameters"
+    }
+  ],
+  "testFailures" : [
+    {
+      "failureText" : "Test crashed with signal trap.",
+      "targetName" : "EchoTests",
+      "testIdentifier" : 1,
+      "testIdentifierString" : "PhotoProductionIntegrationTests/test_AC7_photoToCreation()",
+      "testIdentifierURL" : "test://com.apple.xcode/Echo/EchoTests/PhotoProductionIntegrationTests/test_AC7_photoToCreation()",
+      "testName" : "AC-7: a real uncaptioned PhotoKit asset reaches grounded creation"
+    }
+  ],
+  "title" : "Test - Echo",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 2
+}

@@ -44,6 +44,8 @@ nonisolated public struct CreativeSource: Sendable, Equatable {
     /// 记忆时间戳
     nonisolated public let timestamp: TimeInterval
     nonisolated public let revision: TimeInterval?
+    /// Current caption or nonblank user description, resolved by storage.
+    nonisolated public let photoCreationReady: Bool
 
     nonisolated public init(
         memoryID: UUID,
@@ -51,7 +53,8 @@ nonisolated public struct CreativeSource: Sendable, Equatable {
         sourceType: String,
         text: String?,
         timestamp: TimeInterval,
-        revision: TimeInterval? = nil
+        revision: TimeInterval? = nil,
+        photoCreationReady: Bool = false
     ) {
         self.memoryID = memoryID
         self.assetID = assetID
@@ -59,6 +62,7 @@ nonisolated public struct CreativeSource: Sendable, Equatable {
         self.text = text
         self.timestamp = timestamp
         self.revision = revision
+        self.photoCreationReady = photoCreationReady
     }
 }
 
@@ -355,6 +359,9 @@ public actor CreativePipeline {
                 ) else {
                     throw GenerationRuntimeError.privacyDenied
                 }
+                guard current.sourceType != "photo" || current.photoCreationReady else {
+                    throw CreativeError.noSources
+                }
                 try GenerationInputBudget.consume(current.text ?? "", remaining: &remaining)
                 currentSources.append(current)
             }
@@ -380,9 +387,10 @@ public actor CreativePipeline {
                 },
                 sourceTypes: submittedSourceTypes,
                 traceID: traceID,
-                deadline: ProcessInfo.processInfo.systemUptime + 120,
+                deadline: ProcessInfo.processInfo.systemUptime + GenerationExecutionScope.manualCreation.requestSeconds,
                 sourceSnapshots: submittedSources,
-                useEffectiveSourceText: true
+                useEffectiveSourceText: true,
+                executionScope: .manualCreation
             )
             let paragraphs = aligned.paragraphs
             if template == .poem {
@@ -546,7 +554,8 @@ public actor CreativePipeline {
         isReduction: Bool = false,
         sourceSnapshots: [CreativeSource] = [],
         excerptScalarLimit: Int? = nil,
-        useEffectiveSourceText: Bool = false
+        useEffectiveSourceText: Bool = false,
+        executionScope: GenerationExecutionScope = .standard
     ) async throws -> AlignedGeneration {
         let checkpoint = await privacyActor.validate(
             operation: .search,
@@ -583,7 +592,8 @@ public actor CreativePipeline {
                 language: policy.preferredLanguage,
                 traceID: traceID,
                 deadline: deadline,
-                terminology: terminology
+                terminology: terminology,
+                executionScope: executionScope
             ),
             isReduction: isReduction
         )

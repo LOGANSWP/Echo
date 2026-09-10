@@ -203,6 +203,7 @@ struct CreationView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: EchoSpacingToken.section.points) {
                 reportLibrarySection
+                photoPreparationSection
 
                 EchoSectionHeader(
                     title: "Choose a template",
@@ -409,7 +410,7 @@ struct CreationView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(EchoActionButtonStyle(role: .primary))
-        .disabled(viewModel.selectedTemplate == nil)
+        .disabled(!viewModel.canGenerate)
         .accessibilityIdentifier("creation-generate")
     }
 
@@ -617,6 +618,7 @@ struct CreationView: View {
     private var emptyState: some View {
         VStack(spacing: 12) {
             Spacer()
+            photoPreparationSection
 
             EchoContainer(level: .section) {
                 EchoStatusPresentation(
@@ -624,17 +626,20 @@ struct CreationView: View {
                     systemImage: "tray",
                     title: EchoLocalization.localized(
                         viewModel.requiresSourceText
-                            ? "This memory needs text for creation" : "No source memories found",
+                            ? "Creation material is not ready" : "No source memories found",
                         locale: locale
                     ),
                     message: EchoLocalization.localized(
                         viewModel.requiresSourceText
-                            ? "AI Creation uses saved text, not photo pixels. Return to the memory details and add a description, or choose a memory with text."
+                            ? "Prepare photo material or choose another available memory, then try creation again."
                             : "Try a different template or add more memories.",
                         locale: locale
                     )
                 )
             }
+
+            Button("Choose a template again") { viewModel.dismissError() }
+                .buttonStyle(EchoActionButtonStyle(role: .recovery))
 
             Button {
                 dismiss()
@@ -651,6 +656,21 @@ struct CreationView: View {
     }
 
     // MARK: - Error State
+
+    @ViewBuilder private var photoPreparationSection: some View {
+        if !viewModel.isFixtureBacked {
+            if !viewModel.photoSourceIDs.isEmpty, !viewModel.photoMaterialsReady {
+                Text("Wait for photo understanding, or add a description in memory details, before generating.")
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("creation-photo-material-required")
+            }
+            ForEach(viewModel.photoSourceIDs, id: \.self) { memoryID in
+                PhotoPreparationView(memoryID: memoryID, service: AppComposition.shared.photoUnderstandingActor) { ready in
+                    viewModel.updatePhotoReadiness(memoryID: memoryID, ready: ready)
+                }
+            }
+        }
+    }
 
     /// 错误视图 — L2 重试横幅 (docs/ui/architecture.md §2.2)。
     private func errorView(level: CreationViewModel.ErrorLevel) -> some View {

@@ -1,0 +1,13 @@
+{
+  "taskId": "4.0l",
+  "recordedAt": "2026-09-09T14:50:43.402333+00:00",
+  "userInstruction": "确认，但需注意磁盘空间占用，不需要的及时删除",
+  "scope": "Fixed SmolVLM-256M download and bounded local research per 4.0l-research-request.md",
+  "inventorySha256": "d341144801c6dc27a08b959c796dad69d41b08b470184171786c90a217c82d72",
+  "revision": "7e3e67edbbed1bf9888184d9df282b700a323964",
+  "approvedDownloadBytes": 517904565,
+  "researchDiskLimitBytes": 3000000000,
+  "cleanup": "Promptly remove this research run temporary downloads and unnecessary failed conversion artifacts; preserve fixed source and compact evidence. No deletion of unrelated files.",
+  "productionArtifactApproval": "pending",
+  "distributionApproval": "not_granted"
+}

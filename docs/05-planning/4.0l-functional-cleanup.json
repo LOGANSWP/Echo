@@ -1,0 +1,22 @@
+{
+  "taskId": "4.0l",
+  "recordedAt": "2026-09-09T15:28:46.561687+00:00",
+  "removedOwnedTemporaryPaths": [
+    {
+      "path": "/tmp/echo-4.0l-swift-module-cache",
+      "bytes": 43682180
+    },
+    {
+      "path": "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/conversion",
+      "bytes": 0
+    },
+    {
+      "path": "/Users/logansu/Documents/Dev/SwiftProjects/Echo/PinnedModels/photo-understanding-evaluation/smolvlm-256m/native-scratch",
+      "bytes": 0
+    }
+  ],
+  "researchBytesRemaining": 1034674525,
+  "preserved": "One verified fixed source, two conversion packages, native probe and compact numerical evidence",
+  "unrelatedPathsDeleted": false,
+  "freeBytes": 144522764288
+}

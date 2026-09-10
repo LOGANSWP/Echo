@@ -4,11 +4,13 @@
 // Task: 4.0k - Approved Core ML generation runtime
 // AC coverage: file integrity, request isolation, bounded tokens, explicit reference decoding and poem form
 // Architecture: AGENTS.md sections 4.2, 7.1, R-005/R-007
+// Task 4.0l: release request models before handing the shared visual/text lease to another actor.
 // Generated: 2026-09-08
 // ==========================================
 
 import CoreML
 import Foundation
+import OSLog
 
 public actor BundledGenerationActor: StructuredLLMProvider {
     private let resourceRoot: URL?
@@ -28,6 +30,19 @@ public actor BundledGenerationActor: StructuredLLMProvider {
     }
 
     public func validateAvailability(traceID: String) async throws {
+        let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        let lease = try await GenerativeModelSessionActor.shared.acquire()
+        do {
+            try await validateAvailabilityUnderLease(traceID: traceID)
+            await GenerativeModelSessionActor.shared.release(lease)
+        } catch {
+            await GenerativeModelSessionActor.shared.release(lease)
+            throw error
+        }
+    }
+
+    private func validateAvailabilityUnderLease(traceID: String) async throws {
         let checkpoint = await privacyActor.validate(operation: .search, traceID: traceID)
         guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
         guard !ownsRequest else { throw GenerationRuntimeError.busy }
@@ -95,6 +110,24 @@ public actor BundledGenerationActor: StructuredLLMProvider {
             sourceTypes: request.sourceTypes
         )
         guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
+        let lease = try await GenerativeModelSessionActor.shared.acquire()
+        do {
+            let result = try await generateUnderLease(request: request)
+            await GenerativeModelSessionActor.shared.release(lease)
+            return result
+        } catch {
+            await GenerativeModelSessionActor.shared.release(lease)
+            throw error
+        }
+    }
+
+    private func generateUnderLease(request: GenerationRequest) async throws -> GenerationResult {
+        let checkpoint = await privacyActor.validate(
+            operation: .search,
+            traceID: request.traceID,
+            sourceTypes: request.sourceTypes
+        )
+        guard checkpoint.isAllowed else { throw GenerationRuntimeError.privacyDenied }
         guard !ownsRequest else { throw GenerationRuntimeError.busy }
         ownsRequest = true
         defer { ownsRequest = false }
@@ -107,6 +140,17 @@ public actor BundledGenerationActor: StructuredLLMProvider {
             try await registerVerifiedIdentity()
             let prompt = try tokens(for: request)
             let start = ProcessInfo.processInfo.systemUptime
+            var loadSeconds = 0.0
+            var prefillSeconds = 0.0
+            var decodeSeconds = 0.0
+            var selectionSeconds = 0.0
+            var generatedTokens = 0
+            defer {
+                let elapsed = ProcessInfo.processInfo.systemUptime - start
+                Logger(subsystem: "com.echo.Echo", category: "GenerationTiming").notice(
+                    "Generation timing: elapsed=\(elapsed, privacy: .public) load=\(loadSeconds, privacy: .public) prefill=\(prefillSeconds, privacy: .public) decode=\(decodeSeconds, privacy: .public) selection=\(selectionSeconds, privacy: .public) tokens=\(generatedTokens, privacy: .public)"
+                )
+            }
             guard resourceRoot != nil, let tokenizer,
                 request.executionDeadline.isFinite, request.executionDeadline > start
             else {
@@ -117,7 +161,8 @@ public actor BundledGenerationActor: StructuredLLMProvider {
                 outputLimit: 256,
                 context: 1024,
                 startedAt: start,
-                seconds: min(60, request.executionDeadline - start)
+                seconds: min(request.executionScope.callSeconds, request.executionDeadline - start),
+                executionScope: request.executionScope
             )
             let referenceMap = GenerationReferenceMap(memoryIDs: request.allowedMemoryIDs)
             let grammar = request.referenceEncoding == .requestAliasV1
@@ -135,7 +180,9 @@ public actor BundledGenerationActor: StructuredLLMProvider {
             try checkMemory()
             // All non-Sendable Core ML objects stay on this actor. Synchronous prediction
             // has an SDK-supported state overload; no unsafe conformance or actor escape.
+            let loadStarted = ProcessInfo.processInfo.systemUptime
             let model = try loadModel()
+            loadSeconds = ProcessInfo.processInfo.systemUptime - loadStarted
             try budget.afterPrediction(now: ProcessInfo.processInfo.systemUptime)
             let state = model.makeState()
             var lastToken: Int?
@@ -153,6 +200,8 @@ public actor BundledGenerationActor: StructuredLLMProvider {
                 } else {
                     throw GenerationRuntimeError.invalidRequest
                 }
+                let predictionStarted = ProcessInfo.processInfo.systemUptime
+                let isPrefill = position < prompt.count
                 let scores = try predict(
                     model: model,
                     state: state,
@@ -160,12 +209,20 @@ public actor BundledGenerationActor: StructuredLLMProvider {
                     position: position,
                     needsLogits: position + count >= prompt.count
                 )
+                let predictionSeconds = ProcessInfo.processInfo.systemUptime - predictionStarted
+                if isPrefill { prefillSeconds += predictionSeconds } else { decodeSeconds += predictionSeconds }
                 try budget.afterPrediction(now: ProcessInfo.processInfo.systemUptime)
                 try GenerationResourcePolicy.check()
                 try checkMemory()
                 position += count
                 if position >= prompt.count {
-                    let next = try decoder.select(scores, deadline: budget.deadline)
+                    let selectionStarted = ProcessInfo.processInfo.systemUptime
+                    let next: Int
+                    do {
+                        defer { selectionSeconds += ProcessInfo.processInfo.systemUptime - selectionStarted }
+                        next = try decoder.select(scores, deadline: budget.deadline)
+                    }
+                    generatedTokens += 1
                     try budget.recordOutput(now: ProcessInfo.processInfo.systemUptime)
                     try decoder.accept(next)
                     lastToken = next

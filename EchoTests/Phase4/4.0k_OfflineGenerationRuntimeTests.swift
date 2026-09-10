@@ -458,6 +458,62 @@ struct OfflineGenerationRuntimeTests {
         #expect(throws: GenerationBudgetError.self) { try budget.afterPrediction(now: 70) }
     }
 
+    @Test("AC-2: approved simulator time extension is manual-only and survives language retry")
+    func test_AC2_manualSimulatorBudget() throws {
+        #expect(GenerationExecutionScope.standard.callSeconds == 60)
+        #expect(throws: GenerationBudgetError.invalidInput) {
+            try GenerationBudget(inputCount: 1, outputLimit: 256, context: 1024, startedAt: 10, seconds: 61)
+        }
+        #if DEBUG && targetEnvironment(simulator)
+        #expect(GenerationExecutionScope.manualCreation.callSeconds == 120)
+        #expect(GenerationExecutionScope.manualCreation.requestSeconds == 240)
+        let budget = try GenerationBudget(
+            inputCount: 1, outputLimit: 256, context: 1024,
+            startedAt: 10, seconds: 120, executionScope: .manualCreation
+        )
+        try budget.afterPrediction(now: 129)
+        #expect(throws: GenerationBudgetError.deadline) { try budget.afterPrediction(now: 130) }
+        #else
+        #expect(GenerationExecutionScope.manualCreation.callSeconds == 60)
+        #expect(GenerationExecutionScope.manualCreation.requestSeconds == 120)
+        #expect(throws: GenerationBudgetError.invalidInput) {
+            try GenerationBudget(
+                inputCount: 1, outputLimit: 256, context: 1024,
+                startedAt: 10, seconds: 120, executionScope: .manualCreation
+            )
+        }
+        #endif
+        let request = GenerationRequest(
+            system: "test", user: "source", allowedMemoryIDs: [UUID()],
+            sourceTypes: ["photo"], preferredLanguage: "zh-Hans", traceID: "manual-budget",
+            executionDeadline: 250, executionScope: .manualCreation
+        )
+        #expect(request.languageRetry().executionScope == .manualCreation)
+        #expect(request.languageRetry().executionDeadline == 250)
+    }
+
+    @Test("AC-2: token selection matches exhaustive ranking, including ties and invalid prefixes")
+    func test_AC2_rankedSelection() throws {
+        let grammar = try GenerationEnvelopeGrammar(allowedAliases: ["S1"])
+        let fragments = [0: Array("x".utf8), 1: Array("{".utf8), 2: Array(" ".utf8), 3: Array("{".utf8)]
+        for step in 0..<64 {
+            var scores = (0..<257).map { Float(($0 * 31 + step * 17) % 23) }
+            scores[256] = -.infinity
+            var decoder = GenerationGrammarDecoder(grammar: grammar, tokenBytes: fragments, eosIDs: [4])
+            let ranked = scores.indices.sorted {
+                scores[$0] == scores[$1] ? $0 < $1 : scores[$0] > scores[$1]
+            }
+            let expected = try #require(ranked.first { scores[$0].isFinite && decoder.allows($0) })
+            #expect(try decoder.select(scores) == expected)
+        }
+        var decoder = GenerationGrammarDecoder(grammar: grammar, tokenBytes: fragments, eosIDs: [4])
+        #expect(throws: GenerationGrammarError.invalidLogits) { try decoder.select([.nan]) }
+        #expect(throws: GenerationGrammarError.noAllowedToken) { try decoder.select([1]) }
+        #expect(throws: GenerationBudgetError.deadline) {
+            try decoder.select([0, 1], deadline: ProcessInfo.processInfo.systemUptime - 1)
+        }
+    }
+
     @Test("AC-2: grammar permits only submitted leaf identities and complete EOS")
     func test_AC2_grammarSourceBoundaryAndEOS() throws {
         let known = "00000000-0000-0000-0000-000000000001"

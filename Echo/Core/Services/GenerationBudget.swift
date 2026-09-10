@@ -19,10 +19,17 @@ nonisolated struct GenerationBudget {
     private(set) var outputCount = 0
     private var processedTokenCount = 0
 
-    init(inputCount: Int, outputLimit: Int, context: Int, startedAt: Double, seconds: Double) throws {
+    init(
+        inputCount: Int,
+        outputLimit: Int,
+        context: Int,
+        startedAt: Double,
+        seconds: Double,
+        executionScope: GenerationExecutionScope = .standard
+    ) throws {
         guard (1...1024).contains(context), (1...context).contains(inputCount),
             (1...256).contains(outputLimit), outputLimit <= context - inputCount,
-            startedAt.isFinite, seconds.isFinite, seconds > 0, seconds <= 60
+            startedAt.isFinite, seconds.isFinite, seconds > 0, seconds <= executionScope.callSeconds
         else {
             throw GenerationBudgetError.invalidInput
         }

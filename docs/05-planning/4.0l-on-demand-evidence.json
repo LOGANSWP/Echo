@@ -1,0 +1,47 @@
+{
+  "updatedAt": "2026-09-09T19:07:32.722955+00:00",
+  "decision": "Detail or selected-photo creation only; no import/sync/foreground/report bulk visual preparation",
+  "before": {
+    "jobs": {
+      "failed": 2,
+      "queued": 14,
+      "ready": 23
+    },
+    "photoCount": 39,
+    "materialCount": 23,
+    "photoProgress": 10
+  },
+  "after": {
+    "jobs": {
+      "failed": 2,
+      "ready": 23
+    },
+    "photoCount": 39,
+    "materialCount": 23,
+    "photoProgress": 0
+  },
+  "simulator": "iPhone 16 Pro / iOS 18.2",
+  "tests": "7 tests / 5 suites passed; real PhotoKit import produces no photo job until demand, then real creation and monthly report pass",
+  "log": "/tmp/echo-4.0l-demand-green.log",
+  "logSha256": "e4f6a2e96528b08234df70c835d5a5dde41599887fb87fda765075a5278113d8",
+  "afterOpeningSyntheticDetail": [
+    [
+      "failed",
+      "automatic",
+      2
+    ],
+    [
+      "queued",
+      "onDemand",
+      1
+    ],
+    [
+      "ready",
+      "automatic",
+      23
+    ]
+  ],
+  "selectedDetailCompleted": true,
+  "readyUIHash": "0qdkhrg",
+  "staticChecks": "8 directly changed photo files: SwiftLint 0; localization 474 keys and static bans passed"
+}

@@ -1,0 +1,9 @@
+{
+  "exitCode": 0,
+  "stopReason": null,
+  "elapsedSeconds": 40.44168958299997,
+  "sampledPeakProcessTreeRSSBytes": 2416607232,
+  "peakResearchDiskBytes": 1392004099,
+  "pollIntervalSeconds": 1,
+  "scope": "host converter plus its subprocesses; not iPhone or whole App memory"
+}

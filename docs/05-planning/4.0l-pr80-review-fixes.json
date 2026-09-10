@@ -1,0 +1,39 @@
+{
+  "pr": 80,
+  "reviewed_head": "0ec541d0a0650264d6c3093051674bff9206d413",
+  "recorded_at": "2026-09-10T01:32:54.189191+00:00",
+  "status": "review",
+  "fixed": [
+    "R1: resource-deferred orphan without checkpoint projects unprepared; selected-photo access/manual preparation can enqueue again",
+    "R2: bounded candidate pages retain at most 256 usable sources and preserve omitted coverage",
+    "R3: stale empty-state expectations replaced with disabled/idle/zero-model-call assertions; pipeline refusal preserved"
+  ],
+  "red": {
+    "resource_log": "/tmp/echo-pr80-resource-red.log",
+    "resource_failures": 1,
+    "report_and_gate_log": "/tmp/echo-pr80-fix-red.log",
+    "report_assertions": 3,
+    "gate_assertions": 4
+  },
+  "green": {
+    "log": "/tmp/echo-pr80-fix-final.log",
+    "device": "iPhone 17 Pro",
+    "parallel_testing": false,
+    "tests": 36,
+    "suites": 7,
+    "seconds": 2.059,
+    "result": "TEST SUCCEEDED"
+  },
+  "lint": {
+    "default": "zero violations, no-cache strict",
+    "changed_swift": "zero violations, no-cache strict"
+  },
+  "limits": [
+    "No model or runtime budget changes",
+    "No test skips or coverage gate changes",
+    "No PR #81 changes included",
+    "No full regression, coverage, device or photo-to-poem qualification claim",
+    "Existing cancellation checkpoints remain owned by Continue/Restart recovery"
+  ],
+  "cleanup": "Reused existing DerivedData and models; only this turn intermediate result bundles removed after final success."
+}
