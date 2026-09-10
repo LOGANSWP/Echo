@@ -1,0 +1,30 @@
+{
+  "$schema": "https://echo-ui-automation/schemas/contracts/surface/v1",
+  "designProfileId": "echo-memory-canvas",
+  "surfaceId": "creation-library",
+  "surfaceFamily": "task",
+  "responsibility": "Project durable manual creation jobs and existing narrative reports; page navigation never owns cancellation. ADR-026 / US-SYN-003 AC-8/9/10.",
+  "inputs": {
+    "records": "Current-policy-authorized CreationLibraryRecord values",
+    "reports": "Existing NarrativeReportActor projections"
+  },
+  "outputs": {
+    "visibleContent": "Chronological native List, filters, actual job states, unread markers, explicit retry/cancel/delete and Focus result navigation",
+    "interactionTargets": "creation-library-open; native row navigation, filter, retry, cancel and delete; creation-library-actions-{UUID}; creation-library-delete-{UUID}; creation-library-confirm-delete"
+  },
+  "systemContainer": "NavigationStack + List + Picker",
+  "layoutMode": "system_list",
+  "masonryEnabled": false,
+  "orderingRule": "Descending createdAt, UUID tie-break; automatic and manual results share one order.",
+  "emptyStateRule": "No placeholder success; loading and errors differ from an empty library.",
+  "relatedStories": [
+    "US-SYN-003",
+    "US-SYN-004",
+    "US-SYS-001",
+    "US-PRV-007"
+  ],
+  "version": "1.3.0",
+  "gestureRule": "Row navigation only reads existing job state. Retry/cancel use independent borderless buttons; entering a row must not invoke them. Library-origin details return to the existing library without pushing another instance.",
+  "deletionRule": "Manual and automatic entries offer a native row menu and trailing swipe. Both require confirmation; full swipe cannot delete immediately. Cancellation keeps the entry. Confirmed deletion preserves source memories, cancels active manual work, and uses existing report period invalidation. Failures keep the entry and show a persistent error until dismissed or a successful retry. Same-ID deletion waits for accepted submission/retry reservations before cancelling owned work and removing the entry.",
+  "resourceDeferralRule": "Persist deferred outside L2/PendingOperations; show Waiting for device resources and explicit Continue. Opening or refreshing never replays work. Detail continuation target: creation-continue-resources."
+}

@@ -1,0 +1,25 @@
+{
+  "removedDuplicateResults": [
+    {
+      "path": "/tmp/echo-library-red.xcresult",
+      "bytes": 23046
+    },
+    {
+      "path": "/tmp/echo-library-storage.xcresult",
+      "bytes": 59548353
+    },
+    {
+      "path": "/tmp/echo-library-green.xcresult",
+      "bytes": 20379
+    },
+    {
+      "path": "/tmp/echo-library-green2.xcresult",
+      "bytes": 235277
+    },
+    {
+      "path": "/tmp/echo-library-lifecycle.xcresult",
+      "bytes": 263865
+    }
+  ],
+  "retained": "Raw /tmp logs and final real-model / boundary xcresult bundles; no model or user content deleted"
+}

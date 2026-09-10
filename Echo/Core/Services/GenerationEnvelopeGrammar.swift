@@ -17,8 +17,9 @@ nonisolated enum GenerationPrefixStatus: String { case invalid, prefix, complete
 nonisolated struct GenerationEnvelopeGrammar {
     let identities: [[UInt8]]
     let requiresPoem: Bool
+    let compactPoem: Bool
 
-    init(allowedIDs: [String], requiresPoem: Bool = false) throws {
+    init(allowedIDs: [String], requiresPoem: Bool = false, compactPoem: Bool = false) throws {
         let ids = Array(Set(allowedIDs)).sorted()
         guard (1...24).contains(ids.count),
             ids.allSatisfy({
@@ -26,16 +27,18 @@ nonisolated struct GenerationEnvelopeGrammar {
             })
         else { throw GenerationGrammarError.invalidInput }
         identities = ids.map { Array(("\"" + $0 + "\"").utf8) }
+        self.compactPoem = compactPoem
         self.requiresPoem = requiresPoem
     }
 
-    init(allowedAliases: [String], requiresPoem: Bool = false) throws {
+    init(allowedAliases: [String], requiresPoem: Bool = false, compactPoem: Bool = false) throws {
         let names = Array(Set(allowedAliases)).sorted()
         guard (1...24).contains(names.count), names.allSatisfy({ name in
             guard name.first == "S", let number = Int(name.dropFirst()) else { return false }
             return (1...24).contains(number) && name == "S\(number)"
         }) else { throw GenerationGrammarError.invalidInput }
         identities = names.map { Array(("\"" + $0 + "\"").utf8) }
+        self.compactPoem = compactPoem
         self.requiresPoem = requiresPoem
     }
 
@@ -43,7 +46,7 @@ nonisolated struct GenerationEnvelopeGrammar {
         guard data.count <= 65_536 else { return .invalid }
         let utf8 = Self.utf8Status(data)
         guard utf8 != .invalid else { return .invalid }
-        var parser = Parser(data: data, identities: identities, requiresPoem: requiresPoem)
+        var parser = Parser(data: data, identities: identities, requiresPoem: requiresPoem, compactPoem: compactPoem)
         do {
             try parser.document()
             return utf8 == .prefix ? .prefix : .complete
@@ -100,9 +103,13 @@ nonisolated struct GenerationEnvelopeGrammar {
         let data: [UInt8]
         let identities: [[UInt8]]
         let requiresPoem: Bool
+        let compactPoem: Bool
         var position = 0
 
         mutating func whitespace() {
+            // Compact manual poems reserve decoding work for content and citations.
+            // String whitespace is still handled by text(), without rewriting output.
+            guard !compactPoem else { return }
             while position < data.count && [9, 10, 13, 32].contains(data[position]) { position += 1 }
         }
 
@@ -135,7 +142,7 @@ nonisolated struct GenerationEnvelopeGrammar {
             try paragraph()
             whitespace()
             if requiresPoem {
-                for _ in 1..<CreativeGenerationLimits.targetPoemLineCount {
+                for _ in 1..<(compactPoem ? 3 : CreativeGenerationLimits.targetPoemLineCount) {
                     try token(",")
                     try paragraph()
                 }
@@ -192,7 +199,9 @@ nonisolated struct GenerationEnvelopeGrammar {
             let start = position
             try literal("\"")
             var count = 0
+            var scalarCount = 0
             while true {
+                guard !compactPoem || scalarCount <= 5 else { throw GenerationGrammarError.invalidPrefix }
                 let byte = try peek()
                 if byte == 34 {
                     guard count > 0 else { throw GenerationGrammarError.invalidPrefix }
@@ -226,6 +235,7 @@ nonisolated struct GenerationEnvelopeGrammar {
                     }
                 }
                 count += 1
+                if byte & 0xC0 != 0x80 { scalarCount += 1 }
             }
         }
 

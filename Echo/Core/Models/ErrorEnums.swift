@@ -173,6 +173,7 @@ public enum TaskType: String, Sendable, Codable {
     case narrativeReport
     /// Task 4.0l / US-ING-004: bounded, reconstructible photo material preparation.
     case photoUnderstanding
+    case manualCreation
     /// Persisted raw value is unknown to this app version. `TaskProgress.rawTaskType`
     /// retains the original identity for diagnostics and fail-closed recovery.
     case unknown

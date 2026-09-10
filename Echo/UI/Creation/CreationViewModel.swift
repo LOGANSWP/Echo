@@ -108,6 +108,7 @@ final class CreationViewModel: CreationSharePresentationReporting {
         case idle
         /// 生成中 — ProgressView
         case generating
+        case waitingForResources
         /// 生成完成 — 展示内容 + 操作按钮
         case generated
         /// 空态 — 无匹配源记忆
@@ -200,6 +201,8 @@ final class CreationViewModel: CreationSharePresentationReporting {
     // MARK: - Dependencies
 
     /// 当前活跃的生成 Task
+    private let creationLibrary: CreationLibraryActor?
+    private(set) var libraryRequestID: UUID?
     private var generateTask: Task<Void, Never>?
     /// Currently active PDF generation task.
     private var exportTask: Task<Void, Never>?
@@ -234,8 +237,10 @@ final class CreationViewModel: CreationSharePresentationReporting {
     init(
         creativePipeline: CreativePipeline? = nil,
         exportCoordinator: CreationExportCoordinator? = nil,
-        narrativeReportActor: NarrativeReportActor? = nil
+        narrativeReportActor: NarrativeReportActor? = nil,
+        creationLibrary: CreationLibraryActor? = nil
     ) {
+        self.creationLibrary = creationLibrary
         self.creativePipeline = creativePipeline
         self.exportCoordinator = exportCoordinator
         self.narrativeReportActor = narrativeReportActor
@@ -515,7 +520,20 @@ final class CreationViewModel: CreationSharePresentationReporting {
         generateTask = Task { [weak self] in
             guard let self else { return }
 
-            // 生产路径: grounded generation (ADR-013 决策 3)
+            if let creationLibrary = self.creationLibrary, let template = self.selectedTemplate,
+                let coreTemplate = CreativeTemplate(rawValue: template.rawValue) {
+                let requestID = UUID()
+                self.libraryRequestID = requestID
+                do {
+                    try await creationLibrary.submit(id: requestID, template: coreTemplate, sourceIDs: self.sourceMemories.map(\.memoryID))
+                    await self.observeLibraryRequest(requestID)
+                } catch {
+                    self.viewState = .error(.l2Recoverable(message: "Generation is currently unavailable. Please try again."))
+                }
+                return
+            }
+
+            // Production generation without a library is retained for isolated tests.
             if let pipeline = self.creativePipeline, let template = self.selectedTemplate {
                 self.isFixtureBacked = false
                 await self.generateViaPipeline(pipeline, template: template)
@@ -611,6 +629,52 @@ final class CreationViewModel: CreationSharePresentationReporting {
         }
     }
 
+    func observeLibraryRequest(_ id: UUID) async {
+        guard let creationLibrary else { return }
+        libraryRequestID = id
+        do {
+            while !Task.isCancelled {
+                guard let record = try await creationLibrary.list().first(where: { $0.id == id }) else {
+                    creation = nil
+                    viewState = .error(.l2Recoverable(message: "The source or its permissions changed. Return to search and select the memory again."))
+                    return
+                }
+                if let output = record.output, record.state == .completed {
+                    creation = mapToCreationModel(output)
+                    viewState = .generated
+                    if record.unread { try await creationLibrary.markRead(id: id) }
+                }
+                switch record.state {
+                case .submitting, .queued, .running:
+                    viewState = .generating
+
+                case .failed, .cancelled, .interrupted:
+                    if record.errorCode == "model-unavailable" {
+                        viewState = .error(.l3Blocking(message: ErrorSeverity.l3Blocking.userFacingMessageKey))
+                        return
+                    }
+                    viewState = .error(.l2Recoverable(message: record.errorCode == "deadline"
+                        ? Self.generationFailureMessage(.deadline)
+                        : record.errorCode == "output-limit" ? Self.generationFailureMessage(.outputLimit)
+                        : record.errorCode == "language" ? Self.generationFailureMessage(.languageFallback)
+                        : "Generation is currently unavailable. Please try again."))
+                    return
+
+                case .deferred:
+                    viewState = .waitingForResources
+                    return
+
+                case .completed: break
+                }
+                try await Task.sleep(for: .seconds(1))
+            }
+        } catch is CancellationError {
+            return
+        } catch {
+            viewState = .error(.l2Recoverable(message: "Generation is currently unavailable. Please try again."))
+        }
+    }
+
     private static func generationFailureMessage(_ error: GenerationRuntimeError) -> String {
         switch error {
         case .deadline:
@@ -622,7 +686,10 @@ final class CreationViewModel: CreationSharePresentationReporting {
         case .contextLimit:
             "This memory is too long for generation. Choose a shorter memory."
 
-        case .outputLimit, .languageFallback:
+        case .outputLimit:
+            "The model reached the output limit before completing this creation. Please try again."
+
+        case .languageFallback:
             "The model could not produce a complete response in your selected language. Please try again."
 
         case .privacyDenied:
@@ -990,12 +1057,28 @@ final class CreationViewModel: CreationSharePresentationReporting {
 
     /// 重试 (L2 恢复路径) — error → generating; empty → generating。
     func retry() {
-        guard case .error = viewState else { return }
+        if viewState != .waitingForResources {
+            guard case .error = viewState else { return }
+        }
+        if let creationLibrary, let libraryRequestID {
+            viewState = .generating
+            generateTask?.cancel()
+            generateTask = Task { [weak self] in
+                do {
+                    try await creationLibrary.retry(id: libraryRequestID)
+                    await self?.observeLibraryRequest(libraryRequestID)
+                } catch {
+                    self?.viewState = .error(.l2Recoverable(message: "Generation is currently unavailable. Please try again."))
+                }
+            }
+            return
+        }
         viewState = .idle
         generate()
     }
 
     func retryModelLoad() {
+        if creationLibrary != nil, libraryRequestID != nil { retry(); return }
         viewState = .generating
         guard let pipeline = creativePipeline, let template = selectedTemplate else {
             viewState = .error(.l3Blocking(message: ErrorSeverity.l3Blocking.userFacingMessageKey))

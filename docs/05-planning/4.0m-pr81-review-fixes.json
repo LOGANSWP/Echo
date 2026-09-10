@@ -1,0 +1,33 @@
+{
+  "task_id": "4.0m",
+  "pr": 81,
+  "base_head": "302abb715f313f1970cf6a9f5ac521b4a29eca58",
+  "findings": {
+    "R1": "fixed; overlapping retry/delete regression",
+    "R2": "fixed; canonical aliases and revoked policy regression",
+    "R3": "fixed; deferred UI state, no pending operation, explicit continuation and genuine L2 regression"
+  },
+  "red": {
+    "methods": 3,
+    "parameter_cases": 5,
+    "issues": 7,
+    "log": "/tmp/echo-pr81-review-red2.log"
+  },
+  "green": {
+    "methods": 11,
+    "suites": 5,
+    "duration_seconds": 64.102,
+    "result": "passed",
+    "log": "/tmp/echo-pr81-review-green.log",
+    "actual_bundled_model_publication": true
+  },
+  "destination": "iPhone 17 Pro",
+  "parallel_testing": false,
+  "swiftlint_violations": 0,
+  "limitations": [
+    "Full cumulative regression and coverage not measured",
+    "Existing SQLite test teardown open-file unlink diagnostics",
+    "Quality, device, artifact distribution and release gates unchanged"
+  ],
+  "new_deferred_findings": []
+}

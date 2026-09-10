@@ -1,0 +1,269 @@
+{
+  "task": "4.0m",
+  "updatedAt": "2026-09-10T01:06:21.875536+00:00",
+  "baselineCommit": "0ec541d",
+  "baselinePR": "https://github.com/logan-suu/Echo/pull/80",
+  "status": "review",
+  "tests": {
+    "libraryAndRelated": {
+      "tests": 24,
+      "suites": 3,
+      "seconds": 37.714,
+      "result": "passed",
+      "bundle": "/tmp/echo-library-final.xcresult"
+    },
+    "actualBundledModel": {
+      "seconds": 36.016,
+      "result": "passed",
+      "scope": "Real bundled text model, isolated synthetic canonical note, production queue and pipeline; submitting ViewModel disappears before completion."
+    },
+    "finalBoundary": {
+      "tests": 21,
+      "suites": 2,
+      "seconds": 1.272,
+      "result": "passed",
+      "bundle": "/tmp/echo-library-boundary.xcresult",
+      "covers": [
+        "source deletion",
+        "exclusion",
+        "consent revocation",
+        "publication failure rollback",
+        "duplicate identity",
+        "page departure",
+        "explicit cancel",
+        "failed job persistence",
+        "completed result reopening"
+      ]
+    },
+    "delivery": {
+      "tests": 21,
+      "suites": 2,
+      "seconds": 1.27,
+      "result": "passed",
+      "bundle": "/tmp/echo-library-delivery.xcresult"
+    },
+    "finalRetry": {
+      "tests": 20,
+      "suites": 2,
+      "result": "passed",
+      "bundle": "/tmp/echo-library-review.xcresult",
+      "covers": "List/detail retry retains job identity and routes model repair through the same application-owned job."
+    }
+  },
+  "limitations": [
+    "No indefinite system-background execution promise",
+    "Existing 4.0l real dog-photo poem failure remains open",
+    "Full phase regression, coverage and device/release qualification not claimed"
+  ],
+  "liveReview": {
+    "iPhone17Pro": "Final build launched; English Home Creation Library entry, library filter and empty state observed (semantic snapshots seq117/118).",
+    "iPhone16Pro": "Final build installed over existing data. Actual dog-photo Chinese letter submitted; user-style return through detail/Home to library while running (seq520/521). Model completed two calls (52.220188s,44.506168s) but language validation failed; durable row failed/language with NULL output, exactly one row. App restart preserved failure; final UI displays Chinese template and language failure reason.",
+    "humanApproval": "pending; no screenshot/video created"
+  },
+  "lint": "Explicit changed Swift files: zero violations",
+  "navigationFix": {
+    "updatedAt": "2026-09-09T21:27:38.110552+00:00",
+    "red": "iOS18 semantic snapshots 532→533: tapping a failed row immediately started generation without a retry tap. Frozen prior process sample showed SwiftUI layout/preference work on main thread.",
+    "changes": [
+      "Borderless explicit row retry/cancel buttons",
+      "Library-owned detail dismisses back to its existing library instead of pushing another library",
+      "Observation regression asserts unchanged record and no owned queue job before explicit retry"
+    ],
+    "green": "iOS18 snapshots 536→537: opening interrupted record stays error. Explicit retry 538, return 540; repeated detail/return 541→543 remains responsive. Explicit cancel 545 leaves cancelled without navigating or retrying.",
+    "tests": {
+      "count": 20,
+      "suites": 2,
+      "seconds": 2.66,
+      "result": "passed",
+      "bundle": "/tmp/echo-library-navigation.xcresult"
+    },
+    "lint": "Changed Swift files: zero violations",
+    "installation": "Updated iPhone 16 Pro; local changes remain uncommitted"
+  },
+  "newCreationInteractionFix": {
+    "red": "iOS18 process 78753 sample /tmp/echo-start-creation-hang.txt: main thread continuously rendering SwiftUI layout/navigation preferences; UI seq547 has no interactive targets.",
+    "change": "New creation opens library only after explicit button action, in a sheet with an independent NavigationStack. Library-origin detail continues to dismiss to existing list.",
+    "verification": "BUILD SUCCEEDED; SwiftLint --no-cache zero violations. Actual dog photo -> letter -> generate seq564; library sheet 565 -> Done 567; Settings 568 -> Home creation 570; Back to photo 572 -> Home 573 -> library 574, same request still running. Explicit cancellation requested afterward; last snapshot still shows running, so cancellation completion is not claimed.",
+    "scope": "iPhone16Pro iOS18 installed over existing data; no model, queue or persistence behavior changed; model quality not claimed."
+  },
+  "shortChineseFix": {
+    "red": "CreationLanguageTests: 3 methods, 11 parameter cases, 2 failing assertions; /tmp/echo-language-red.log",
+    "green": "All 11 language cases passed; separate structured alignment test passed (0.362s), verifies at most one retry and schema rejection. /tmp/echo-language-green.log; /tmp/echo-language-retry-regression.log",
+    "live": "iPhone16Pro: explicit retry of original failed Chinese letter, one model call 66.529005s, library completed seq585, detail body and real source link seq587. No model/limit change. Poem separately under verification.",
+    "quality": "Letter output is a short image summary; no claim of literary quality."
+  },
+  "finalCreationFix": {
+    "prompt": "creative-forms-production-v17",
+    "language": "Uncertain all-Han short Simplified Chinese is validated using existing Unicode fallback; confident other languages, Traditional Chinese and non-Han mixed fallback remain rejected.",
+    "poem": "Manual Chinese: three model-authored bounded lines (<=5 Unicode scalars each), current source aliases and existing 3–6 line pipeline validation. No post-generation truncation.",
+    "tests": {
+      "realModelAndRegression": "9 methods / 3 suites passed, 51.662s; actual model 48.852154s; /tmp/echo-bounded-poem.log",
+      "finalBoundaries": "6 methods / 1 suite passed, 0.395s; /tmp/echo-poem-boundary-final.log",
+      "languageRetry": "1 test, 0.362s passed; at most one retry; /tmp/echo-language-retry-regression.log",
+      "lint": "All changed generation and test Swift files zero violations"
+    },
+    "live16": {
+      "letter": "Dog photo: completed one call 66.529005s; opened and source anchor observed seq585/587; retained across installs.",
+      "poem": "Dog photo task 637B56C7-D39C-445E-946A-C8AEBE429127: completed one call 107.505394s, 92 output tokens; library completed seq625; body/source seq627; back to library629 then reopened.",
+      "sourceCorrection": "Older poem task 510EACC9-3BBF-4BFC-93DD-06B55291E546 belongs to red-circle source, NOT dog; remains failed/generation-failed and is not counted as repaired."
+    },
+    "limits": [
+      "One successful dog-photo run does not guarantee all inputs/devices finish within budget",
+      "Poetic quality remains weak/repetitive; letter remains summary-like",
+      "No model/timeout expansion; no release/full-quality approval",
+      "Older red-circle generic failure remains to diagnose"
+    ]
+  },
+  "redCircleFunctionalFix": {
+    "promptVersion": "creative-forms-production-v18",
+    "cause": "Unbounded JSON formatting whitespace consumed the output budget in compact manual Chinese poem decoding.",
+    "before": {
+      "simulator16Seconds": 112.258171,
+      "simulator16Tokens": 256,
+      "synthetic17Seconds": 97.542967,
+      "synthetic17Tokens": 256,
+      "bytes": 548,
+      "whitespaceBytes": 473,
+      "completed": false,
+      "error": "outputLimit"
+    },
+    "changes": [
+      "Compact poem JSON disallows whitespace outside strings; text whitespace remains valid.",
+      "Only output-limit errors receive a new durable code and bilingual message; failures remain manual retry only.",
+      "Numeric structure diagnostics contain no body or source text."
+    ],
+    "regression": {
+      "result": "passed",
+      "methods": 14,
+      "suites": 4,
+      "seconds": 67.235,
+      "log": "/tmp/echo-creation-functional-final.log",
+      "dogSeconds": 34.165456,
+      "dogTokens": 56,
+      "redObjectSeconds": 24.590729,
+      "redObjectTokens": 51,
+      "whitespaceBytes": 0,
+      "swiftLintViolations": 0,
+      "diffCheck": "passed",
+      "coverage": [
+        "UTF-8 prefixes",
+        "structural whitespace rejection",
+        "body whitespace acceptance",
+        "language",
+        "citation identity",
+        "poem structure",
+        "failure persistence and UI",
+        "explicit retry",
+        "page lifetime",
+        "publication rollback",
+        "source deletion/exclusion/consent"
+      ]
+    },
+    "live16": {
+      "taskId": "510EACC9-3BBF-4BFC-93DD-06B55291E546",
+      "sourceId": "A38642AA-23A3-53DC-8730-4A5CF34BF387",
+      "seconds": 34.184349,
+      "tokens": 50,
+      "bytes": 163,
+      "whitespaceBytes": 0,
+      "modelCalls": 1,
+      "state": "completed",
+      "outputPersisted": true,
+      "pendingOperations": 0,
+      "taskProgress": 0,
+      "readOnlyFailureSnapshots": [
+        639,
+        640
+      ],
+      "explicitRetrySnapshot": 641,
+      "returnToLibrarySnapshot": 644,
+      "settingsNavigationSnapshot": 645,
+      "completedLibrarySnapshot": 646,
+      "sourceNavigationSnapshot": 650,
+      "restartPID": 79533,
+      "reopenedResultSnapshot": 655
+    },
+    "qualityFollowUp": "Sparse red-object output has repeated lines. This new functional regression does not impose distinct-line quality; all existing subject checks retain their previous assertions.",
+    "limits": "Same approved artifacts and budgets; no new download. Functional simulator evidence only, no full quality/device/release acceptance. Included in draft PR #81.",
+    "cleanup": {
+      "removedIntermediateResults": [
+        {
+          "path": "/Users/logansu/Library/Developer/Xcode/DerivedData/Echo-awzgiadvdwbqtdciilaczfrndbdg/Logs/Test/Test-Echo-2026.09.09_18-34-58--0500.xcresult",
+          "bytes": 62626939
+        },
+        {
+          "path": "/Users/logansu/Library/Developer/Xcode/DerivedData/Echo-awzgiadvdwbqtdciilaczfrndbdg/Logs/Test/Test-Echo-2026.09.09_18-38-24--0500.xcresult",
+          "bytes": 62527749
+        }
+      ],
+      "reclaimedBytes": 125154688,
+      "preserved": "Final passing xcresult, diagnostic text logs, approved models and shared DerivedData build cache."
+    }
+  },
+  "libraryDeletion": {
+    "updatedAt": "2026-09-10T00:46:06.460424+00:00",
+    "scope": "Visible native row menus and confirmed swipe deletion for manual creations and narrative reports. Source memories preserved; report periods invalidated.",
+    "implementation": [
+      "Typed existing Actor deletion paths; no new schema or model changes.",
+      "Per-ID duplicate deletion guard.",
+      "Separate deletion failure alert survives periodic refresh.",
+      "No full-swipe execution; both entry points require confirmation."
+    ],
+    "tests": {
+      "file": "EchoTests/Phase4/4.0m_CreationDeletionTests.swift",
+      "log": "/tmp/echo-creation-delete-green.log",
+      "result": "passed",
+      "methods": 3,
+      "suites": 2,
+      "parameterCases": 12,
+      "seconds": 3.826,
+      "covers": [
+        "manual/report deletion",
+        "injected deletion failure and retained entry",
+        "error remains through refresh",
+        "original Memory and ExcludedAssets preservation",
+        "source relationships removed",
+        "report period invalidated",
+        "reopen after deletion",
+        "running job cancellation without late publication"
+      ]
+    },
+    "build": "/tmp/echo-creation-delete-build.log",
+    "swiftLintViolations": 0,
+    "diffCheck": "passed",
+    "live16": {
+      "cancelledTestRecord": "76B0C52E-3B8A-4FF5-B087-44DC3B6187BE",
+      "menuSnapshot": 666,
+      "confirmationSnapshot": 667,
+      "cancelKeepsRecordSnapshot": 663,
+      "confirmedRemovalSnapshot": 669,
+      "restartPID": 10421,
+      "restartLibrarySnapshot": 671,
+      "completedCreationsRetained": 3,
+      "result": "passed"
+    },
+    "limits": "Report deletion and active-job deletion tested in isolated fixtures; actual simulator deletion exercised a cancelled test creation. No full phase/coverage or release acceptance. Included in draft PR #81."
+  },
+  "precommit": {
+    "at": "2026-09-10T01:03:05.506650+00:00",
+    "methods": 16,
+    "suites": 5,
+    "seconds": 69.884,
+    "result": "passed",
+    "log": "/tmp/echo-4.0m-precommit.log",
+    "lint": "Default and every changed Swift file: strict, no-cache, zero violations",
+    "fullCoverageMeasured": false,
+    "basePR": 80,
+    "deliveryAuthorization": "User explicitly invoked commit-pr-echo"
+  },
+  "delivery": {
+    "implementationCommit": "468f597",
+    "pr": 81,
+    "url": "https://github.com/logan-suu/Echo/pull/81",
+    "base": "dev-1.0",
+    "draft": true,
+    "dependencyPR": 80,
+    "ci": "Build, Lint & Test triggered; not yet complete",
+    "merged": false
+  }
+}

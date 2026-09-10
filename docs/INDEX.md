@@ -162,4 +162,9 @@
 
 - 待明确范围的新需求：[4.0m 统一创作库与页面无关的生成任务方案](05-planning/4.0m-creation-library-proposal.md)，供用户查看手动作品及月/年报告、离开创作页后取回结果；尚未实现。
 
+- [ADR-026：统一创作库](decisions/ADR-026-creation-library.md)：持久手动作品、页面无关任务和 D-005；4.0m 实现中。
+
+- [Live 创作失败排查（2026-09-09）](06-troubleshooting/creation-live-failure-diagnosis-2026-09-09.md)：短简体中文 uncertain 误拒的真实模型对照与独立诗歌超时；本轮仅诊断，修复未完成。
 - [PR #80 审查修复证据](05-planning/4.0l-pr80-review-fixes.json)：资源延后恢复、报告候选分页与素材门禁回归，36 tests / 7 suites 通过；不代表完整照片创作或发布验收。
+
+- [PR #81 同步后审查](05-planning/4.0m-pr81-review.md)：冲突处理、删除/重试竞态、来源类型映射和资源延后审查，当前不建议合并。

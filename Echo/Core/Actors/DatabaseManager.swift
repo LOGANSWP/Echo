@@ -787,6 +787,7 @@ public actor DatabaseManager {
                 END
                 """
         )
+        try createCreationLibrarySchema()
         // WP6 (4b): 完整路由快照 canonical bytes 持久化——原子发布校验基础
         try execute(
             sql: """

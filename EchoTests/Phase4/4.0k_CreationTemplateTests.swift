@@ -76,6 +76,34 @@ struct CreationTemplateTests {
         }
     }
 
+    @Test("AC-1: compact decoding bounds each model-authored line and retains source checks")
+    func test_AC1_compactPoemGrammar() throws {
+        let grammar = try GenerationEnvelopeGrammar(allowedAliases: ["S1"], requiresPoem: true, compactPoem: true)
+        for text in ["狗立沙地间", "狗站立在沙地"] {
+            let paragraph = "{\"text\":\"\(text)\",\"sourceMemoryIDs\":[\"S1\"]}"
+            let verses = Array(repeating: paragraph, count: 3).joined(separator: ",")
+            let envelope = "{\"schemaVersion\":1,\"paragraphs\":[\(verses)]}"
+            #expect(grammar.status(Array(envelope.utf8)) == (text.count <= 5 ? .complete : .invalid))
+            #expect(grammar.status(Array(envelope.replacingOccurrences(of: "S1", with: "S2").utf8)) == .invalid)
+        }
+    }
+
+    @Test("AC-1: compact JSON cannot spend the output budget on formatting whitespace")
+    func test_AC1_compactFormattingBudget() throws {
+        let compact = try GenerationEnvelopeGrammar(allowedAliases: ["S1"], requiresPoem: true, compactPoem: true)
+        let standard = try GenerationEnvelopeGrammar(allowedAliases: ["S1"])
+        for prefix in [" ", "{ ", "{\"schemaVersion\":1,\n", "{\"schemaVersion\":1,\"paragraphs\":[\n    "] {
+            #expect(compact.status(Array(prefix.utf8)) == .invalid)
+            #expect(standard.status(Array(prefix.utf8)) == .prefix)
+        }
+        let paragraph = "{\"text\":\"红 色\",\"sourceMemoryIDs\":[\"S1\"]}"
+        let envelope = "{\"schemaVersion\":1,\"paragraphs\":[" + Array(repeating: paragraph, count: 3).joined(separator: ",") + "]}"
+        for length in 0..<envelope.utf8.count {
+            #expect(compact.status(Array(envelope.utf8.prefix(length))) == .prefix)
+        }
+        #expect(compact.status(Array(envelope.utf8)) == .complete)
+    }
+
     @Test("AC-1/2: poem format gates success without changing text or citations",
           arguments: ["en-US", "zh-Hans"], [1, 2, 3, 4, 6, 7])
     func test_AC1_poemForm(language: String, lineCount: Int) async throws {

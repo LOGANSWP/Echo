@@ -695,6 +695,23 @@
         }
       }
     },
+    "All creations": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All creations"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部创作"
+          }
+        }
+      }
+    },
     "Allow": {
       "extractionState": "manual",
       "localizations": {
@@ -1372,6 +1389,23 @@
         }
       }
     },
+    "Completed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成"
+          }
+        }
+      }
+    },
     "Configure how Echo proactively delivers memories based on location, date anniversaries, and mood.": {
       "extractionState": "manual",
       "localizations": {
@@ -1557,6 +1591,40 @@
         }
       }
     },
+    "Could not delete creation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not delete creation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法删除创作"
+          }
+        }
+      }
+    },
+    "Could not load creations. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load creations. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法加载创作，请重试。"
+          }
+        }
+      }
+    },
     "Create from this photo": {
       "extractionState": "manual",
       "localizations": {
@@ -1574,6 +1642,23 @@
         }
       }
     },
+    "Creating": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creating"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在创作"
+          }
+        }
+      }
+    },
     "Creating narrative report": {
       "extractionState": "manual",
       "localizations": {
@@ -1587,6 +1672,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在生成叙事报告"
+          }
+        }
+      }
+    },
+    "Creation Library": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creation Library"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创作库"
           }
         }
       }
@@ -1778,6 +1880,23 @@
         }
       }
     },
+    "Delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
+          }
+        }
+      }
+    },
     "Delete All Echo Data": {
       "extractionState": "manual",
       "localizations": {
@@ -1872,6 +1991,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "删除报告"
+          }
+        }
+      }
+    },
+    "Delete this creation?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this creation?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除这篇创作？"
           }
         }
       }
@@ -2620,6 +2756,7 @@
       }
     },
     "Failed": {
+      "extractionState": "manual",
       "localizations": {
         "en-US": {
           "stringUnit": {
@@ -2750,6 +2887,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "反馈记录，%lld 条"
+          }
+        }
+      }
+    },
+    "Filter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "筛选"
           }
         }
       }
@@ -3156,6 +3310,23 @@
         }
       }
     },
+    "In progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In progress"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进行中"
+          }
+        }
+      }
+    },
     "In-app awakening cards remain available. Enable notifications only for system delivery.": {
       "localizations": {
         "en-US": {
@@ -3235,6 +3406,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "操作暂不可用"
+          }
+        }
+      }
+    },
+    "Interrupted — retry to start again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrupted — retry to start again"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已中断，请重试以重新生成"
           }
         }
       }
@@ -3354,6 +3542,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "了解如何通过 AirDrop 或加密 Finder 备份将 Echo 数据传输到新设备。"
+          }
+        }
+      }
+    },
+    "Letter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letter"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "信件"
           }
         }
       }
@@ -4095,6 +4300,23 @@
         }
       }
     },
+    "More actions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More actions"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多操作"
+          }
+        }
+      }
+    },
     "Name": {
       "extractionState": "manual",
       "localizations": {
@@ -4160,6 +4382,23 @@
         }
       }
     },
+    "Needs attention": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Needs attention"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要处理"
+          }
+        }
+      }
+    },
     "Never": {
       "extractionState": "manual",
       "localizations": {
@@ -4173,6 +4412,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "从未"
+          }
+        }
+      }
+    },
+    "New creation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New creation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新作品"
           }
         }
       }
@@ -4999,6 +5255,23 @@
         }
       }
     },
+    "Poem": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poem"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "诗歌"
+          }
+        }
+      }
+    },
     "Prepare or retry photo": {
       "extractionState": "manual",
       "localizations": {
@@ -5148,6 +5421,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "推送去重：此围栏每次进入只投递一次。需离开后再次进入才会再次投递。持续停留不会重复推送。"
+          }
+        }
+      }
+    },
+    "Queued": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Queued"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "排队中"
           }
         }
       }
@@ -5313,6 +5603,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "移除这条记忆？"
+          }
+        }
+      }
+    },
+    "Report": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Report"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "报告"
           }
         }
       }
@@ -6209,6 +6516,23 @@
         }
       }
     },
+    "Submitting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Submitting"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提交中"
+          }
+        }
+      }
+    },
     "Suggestion": {
       "localizations": {
         "en-US": {
@@ -6343,6 +6667,23 @@
         }
       }
     },
+    "The creation has been kept. Please try deleting it again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The creation has been kept. Please try deleting it again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创作仍已保留，请重新尝试删除。"
+          }
+        }
+      }
+    },
     "The current privacy policy no longer permits opening this source.": {
       "localizations": {
         "en-US": {
@@ -6405,6 +6746,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "模型未能以你选择的语言生成完整回答，请重试。"
+          }
+        }
+      }
+    },
+    "The model reached the output limit before completing this creation. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The model reached the output limit before completing this creation. Please try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模型达到输出上限，尚未完成创作。请重试。"
           }
         }
       }
@@ -6520,6 +6878,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "此操作无法完成。你可以在准备好时重试。"
+          }
+        }
+      }
+    },
+    "This deletes only this creation and cancels any active generation. Your source memories will be kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This deletes only this creation and cancels any active generation. Your source memories will be kept."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅删除这篇创作，并取消尚在进行的生成任务。原始记忆会保留。"
+          }
+        }
+      }
+    },
+    "This deletes only this report. Your source memories will be kept. This report will not be generated again automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This deletes only this report. Your source memories will be kept. This report will not be generated again automatically."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅删除这份报告，保留原始记忆。该报告不会自动重新生成。"
           }
         }
       }
@@ -6753,6 +7145,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "引人深思的记忆"
+          }
+        }
+      }
+    },
+    "Timeline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timeline"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间线"
           }
         }
       }
@@ -7686,6 +8095,23 @@
         }
       }
     },
+    "View Creation Library": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View Creation Library"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看创作库"
+          }
+        }
+      }
+    },
     "View diff and merge": {
       "extractionState": "manual",
       "localizations": {
@@ -7733,6 +8159,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "语音备忘录"
+          }
+        }
+      }
+    },
+    "Wait for photo understanding, or add a description in memory details, before generating.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请等待图片理解完成，或在记忆详情中填写描述后再生成。"
+          }
+        },
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wait for photo understanding, or add a description in memory details, before generating."
           }
         }
       }
@@ -7802,6 +8244,23 @@
         }
       }
     },
+    "You can browse Echo while this creation continues.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can browse Echo while this creation continues."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你可以继续浏览 Echo，创作会继续进行。"
+          }
+        }
+      }
+    },
     "You can optionally ask HealthKit for HRV read access. Echo cannot inspect the read authorization choice.": {
       "localizations": {
         "en-US": {
@@ -7831,6 +8290,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的同意未能保存。请重启 Echo 重试。"
+          }
+        }
+      }
+    },
+    "Your creations will appear here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your creations will appear here."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的创作会显示在这里。"
           }
         }
       }
@@ -8037,18 +8513,34 @@
         }
       }
     },
-    "Wait for photo understanding, or add a description in memory details, before generating.": {
+    "Waiting for device resources": {
       "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请等待图片理解完成，或在记忆详情中填写描述后再生成。"
-          }
-        },
         "en-US": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wait for photo understanding, or add a description in memory details, before generating."
+            "value": "Waiting for device resources"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待设备资源"
+          }
+        }
+      }
+    },
+    "Generation is paused for device resources. Continue when the device is ready.": {
+      "localizations": {
+        "en-US": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generation is paused for device resources. Continue when the device is ready."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "因设备资源限制，创作已暂缓。设备就绪后可继续。"
           }
         }
       }

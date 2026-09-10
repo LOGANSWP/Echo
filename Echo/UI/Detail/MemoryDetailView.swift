@@ -327,7 +327,8 @@ struct MemoryDetailView: View {
                         let model = CreationViewModel(
                             creativePipeline: composition.creativePipeline,
                             exportCoordinator: composition.creationExportCoordinator,
-                            narrativeReportActor: composition.narrativeReportActor
+                            narrativeReportActor: composition.narrativeReportActor,
+                            creationLibrary: composition.creationLibraryActor
                         )
                         model.loadSourceMemories([
                             CreativeSource(
