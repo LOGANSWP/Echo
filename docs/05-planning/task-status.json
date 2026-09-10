@@ -1,7 +1,7 @@
 {
   "version": "1.2",
   "project": "Echo v4.6",
-  "last_updated": "2026-09-10T02:14:09.119981+00:00",
+  "last_updated": "2026-09-10T02:34:40.382262+00:00",
   "current_phase": "4",
   "phase_order": [
     "1",
@@ -3089,7 +3089,7 @@
             "US-SYS-001",
             "US-PRV-007"
           ],
-          "status": "review",
+          "status": "done",
           "dependencies": [
             "4.0g",
             "4.0i",
@@ -3103,10 +3103,15 @@
             "head": "feature/creation-library-US-SYN-003",
             "base": "dev-1.0",
             "created_at": "2026-09-10T01:05:30Z",
-            "status": "draft"
+            "status": "merged",
+            "merged_at": "2026-09-10T02:33:17Z",
+            "merge_commit": "f524b0fbb7832c1e766833b616017588c89d71df",
+            "draft": false
           },
-          "last_updated": "2026-09-10T01:06:21.875536+00:00",
-          "notes": "用户明确批准先提交推送 4.0l，再更新文档并实现创作库。4.0l 当前代码基线 fbf3d42/PR #80 为在审叠加依赖，不宣称完成；首版只覆盖 Echo 内切换页面，遵循 ADR-026。\n2026-09-09T21:10:32.711799+00:00：已实现持久作品/来源、应用级队列、页面订阅、统一时间排序与筛选、取消/手动重试、成功持久化/中断/撤权/D-005；24 tests/3 suites通过，真实获批文本模型离开页面后36.016秒完成；最终边界回归21 tests/2 suites通过。16Pro已安装并观察首页入口、空态及离页后任务继续。证据4.0m-implementation-evidence.json；新功能尚未提交，待最终 Live Review。\n2026-09-09T21:13:46.426615+00:00：最终回归21 tests/2 suites/1.270s通过、修改Swift lint0。最终产物17Pro英文/16Pro中文入口和创作库语义检查通过；16Pro狗图中文信件离页后持续运行，两次模型调用后language失败，库中保留1条failed/language且output=NULL，重启后仍可见。失败原因已显式显示。英文合成来源真实模型成功证据独立保留；用户Live审查待完成，新创作库改动未提交。清理重复结果60,090,920bytes。\n最终详情重试/模型恢复转发后20 tests/2 suites通过（echo-library-review），同一最终产物覆盖安装16Pro。4.0m保持in_progress等待人类Live审查，不自动提交/推送本轮新功能。\n2026-09-09T21:27:38.110552+00:00：修复Live Review点击库中条目意外重试（List默认Button整行响应）和详情再次push创作库的布局卡死。行操作改borderless；库内详情查看库改dismiss原列表。16Pro确认只读进入、显式重试、两次往返与显式取消正常；20tests/2suites/2.660s通过、改动Swift lint0；已更新安装，未提交。 Live Review follow-up: new photo creation library entry uses an explicit sheet with independent navigation; iPhone16Pro actual generation supports library open/close, Settings round trip and back to photo/Home with job still running. Build and lint passed.\n2026-09-09：短中文误拒修复；v17三行有界手动中文诗歌。16Pro真实狗图信件66.53秒、诗歌107.51秒成功落库并打开/重读。9方法/3套件真实模型与回归通过，6方法边界回归通过，SwiftLint0。文采仍弱；旧红圆任务通用错误仍需单独定位，未算通过。代码未提交，用户Live Review待确认。\n2026-09-09T23:47:31.754246+00:00：红圆剩余失败定位为compact JSON结构空白耗尽输出预算（548字节/473空白/256tokens）。v18限制字符串外格式空白，output-limit单独持久化和双语显示；14方法/4套件67.235秒通过，SwiftLint0。16Pro旧红圆任务显式重试34.18秒成功，离页切设置不取消、来源跳转正确、重启后结果仍可读，PendingOperations/TaskProgress均清理。重复诗行仅为后续质量待办；无新模型或预算增补。已覆盖安装16Pro，未提交，等待用户Live审查。证据redCircleFunctionalFix。\n2026-09-10T00:46:06.460424+00:00：用户要求创作库删除逻辑；统一手动/月年报告的行末菜单和左滑确认删除，删除失败独立提示、防重复操作，保留来源并复用报告invalidated契约。新增4.0m_CreationDeletionTests；12参数场景/3方法/2套件3.826秒通过，含进行中任务删除无迟到结果、失败保留与重启；SwiftLint0。16Pro已安装，取消确认保留、确认删除已取消测试创作、重启不恢复通过，3篇完成作品保留。文档/合约/证据同步，未提交。\n2026-09-10T01:03:05.506650+00:00：用户调用commit-pr-echo授权交付；当前任务提交前回归16方法/5套件69.884秒通过（含真实模型与删除），默认及所有变更Swift显式SwiftLint严格扫描0违规。进入review，准备目标dev-1.0的草稿PR；叠加前置PR#80仍在审，不标4.0l done。完整覆盖率/阶段/实机/发布未宣称通过。\n2026-09-10T01:06:21.875536+00:00：已提交468f597并推送，草稿PR#81目标dev-1.0，依赖在审PR#80；CI Build, Lint & Test已触发，当前运行中。未合并，保留review。\nPR #81 conflict resolution: sync dev-1.0 ff6c21a, retain merged Task 4.0l metadata and all three PR #80 fixes; preserve creation-library evidence and validate all declared task dependencies. Architectural review remains changes-required; see 4.0m-pr81-review.md.\n2026-09-10T02:14:09.119981+00:00 PR #81 R1/R2/R3修复：删除屏障等待同ID提交/重试并取消后删除；存储授权复用来源类型归一化；资源延后持久为deferred并提供明确继续，不写L2。修复前3测试/5参数场景出现7个目标问题，原始日志保留。最终回归11项测试/5套件通过（64.102秒，含真实模型），SwiftLint 0违规；R1/R2/R3已解决，完整CI与验收门禁保留。见4.0m-pr81-review-fixes.json。"
+          "last_updated": "2026-09-10T02:34:40.382262+00:00",
+          "notes": "用户明确批准先提交推送 4.0l，再更新文档并实现创作库。4.0l 当前代码基线 fbf3d42/PR #80 为在审叠加依赖，不宣称完成；首版只覆盖 Echo 内切换页面，遵循 ADR-026。\n2026-09-09T21:10:32.711799+00:00：已实现持久作品/来源、应用级队列、页面订阅、统一时间排序与筛选、取消/手动重试、成功持久化/中断/撤权/D-005；24 tests/3 suites通过，真实获批文本模型离开页面后36.016秒完成；最终边界回归21 tests/2 suites通过。16Pro已安装并观察首页入口、空态及离页后任务继续。证据4.0m-implementation-evidence.json；新功能尚未提交，待最终 Live Review。\n2026-09-09T21:13:46.426615+00:00：最终回归21 tests/2 suites/1.270s通过、修改Swift lint0。最终产物17Pro英文/16Pro中文入口和创作库语义检查通过；16Pro狗图中文信件离页后持续运行，两次模型调用后language失败，库中保留1条failed/language且output=NULL，重启后仍可见。失败原因已显式显示。英文合成来源真实模型成功证据独立保留；用户Live审查待完成，新创作库改动未提交。清理重复结果60,090,920bytes。\n最终详情重试/模型恢复转发后20 tests/2 suites通过（echo-library-review），同一最终产物覆盖安装16Pro。4.0m保持in_progress等待人类Live审查，不自动提交/推送本轮新功能。\n2026-09-09T21:27:38.110552+00:00：修复Live Review点击库中条目意外重试（List默认Button整行响应）和详情再次push创作库的布局卡死。行操作改borderless；库内详情查看库改dismiss原列表。16Pro确认只读进入、显式重试、两次往返与显式取消正常；20tests/2suites/2.660s通过、改动Swift lint0；已更新安装，未提交。 Live Review follow-up: new photo creation library entry uses an explicit sheet with independent navigation; iPhone16Pro actual generation supports library open/close, Settings round trip and back to photo/Home with job still running. Build and lint passed.\n2026-09-09：短中文误拒修复；v17三行有界手动中文诗歌。16Pro真实狗图信件66.53秒、诗歌107.51秒成功落库并打开/重读。9方法/3套件真实模型与回归通过，6方法边界回归通过，SwiftLint0。文采仍弱；旧红圆任务通用错误仍需单独定位，未算通过。代码未提交，用户Live Review待确认。\n2026-09-09T23:47:31.754246+00:00：红圆剩余失败定位为compact JSON结构空白耗尽输出预算（548字节/473空白/256tokens）。v18限制字符串外格式空白，output-limit单独持久化和双语显示；14方法/4套件67.235秒通过，SwiftLint0。16Pro旧红圆任务显式重试34.18秒成功，离页切设置不取消、来源跳转正确、重启后结果仍可读，PendingOperations/TaskProgress均清理。重复诗行仅为后续质量待办；无新模型或预算增补。已覆盖安装16Pro，未提交，等待用户Live审查。证据redCircleFunctionalFix。\n2026-09-10T00:46:06.460424+00:00：用户要求创作库删除逻辑；统一手动/月年报告的行末菜单和左滑确认删除，删除失败独立提示、防重复操作，保留来源并复用报告invalidated契约。新增4.0m_CreationDeletionTests；12参数场景/3方法/2套件3.826秒通过，含进行中任务删除无迟到结果、失败保留与重启；SwiftLint0。16Pro已安装，取消确认保留、确认删除已取消测试创作、重启不恢复通过，3篇完成作品保留。文档/合约/证据同步，未提交。\n2026-09-10T01:03:05.506650+00:00：用户调用commit-pr-echo授权交付；当前任务提交前回归16方法/5套件69.884秒通过（含真实模型与删除），默认及所有变更Swift显式SwiftLint严格扫描0违规。进入review，准备目标dev-1.0的草稿PR；叠加前置PR#80仍在审，不标4.0l done。完整覆盖率/阶段/实机/发布未宣称通过。\n2026-09-10T01:06:21.875536+00:00：已提交468f597并推送，草稿PR#81目标dev-1.0，依赖在审PR#80；CI Build, Lint & Test已触发，当前运行中。未合并，保留review。\nPR #81 conflict resolution: sync dev-1.0 ff6c21a, retain merged Task 4.0l metadata and all three PR #80 fixes; preserve creation-library evidence and validate all declared task dependencies. Architectural review remains changes-required; see 4.0m-pr81-review.md.\n2026-09-10T02:14:09.119981+00:00 PR #81 R1/R2/R3修复：删除屏障等待同ID提交/重试并取消后删除；存储授权复用来源类型归一化；资源延后持久为deferred并提供明确继续，不写L2。修复前3测试/5参数场景出现7个目标问题，原始日志保留。最终回归11项测试/5套件通过（64.102秒，含真实模型），SwiftLint 0违规；R1/R2/R3已解决，完整CI与验收门禁保留。见4.0m-pr81-review-fixes.json。\n2026-09-10T02:34:40.382262+00:00: User-confirmed PR #81 merge verified at f524b0fbb7832c1e766833b616017588c89d71df. Task 4.0m completed; R1/R2/R3 fixes included. Full quality/device/coverage and existing artifact deferrals remain separate.",
+          "merged_at": "2026-09-10T02:33:17Z",
+          "merge_commit": "f524b0fbb7832c1e766833b616017588c89d71df"
         },
         {
           "id": "4.1",
